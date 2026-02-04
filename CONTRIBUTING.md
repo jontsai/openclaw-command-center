@@ -198,32 +198,32 @@ clawhub login
 clawhub whoami   # verify
 ```
 
-> **Registry URL workaround:** If you encounter connection or redirect issues
-> (e.g. during login, publish, or install), override the registry URL:
->
-> ```bash
-> export CLAWHUB_REGISTRY=https://www.clawhub.ai
-> # or pass inline:
-> clawhub --registry https://www.clawhub.ai publish ...
-> ```
->
-> This is needed until the upstream `.well-known` redirect is fixed.
-
 ### Publishing a New Version
 
 1. **Bump the version** in `package.json`
-2. **Publish:**
+2. **Tag the release** (see [Git Tags for Releases](#git-tags-for-releases))
+3. **Publish:**
 
    ```bash
-   clawhub publish . --slug command-center --version <new-version> \
+   clawhub publish . --registry https://www.clawhub.ai \
+     --slug command-center --version <new-version> \
      --changelog "Description of changes"
    ```
 
-   Or use auto-sync to detect and bump automatically:
+> **Note:** The `--registry` flag is required until the upstream `.well-known` redirect is fixed.
+> You can also set `export CLAWHUB_REGISTRY=https://www.clawhub.ai` to avoid passing it each time.
 
-   ```bash
-   clawhub sync --bump patch --changelog "Description of changes"
-   ```
+### Git Tags for Releases
+
+Tag each release so the [release workflow](.github/workflows/release.yml) can generate GitHub Releases automatically:
+
+```bash
+# Tag the current commit
+git tag -a v<version> -m "v<version> — short description"
+
+# Push tags
+git push origin --tags
+```
 
 ### Version Bumping
 

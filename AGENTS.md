@@ -122,22 +122,15 @@ clawhub whoami
 #    minor: new features      (0.1.0 → 0.2.0)
 #    major: breaking changes  (0.1.0 → 1.0.0)
 
-# 3. Publish
-clawhub publish . --slug command-center --version <new-version> \
+# 3. Tag the release
+git tag -a v<new-version> -m "v<new-version> — short description"
+git push origin --tags
+
+# 4. Publish (--registry flag required until upstream redirect is fixed)
+clawhub publish . --registry https://www.clawhub.ai \
+  --slug command-center --version <new-version> \
   --changelog "Description of what changed"
-
-# Or auto-detect changes and bump:
-clawhub sync --bump patch --changelog "Description of what changed"
 ```
-
-> **Registry URL workaround:** If you hit connection or redirect errors,
-> override the registry:
->
-> ```bash
-> export CLAWHUB_REGISTRY=https://www.clawhub.ai
-> ```
->
-> This is needed until the upstream `.well-known` redirect is fixed.
 
 ### Verifying a Publish
 
