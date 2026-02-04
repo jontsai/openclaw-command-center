@@ -4,11 +4,11 @@
 
 Welcome, AI agent. This document defines how you should interact with this codebase.
 
-## Mission
+## 🎯 Mission
 
 OpenClaw Command Center is the central dashboard for AI assistant management. Your mission is to help build, maintain, and improve this system while maintaining the Starcraft/Zerg thematic elements that make it unique.
 
-## Workspace Structure
+## 📁 Workspace Structure
 
 ```
 openclaw-command-center/
@@ -34,7 +34,7 @@ openclaw-command-center/
 └── package.json            # Version and dependencies
 ```
 
-## Safe Operations
+## ✅ Safe Operations
 
 Do freely:
 
@@ -44,7 +44,7 @@ Do freely:
 - Update documentation
 - Create feature branches
 
-## Ask First
+## ⚠️ Ask First
 
 Check with a human before:
 
@@ -54,14 +54,14 @@ Check with a human before:
 - Making breaking API changes
 - Anything touching authentication/secrets
 
-## Never
+## 🚫 Never
 
 - Commit secrets, API keys, or credentials
 - Delete files without confirmation
 - Push directly to `main` branch
 - Expose internal endpoints publicly
 
-## Development Workflow
+## 🛠️ Development Workflow
 
 ### 1. Feature Development
 
@@ -99,7 +99,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - JSDoc comments for public functions
 - Meaningful variable names (thematic names encouraged!)
 
-## ClawHub Skill Workflow
+## 📦 ClawHub Skill Workflow
 
 This project is distributed as a ClawHub skill. After changes are merged to `main`, they need to be published to the registry so users can install/update via `clawhub install command-center`.
 
@@ -159,7 +159,7 @@ clawhub update command-center
 
 The installed version is tracked in `.clawhub/origin.json` within the skill directory.
 
-## Thematic Guidelines
+## 🎨 Thematic Guidelines
 
 This project has a Starcraft/Zerg theme. When naming things:
 
@@ -183,7 +183,7 @@ const creepLayer = new CreepCache();
 function scanEssence()
 ```
 
-## Documentation Standards
+## 📝 Documentation Standards
 
 When you add features, document them:
 
@@ -192,7 +192,7 @@ When you add features, document them:
 3. **API docs** — In `docs/api/` for endpoints
 4. **Architecture Decision Records** — In `docs/architecture/` for major changes
 
-## Testing
+## 🧪 Testing
 
 ```bash
 # Run all tests
@@ -204,7 +204,7 @@ npm run test:coverage
 
 Aim for meaningful test coverage. Test the logic, not the framework.
 
-## Debugging
+## 🐛 Debugging
 
 ```bash
 # Enable all command-center debug output
@@ -215,7 +215,7 @@ DEBUG=openclaw:api npm run dev
 DEBUG=openclaw:overlord npm run dev
 ```
 
-## Handoff Protocol
+## 🔄 Handoff Protocol
 
 When handing off to another AI or ending a session:
 
@@ -224,7 +224,7 @@ When handing off to another AI or ending a session:
 3. List any unfinished tasks
 4. Note any decisions that need human input
 
-## Key Resources
+## 📚 Key Resources
 
 - [SKILL.md](./SKILL.md) — ClawHub skill metadata
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — Contribution guidelines
