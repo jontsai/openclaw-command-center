@@ -271,6 +271,7 @@ Contributors will be recognized in:
 
 - GitHub Contributors list
 - Release notes for significant contributions
+- Our eternal gratitude 🐛
 
 ---
 
