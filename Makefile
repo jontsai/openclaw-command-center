@@ -10,7 +10,7 @@ DASHBOARD_DIR := $(CURDIR)
 PORT := 3333
 
 .DEFAULT_GOAL := help
-.PHONY: help ensure start stop restart status logs attach clean
+.PHONY: help ensure start stop restart status logs attach clean release
 
 # Include local overrides if they exist (not tracked in git)
 -include Makefile.local
@@ -107,3 +107,12 @@ clean: ## Stop dashboard and clean logs
 	@echo "Cleaning logs..."
 	@rm -f $(LOG_FILE)
 	@echo "✅ Cleaned."
+
+release: ## Create a release (usage: make release V=0.4.0)
+ifndef V
+	@echo "Usage: make release V=<version>"
+	@echo "  e.g., make release V=0.4.0"
+	@./scripts/release.sh --current
+else
+	@./scripts/release.sh $(V)
+endif
