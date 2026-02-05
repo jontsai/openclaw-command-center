@@ -149,9 +149,9 @@
           <div class="stat-value" id="active-sessions">-</div>
           <div class="stat-label">Active (15m)</div>
         </div>
-        <div class="stat" title="What this would cost at API rates (24h)">
+        <div class="stat" title="Click for cost breakdown" onclick="openCostModal()" style="cursor: pointer;">
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label">API Cost</div>
+          <div class="stat-label">API Cost 📊</div>
         </div>
         <div class="stat" title="Savings vs API pricing (you pay flat $200/mo)" id="savings-stat" style="display: none;">
           <div class="stat-value" id="est-savings" style="color: var(--green);">-</div>
@@ -1345,6 +1345,33 @@ Jonathan Tsai (@jontsai)
           <button class="action-btn" disabled title="Coming soon">💬 Send Message</button>
           <button class="action-btn" disabled title="Coming soon">🔄 Refresh</button>
           <button class="action-btn danger" disabled title="Coming soon">🗑️ Clear Session</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cost Breakdown Modal -->
+    <div id="cost-modal-overlay" class="detail-overlay hidden" onclick="closeCostModal()"></div>
+    <div id="cost-modal" class="detail-panel hidden" style="max-width: 500px;">
+      <div class="detail-header">
+        <h2>💰 Cost Breakdown (24h)</h2>
+        <button class="close-btn" onclick="closeCostModal()">✕</button>
+      </div>
+      <div class="detail-content" id="cost-modal-content">
+        <div class="detail-section">
+          <h3>📊 Token Usage</h3>
+          <div class="detail-box" id="cost-tokens"></div>
+        </div>
+        <div class="detail-section">
+          <h3>💵 Pricing Rates (Claude Opus)</h3>
+          <div class="detail-box" id="cost-rates"></div>
+        </div>
+        <div class="detail-section">
+          <h3>🧮 Calculation</h3>
+          <div class="detail-box" id="cost-calculation"></div>
+        </div>
+        <div class="detail-section" style="background: rgba(63,185,80,0.1); border-radius: 8px; padding: 16px;">
+          <h3>✨ Your Savings</h3>
+          <div class="detail-box" id="cost-savings"></div>
         </div>
       </div>
     </div>
@@ -2653,6 +2680,88 @@ Jonathan Tsai (@jontsai)
           document.getElementById("detail-panel").classList.add("hidden");
           document.getElementById("detail-overlay").classList.add("hidden");
         }, 200);
+      }
+
+      // Cost breakdown modal
+      let cachedCostData = null;
+      
+      async function openCostModal() {
+        document.getElementById("cost-modal").classList.remove("hidden");
+        document.getElementById("cost-modal").classList.add("visible");
+        document.getElementById("cost-modal-overlay").classList.remove("hidden");
+        document.getElementById("cost-modal-overlay").classList.add("visible");
+        
+        // Fetch cost breakdown data
+        try {
+          const res = await fetch("/api/cost-breakdown");
+          const data = await res.json();
+          cachedCostData = data;
+          renderCostBreakdown(data);
+        } catch (e) {
+          document.getElementById("cost-tokens").innerHTML = '<em style="color:var(--red)">Failed to load cost data</em>';
+        }
+      }
+      
+      function closeCostModal() {
+        document.getElementById("cost-modal").classList.remove("visible");
+        document.getElementById("cost-modal-overlay").classList.remove("visible");
+        setTimeout(() => {
+          document.getElementById("cost-modal").classList.add("hidden");
+          document.getElementById("cost-modal-overlay").classList.add("hidden");
+        }, 200);
+      }
+      
+      function renderCostBreakdown(data) {
+        // Token usage
+        document.getElementById("cost-tokens").innerHTML = `
+          <div class="detail-row"><span class="detail-label">Input Tokens</span><span class="detail-value">${data.inputTokens?.toLocaleString() || 0}</span></div>
+          <div class="detail-row"><span class="detail-label">Output Tokens</span><span class="detail-value">${data.outputTokens?.toLocaleString() || 0}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">${data.cacheRead?.toLocaleString() || 0}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">${data.cacheWrite?.toLocaleString() || 0}</span></div>
+          <div class="detail-row"><span class="detail-label">API Requests</span><span class="detail-value">${data.requests?.toLocaleString() || 0}</span></div>
+        `;
+        
+        // Pricing rates
+        document.getElementById("cost-rates").innerHTML = `
+          <div class="detail-row"><span class="detail-label">Input</span><span class="detail-value">$${data.rates?.input || '15.00'}/1M tokens</span></div>
+          <div class="detail-row"><span class="detail-label">Output</span><span class="detail-value">$${data.rates?.output || '75.00'}/1M tokens</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">$${data.rates?.cacheRead || '1.50'}/1M tokens (90% discount)</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">$${data.rates?.cacheWrite || '18.75'}/1M tokens (25% premium)</span></div>
+        `;
+        
+        // Calculation breakdown
+        const calc = data.calculation || {};
+        document.getElementById("cost-calculation").innerHTML = `
+          <div class="detail-row"><span class="detail-label">Input Cost</span><span class="detail-value">$${calc.inputCost?.toFixed(4) || '0.00'}</span></div>
+          <div class="detail-row"><span class="detail-label">Output Cost</span><span class="detail-value">$${calc.outputCost?.toFixed(4) || '0.00'}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Read Cost</span><span class="detail-value">$${calc.cacheReadCost?.toFixed(4) || '0.00'}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Write Cost</span><span class="detail-value">$${calc.cacheWriteCost?.toFixed(4) || '0.00'}</span></div>
+          <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
+            <span class="detail-label"><strong>Total API Cost</strong></span>
+            <span class="detail-value"><strong>$${data.totalCost?.toFixed(2) || '0.00'}</strong></span>
+          </div>
+        `;
+        
+        // Savings
+        const savings = (data.totalCost || 0) - (data.planCost || 200);
+        const savingsPercent = data.totalCost > 0 ? Math.round((savings / data.totalCost) * 100) : 0;
+        document.getElementById("cost-savings").innerHTML = savings > 0 ? `
+          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
+          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${data.totalCost?.toFixed(2) || '0.00'}</span></div>
+          <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
+            <span class="detail-label"><strong>You Saved</strong></span>
+            <span class="detail-value" style="color: var(--green);"><strong>$${savings.toFixed(2)} (${savingsPercent}%)</strong></span>
+          </div>
+          <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
+            💡 At this rate, your monthly API cost would be ~$${(data.totalCost * 30).toFixed(0)}/mo vs your $${data.planCost}/mo plan.
+          </p>
+        ` : `
+          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
+          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${data.totalCost?.toFixed(2) || '0.00'}</span></div>
+          <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
+            📈 Keep going! Once your 24h API cost exceeds $${data.planCost || 200}, you'll start seeing savings.
+          </p>
+        `;
       }
 
       async function fetchSessionDetail(key) {
