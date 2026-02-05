@@ -2994,8 +2994,12 @@ Jonathan Tsai (@jontsai)
             const statusClass = ageHours > 2 ? "stale" : s.tokens > 1000 ? "active" : "idle";
             const statusText = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
 
+            // Build the session key for detail panel
+            const sessionKey = `agent:main:subagent:${s.id}`;
+            const label = s.task || `Sub-agent ${s.shortId}`;
+            
             return `
-                    <div class="subagent-card ${statusClass}">
+                    <div class="subagent-card ${statusClass}" onclick="openDetail('${escapeHtml(sessionKey)}', '${escapeHtml(label.substring(0, 60))}')" style="cursor: pointer;">
                         <div class="subagent-header">
                             <div class="subagent-info">
                                 <h4>${escapeHtml(s.task || s.id)}</h4>
