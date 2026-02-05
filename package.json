@@ -37,12 +37,9 @@
   },
   "homepage": "https://github.com/jontsai/openclaw-command-center#readme",
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=18.0.0"
   },
-  "dependencies": {
-    "express": "^4.18.2",
-    "ws": "^8.16.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "eslint": "^8.56.0",
     "prettier": "^3.2.4"
