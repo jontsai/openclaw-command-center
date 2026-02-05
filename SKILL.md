@@ -1,118 +1,92 @@
 ---
 name: command-center
-description: Web dashboard for monitoring and controlling OpenClaw instances. Provides real-time session monitoring, LLM usage tracking, Linear integration, and multi-instance management. Use when setting up a command center dashboard, monitoring agent sessions, or managing OpenClaw deployments across multiple machines.
+description: Real-time dashboard for OpenClaw. Monitor sessions, LLM usage, system vitals, and cron jobs. Zero config, auto-detects your workspace.
 ---
 
 # OpenClaw Command Center
 
-A web-based dashboard for monitoring and controlling OpenClaw instances.
-
-## Features
-
-- **Session Monitoring** — Real-time view of active sessions across instances
-- **LLM Usage Tracking** — Token consumption, costs, model distribution
-- **Linear Integration** — View and manage issues from the dashboard
-- **Topic Classification** — Automatic Slack topic tagging
-- **Multi-Instance Support** — Monitor multiple OpenClaw deployments
+Real-time dashboard for your OpenClaw agents.
 
 ## Quick Start
 
 ```bash
-# Navigate to skill directory
-cd "$(clawhub list | grep command-center | awk '{print $2}')"
+# Install
+clawhub install command-center
 
-# Install dependencies
-npm install
-
-# Configure (copy and edit)
-cp config/dashboard.example.json config/dashboard.json
-
-# Start server
-npm start
-# Or with tmux management:
-make start
+# Start
+cd skills/command-center && node lib/server.js
 ```
 
-Dashboard runs at http://localhost:3333
+**That's it.** Dashboard runs at http://localhost:3333
 
-## Configuration
+## What You'll See
 
-Edit `config/dashboard.json`:
+- 📊 **Sessions** — Who's talking to your agents right now
+- ⛽ **LLM Usage** — Token consumption, costs, quota remaining
+- 💻 **System Vitals** — CPU, memory, disk health
+- ⏰ **Cron Jobs** — Scheduled tasks and their status
+- 🧠 **Cerebro** — Topics your agents are discussing
 
-```json
-{
-  "port": 3333,
-  "auth": {
-    "mode": "tailscale",
-    "allowedUsers": ["you@github"]
-  },
-  "branding": {
-    "name": "My Command Center",
-    "theme": "default"
-  },
-  "paths": {
-    "openclaw": "~/.openclaw",
-    "memory": "~/your-workspace/memory",
-    "state": "~/your-workspace/state"
-  }
-}
-```
+## Zero Config
 
-### Auth Modes
+Command Center **auto-detects** your OpenClaw workspace. No config file needed.
 
-| Mode         | Description                              |
-| ------------ | ---------------------------------------- |
-| `none`       | No authentication (local only)           |
-| `tailscale`  | Tailscale identity headers               |
-| `cloudflare` | Cloudflare Access headers                |
-| `token`      | Bearer token (`DASHBOARD_TOKEN` env var) |
+It looks for:
+1. `$OPENCLAW_WORKSPACE` environment variable
+2. `~/.openclaw-workspace` or `~/openclaw-workspace`
+3. Common names: `~/molty`, `~/clawd`, `~/moltbot`
 
-## Makefile Commands
+## Security
+
+By default, only accessible from `localhost`. To expose remotely:
 
 ```bash
-make start    # Start in tmux
-make stop     # Stop server
-make restart  # Restart
-make status   # Check status
-make logs     # Tail logs
-make attach   # Attach to tmux session
+# Tailscale (recommended)
+DASHBOARD_AUTH_MODE=tailscale node lib/server.js
+
+# Token-based
+DASHBOARD_AUTH_MODE=token DASHBOARD_TOKEN=your-secret node lib/server.js
 ```
 
-## Environment Variables
-
-| Variable                  | Description                    | Default   |
-| ------------------------- | ------------------------------ | --------- |
-| `PORT`                    | Server port                    | 3333      |
-| `DASHBOARD_AUTH_MODE`     | Auth mode                      | tailscale |
-| `DASHBOARD_TOKEN`         | Bearer token (if mode=token)   | —         |
-| `DASHBOARD_ALLOWED_USERS` | Comma-separated allowed users  | —         |
-| `LINEAR_API_KEY`          | Linear API key for integration | —         |
-
-## Standalone Installation
-
-For use outside ClawHub:
+## Optional: Run in Background
 
 ```bash
-git clone https://github.com/jontsai/openclaw-command-center
-cd openclaw-command-center
-npm install
-cp config/dashboard.example.json config/dashboard.json
-# Edit config/dashboard.json
-npm start
+# Using make
+make start    # Starts in tmux
+make stop     # Stops the server
+make status   # Check if running
+
+# Or manually
+nohup node lib/server.js &
 ```
 
-## Extending
+## Configuration (Optional)
 
-Create `Makefile.local` for private commands (gitignored):
+Most users don't need this. Environment variables for advanced use:
 
-```makefile
-lfg: ## Start and attach
-	@$(MAKE) start
-	@$(MAKE) attach
-```
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `3333` |
+| `OPENCLAW_WORKSPACE` | Workspace path | Auto-detect |
+| `OPENCLAW_PROFILE` | Profile name | (none) |
+| `DASHBOARD_AUTH_MODE` | Auth: `none`, `token`, `tailscale`, `cloudflare` | `none` |
 
 ## Requirements
 
-- Node.js 20+
-- tmux (optional, for managed sessions)
-- OpenClaw instance(s) to monitor
+- Node.js 18+ (no npm install needed)
+- OpenClaw workspace
+
+## Troubleshooting
+
+**Dashboard shows no data?**
+- Make sure OpenClaw is running and has active sessions
+- Check that your workspace path is correct
+
+**Can't connect?**
+- Default port is 3333: http://localhost:3333
+- Check if another process is using the port: `lsof -i:3333`
+
+## Links
+
+- [GitHub](https://github.com/jontsai/openclaw-command-center)
+- [ClawHub](https://clawhub.ai/jontsai/command-center)
