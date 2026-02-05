@@ -2261,7 +2261,7 @@ Jonathan Tsai (@jontsai)
           document.getElementById("sonnet-weekly-remaining").textContent = "N/A";
           document.getElementById("sonnet-weekly-reset").textContent = "Auth Error";
           
-          // Compact cards
+          // Compact cards - Claude
           const compactSessionEl = document.getElementById("claude-compact-session-pct");
           const compactSessionBar = document.getElementById("claude-compact-session-bar");
           if (compactSessionEl) compactSessionEl.textContent = "N/A";
@@ -2276,6 +2276,23 @@ Jonathan Tsai (@jontsai)
             compactWeekBar.style.width = "0%";
             compactWeekBar.className = "quota-bar-fill gray";
           }
+          
+          // Compact cards - Codex (show 0% but with gray bars since we don't track Codex via API)
+          const codex5hEl = document.getElementById("codex-5h-pct");
+          const codex5hBar = document.getElementById("codex-5h-bar");
+          const codexDayEl = document.getElementById("codex-day-pct");
+          const codexDayBar = document.getElementById("codex-day-bar");
+          if (codex5hEl) codex5hEl.textContent = "0%";
+          if (codex5hBar) {
+            codex5hBar.style.width = "0%";
+            codex5hBar.className = "quota-bar-fill low";
+          }
+          if (codexDayEl) codexDayEl.textContent = "0%";
+          if (codexDayBar) {
+            codexDayBar.style.width = "0%";
+            codexDayBar.className = "quota-bar-fill low";
+          }
+          document.getElementById("codex-tasks").textContent = "0 total";
           
           document.getElementById("llm-sync-time").textContent = errorMsg;
           
