@@ -4926,9 +4926,19 @@
       }
 
       // Init - try SSE first, fall back to polling
-      connectSSE();
-      // Also do an initial fetch to populate immediately
-      fetchData();
+      function init() {
+        connectSSE();
+        // Fetch data after short delay to ensure DOM is ready
+        // This fixes a race condition on initial page load
+        setTimeout(fetchData, 100);
+      }
+
+      // Ensure DOM is ready before initializing
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        setTimeout(init, 0);
+      }
     </script>
 
     <!-- Toast notifications container -->
