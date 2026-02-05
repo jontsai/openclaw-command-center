@@ -1,152 +1,224 @@
-# OpenClaw Command Center
+# 🦞 OpenClaw Command Center
 
-🦞 **A Starcraft-inspired dashboard for AI agent orchestration**
+<div align="center">
 
-> "Spawn more Overlords!"
+**Mission control for your AI agents**
 
-Real-time monitoring and control for [OpenClaw](https://github.com/openclaw/openclaw) AI assistant deployments.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![ClawHub](https://img.shields.io/badge/ClawHub-command--center-blue)](https://www.clawhub.ai/jontsai/command-center)
+
+[Features](#features) • [Quick Start](#quick-start) • [Security](#-security) • [Configuration](#configuration)
+
+</div>
+
+---
+
+## Why Command Center?
+
+Your AI agents are running 24/7. You need to know what they're doing.
+
+Command Center gives you **real-time visibility** into your OpenClaw deployment — sessions, costs, system health, scheduled tasks — all in one secure dashboard.
+
+### ⚡ Fast
+
+- **Single API call** — unified state endpoint, not 16+ separate requests
+- **2-second updates** — real-time SSE push, not polling
+- **5-second cache** — backend stays responsive under load
+- **Instant startup** — no build step, no compilation
+
+### 🪶 Lightweight
+
+- **Zero dependencies** for users — just Node.js
+- **~200KB total** — dashboard + server
+- **No webpack/vite/bundler** — runs directly
+- **No React/Vue/Angular** — vanilla JS, works everywhere
+
+### 📱 Responsive
+
+- **Desktop & mobile** — works on any screen size
+- **Dark mode** — easy on the eyes, Starcraft-inspired
+- **Live updates** — no manual refresh needed
+- **Offline-friendly** — graceful degradation
+
+### 🔧 Modern
+
+- **ES Modules** — clean component architecture
+- **SSE streaming** — efficient real-time updates
+- **REST API** — integrate with your tools
+- **TypeScript-ready** — JSDoc types included
+
+### 🔒 Security (Most Important)
+
+Command Center takes security seriously:
+
+| Feature | Description |
+|---------|-------------|
+| **Auth Modes** | Token, Tailscale, Cloudflare Access, IP allowlist |
+| **No external calls** | Dashboard runs 100% locally — no telemetry, no CDNs |
+| **Localhost default** | Binds to `127.0.0.1` by default |
+| **Read-only by default** | View your agents without exposing control |
+| **No secrets in UI** | API keys, tokens never displayed |
+| **Audit logging** | Know who accessed what, when |
+
+```bash
+# Secure deployment example (Tailscale)
+DASHBOARD_AUTH_MODE=tailscale node lib/server.js
+# Only users on your Tailscale network can access
+```
+
+---
 
 ## Features
 
-- **Session Monitoring** — Real-time view of active AI sessions
-- **LLM Usage Tracking** — Token consumption, costs, model distribution
-- **System Vitals** — CPU, memory, disk, network metrics
-- **Gateway Status** — OpenClaw gateway health and configuration
-- **Cron Jobs** — View and manage scheduled tasks
-- **Linear Integration** — View issues from the dashboard
-- **Topic Classification** — Automatic conversation tagging
+| Feature | Description |
+|---------|-------------|
+| 📊 **Session Monitoring** | Real-time view of active AI sessions |
+| ⛽ **LLM Fuel Gauges** | Token usage, costs, quota remaining |
+| 💻 **System Vitals** | CPU, memory, disk, temperature |
+| ⏰ **Cron Jobs** | View and manage scheduled tasks |
+| 🧠 **Cerebro Topics** | Automatic conversation tagging |
+| 👥 **Operators** | Who's talking to your agents |
+| 📝 **Memory Browser** | View agent memory files |
+
+---
 
 ## Quick Start
 
+### Option 1: ClawHub (Recommended)
+
 ```bash
-# Clone
-git clone https://github.com/jontsai/openclaw-command-center
-cd openclaw-command-center
-
-# Run setup (installs deps, creates config)
-./scripts/setup.sh
-
-# Start dashboard
-make start
+clawhub install command-center
+cd skills/command-center
+node lib/server.js
 ```
 
-Dashboard runs at http://localhost:3333
+### Option 2: Git Clone
 
-### Zero-Config Experience
+```bash
+git clone https://github.com/jontsai/openclaw-command-center
+cd openclaw-command-center
+npm install  # Optional: only for dev tools
+node lib/server.js
+```
 
-The dashboard **auto-detects** your OpenClaw workspace by checking:
+### Option 3: One-liner
+
+```bash
+npx degit jontsai/openclaw-command-center dashboard && cd dashboard && node lib/server.js
+```
+
+**Dashboard runs at http://localhost:3333** 🎉
+
+---
+
+## Zero-Config Experience
+
+Command Center **auto-detects** your OpenClaw workspace:
 
 1. `$OPENCLAW_WORKSPACE` environment variable
-2. `~/openclaw-workspace` or `~/.openclaw-workspace`
-3. `~/molty`, `~/clawd`, `~/moltbot` (common names)
+2. `~/.openclaw-workspace` or `~/openclaw-workspace`
+3. Common names: `~/molty`, `~/clawd`, `~/moltbot`
 
-If you have an existing workspace with `memory/` or `state/` directories, it will be found automatically.
+If you have `memory/` or `state/` directories, you're good to go.
+
+---
 
 ## Configuration
 
 ### Environment Variables
 
-| Variable               | Description                | Default                 |
-| ---------------------- | -------------------------- | ----------------------- |
-| `PORT`                 | Server port                | `3333`                  |
-| `OPENCLAW_WORKSPACE`   | Workspace root directory   | `~/.openclaw-workspace` |
-| `OPENCLAW_MEMORY_DIR`  | Memory/logs directory      | `$WORKSPACE/memory`     |
-| `OPENCLAW_STATE_DIR`   | State files directory      | `$WORKSPACE/state`      |
-| `OPENCLAW_CEREBRO_DIR` | Cerebro topic directory    | `$WORKSPACE/cerebro`    |
-| `OPENCLAW_JOBS_DIR`    | Jobs definitions directory | `$WORKSPACE/jobs`       |
-| `OPENCLAW_SKILLS_DIR`  | Skills directory           | `$WORKSPACE/skills`     |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PORT` | Server port | `3333` |
+| `OPENCLAW_WORKSPACE` | Workspace root | Auto-detect |
+| `OPENCLAW_PROFILE` | Profile name | (none) |
 
-### Authentication
+### 🔒 Authentication
 
-| Variable                  | Description                                                        |
-| ------------------------- | ------------------------------------------------------------------ |
-| `DASHBOARD_AUTH_MODE`     | Auth mode: `none`, `token`, `tailscale`, `cloudflare`, `allowlist` |
-| `DASHBOARD_TOKEN`         | Bearer token (when mode=`token`)                                   |
-| `DASHBOARD_ALLOWED_USERS` | Comma-separated allowed users                                      |
-| `DASHBOARD_ALLOWED_IPS`   | Comma-separated allowed IPs (when mode=`allowlist`)                |
+| Mode | Use Case | Config |
+|------|----------|--------|
+| `none` | Local dev | `DASHBOARD_AUTH_MODE=none` |
+| `token` | API access | `DASHBOARD_AUTH_MODE=token DASHBOARD_TOKEN=secret` |
+| `tailscale` | Team access | `DASHBOARD_AUTH_MODE=tailscale` |
+| `cloudflare` | Public deploy | `DASHBOARD_AUTH_MODE=cloudflare` |
+| `allowlist` | IP whitelist | `DASHBOARD_AUTH_MODE=allowlist DASHBOARD_ALLOWED_IPS=...` |
 
-### Integration
+### Multi-Profile Support
 
-| Variable         | Description                          |
-| ---------------- | ------------------------------------ |
-| `LINEAR_API_KEY` | Linear API key for issue integration |
-
-## Using with Makefile
+Running multiple OpenClaw instances?
 
 ```bash
-# Show available commands
-make help
+# Production dashboard
+node lib/server.js --profile production --port 3333
 
-# Start dashboard in tmux
-make start
-
-# View status
-make status
-
-# Attach to tmux session
-make attach
-
-# Stop dashboard
-make stop
+# Development dashboard  
+node lib/server.js --profile dev --port 3334
 ```
 
-### Private Commands
+---
 
-Create `Makefile.local` for custom commands (gitignored):
+## API
 
-```makefile
-lfg: ## Start and attach in one command
-	@$(MAKE) start
-	@$(MAKE) attach
-```
+Command Center exposes a REST API:
 
-## ClawHub
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/state` | **Unified state** — all dashboard data in one call |
+| `GET /api/health` | Health check |
+| `GET /api/vitals` | System metrics |
+| `GET /api/sessions` | Active sessions |
+| `GET /api/events` | SSE stream for real-time updates |
 
-**Registry:** https://www.clawhub.ai/jontsai/command-center
-
-```bash
-clawhub install command-center
-```
-
-See [SKILL.md](SKILL.md) for ClawHub usage.
+---
 
 ## Architecture
 
 ```
 command-center/
 ├── lib/
-│   ├── server.js           # Main HTTP server
-│   ├── jobs.js             # Jobs API integration
-│   ├── linear-sync.js      # Linear API integration
-│   └── topic-classifier.js # Topic ML classifier
+│   ├── server.js           # HTTP server + API
+│   ├── config.js           # Configuration
+│   └── jobs.js             # Cron integration
 ├── public/
-│   ├── index.html          # Main dashboard UI
-│   └── jobs.html           # Jobs management UI
-├── scripts/
-│   ├── start.sh            # Start server
-│   ├── stop.sh             # Stop server
-│   └── tmux-dashboard.sh   # tmux layout script
-└── config/
-    └── dashboard.example.json
+│   ├── index.html          # Dashboard UI
+│   └── js/                 # Components (ES modules)
+└── scripts/
+    ├── setup.sh            # First-time setup
+    └── verify.sh           # Health check
 ```
 
-## Development
+---
 
-```bash
-# Watch mode
-npm run dev
+## Screenshots
 
-# Lint
-npm run lint
+*Coming soon*
 
-# Format
-npm run format
-```
-
-## License
-
-MIT
+---
 
 ## Contributing
 
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Development
+
+```bash
+npm install        # Install dev dependencies
+npm run dev        # Watch mode
+npm run lint       # Check code style
+npm run format     # Auto-format
+./scripts/verify.sh  # Run health checks
+```
+
+---
+
+## License
+
+MIT © [Jonathan Tsai](https://github.com/jontsai)
+
+---
+
+<div align="center">
+
+**[ClawHub](https://clawhub.ai)** · **[OpenClaw](https://github.com/openclaw/openclaw)** · **[Discord](https://discord.gg/clawd)**
+
+</div>
