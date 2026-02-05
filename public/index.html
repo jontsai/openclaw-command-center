@@ -151,7 +151,7 @@
         </div>
         <div class="stat" title="Click for cost breakdown" onclick="openCostModal()" style="cursor: pointer;">
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label">API Cost 📊</div>
+          <div class="stat-label">API Cost (24h) 📊</div>
         </div>
         <div class="stat" title="Savings vs API pricing (you pay flat $200/mo)" id="savings-stat" style="display: none;">
           <div class="stat-value" id="est-savings" style="color: var(--green);">-</div>
@@ -2711,14 +2711,19 @@ Jonathan Tsai (@jontsai)
         }, 200);
       }
       
+      // Format currency with commas
+      function formatCurrency(n, decimals = 2) {
+        return (n || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      }
+      
       function renderCostBreakdown(data) {
         // Token usage
         document.getElementById("cost-tokens").innerHTML = `
-          <div class="detail-row"><span class="detail-label">Input Tokens</span><span class="detail-value">${data.inputTokens?.toLocaleString() || 0}</span></div>
-          <div class="detail-row"><span class="detail-label">Output Tokens</span><span class="detail-value">${data.outputTokens?.toLocaleString() || 0}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">${data.cacheRead?.toLocaleString() || 0}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">${data.cacheWrite?.toLocaleString() || 0}</span></div>
-          <div class="detail-row"><span class="detail-label">API Requests</span><span class="detail-value">${data.requests?.toLocaleString() || 0}</span></div>
+          <div class="detail-row"><span class="detail-label">Input Tokens</span><span class="detail-value">${(data.inputTokens || 0).toLocaleString()}</span></div>
+          <div class="detail-row"><span class="detail-label">Output Tokens</span><span class="detail-value">${(data.outputTokens || 0).toLocaleString()}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">${(data.cacheRead || 0).toLocaleString()}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">${(data.cacheWrite || 0).toLocaleString()}</span></div>
+          <div class="detail-row"><span class="detail-label">API Requests</span><span class="detail-value">${(data.requests || 0).toLocaleString()}</span></div>
         `;
         
         // Pricing rates
@@ -2732,32 +2737,33 @@ Jonathan Tsai (@jontsai)
         // Calculation breakdown
         const calc = data.calculation || {};
         document.getElementById("cost-calculation").innerHTML = `
-          <div class="detail-row"><span class="detail-label">Input Cost</span><span class="detail-value">$${calc.inputCost?.toFixed(4) || '0.00'}</span></div>
-          <div class="detail-row"><span class="detail-label">Output Cost</span><span class="detail-value">$${calc.outputCost?.toFixed(4) || '0.00'}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Read Cost</span><span class="detail-value">$${calc.cacheReadCost?.toFixed(4) || '0.00'}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Write Cost</span><span class="detail-value">$${calc.cacheWriteCost?.toFixed(4) || '0.00'}</span></div>
+          <div class="detail-row"><span class="detail-label">Input Cost</span><span class="detail-value">$${formatCurrency(calc.inputCost, 2)}</span></div>
+          <div class="detail-row"><span class="detail-label">Output Cost</span><span class="detail-value">$${formatCurrency(calc.outputCost, 2)}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Read Cost</span><span class="detail-value">$${formatCurrency(calc.cacheReadCost, 2)}</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Write Cost</span><span class="detail-value">$${formatCurrency(calc.cacheWriteCost, 2)}</span></div>
           <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
             <span class="detail-label"><strong>Total API Cost</strong></span>
-            <span class="detail-value"><strong>$${data.totalCost?.toFixed(2) || '0.00'}</strong></span>
+            <span class="detail-value"><strong>$${formatCurrency(data.totalCost)}</strong></span>
           </div>
         `;
         
         // Savings
         const savings = (data.totalCost || 0) - (data.planCost || 200);
         const savingsPercent = data.totalCost > 0 ? Math.round((savings / data.totalCost) * 100) : 0;
+        const monthlyProjection = Math.round(data.totalCost * 30);
         document.getElementById("cost-savings").innerHTML = savings > 0 ? `
           <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
-          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${data.totalCost?.toFixed(2) || '0.00'}</span></div>
+          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
           <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
             <span class="detail-label"><strong>You Saved</strong></span>
-            <span class="detail-value" style="color: var(--green);"><strong>$${savings.toFixed(2)} (${savingsPercent}%)</strong></span>
+            <span class="detail-value" style="color: var(--green);"><strong>$${formatCurrency(savings)} (${savingsPercent}%)</strong></span>
           </div>
           <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-            💡 At this rate, your monthly API cost would be ~$${(data.totalCost * 30).toFixed(0)}/mo vs your $${data.planCost}/mo plan.
+            💡 At this rate, your monthly API cost would be ~$${monthlyProjection.toLocaleString()}/mo vs your $${data.planCost}/mo plan.
           </p>
         ` : `
           <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
-          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${data.totalCost?.toFixed(2) || '0.00'}</span></div>
+          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
           <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
             📈 Keep going! Once your 24h API cost exceeds $${data.planCost || 200}, you'll start seeing savings.
           </p>
