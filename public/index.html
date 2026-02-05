@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenClaw Command Center</title>
     <link rel="stylesheet" href="css/dashboard.css">
+    <script src="js/lib/morphdom.min.js"></script>
   </head>
   <body>
     <!-- Sidebar -->
@@ -1375,6 +1376,25 @@
         return div.innerHTML;
       }
 
+      // Smart DOM update using morphdom - only patches what changed
+      function smartUpdate(targetEl, newHtml) {
+        if (typeof morphdom === 'undefined') {
+          // Fallback if morphdom not loaded
+          targetEl.innerHTML = newHtml;
+          return;
+        }
+        // Create a temporary container with the new content
+        const temp = document.createElement('div');
+        temp.innerHTML = newHtml;
+        // If target has single child and temp has single child, morph directly
+        if (targetEl.children.length === 1 && temp.children.length === 1) {
+          morphdom(targetEl.firstElementChild, temp.firstElementChild);
+        } else {
+          // Otherwise morph the container itself
+          morphdom(targetEl, temp, { childrenOnly: true });
+        }
+      }
+
       // Sidebar toggle
       function toggleSidebar() {
         sidebarCollapsed = !sidebarCollapsed;
@@ -1733,14 +1753,14 @@
         // Removed: fallback to updateFilterCounts(sessions) which only counted current page
 
         if (sessions.length === 0) {
-          sessionsEl.innerHTML = `
+          smartUpdate(sessionsEl, `
                     <div class="empty-state">
                         <div class="empty-state-icon">📡</div>
                         <div class="empty-state-text">No active sessions</div>
                     </div>
-                `;
+                `);
         } else {
-          sessionsEl.innerHTML = sessions
+          smartUpdate(sessionsEl, sessions
             .sort((a, b) => a.minutesAgo - b.minutesAgo)
             .map((s) => {
               const iconClass =
@@ -1858,7 +1878,7 @@
                     </div>
                     `;
             })
-            .join("");
+            .join(""));
         }
 
         applyFilter();
@@ -1871,14 +1891,14 @@
         document.getElementById("nav-cron-count").textContent = cron.length;
 
         if (cron.length === 0) {
-          cronEl.innerHTML = `
+          smartUpdate(cronEl, `
                     <div class="empty-state">
                         <div class="empty-state-icon">⏰</div>
                         <div class="empty-state-text">No scheduled jobs</div>
                     </div>
-                `;
+                `);
         } else {
-          cronEl.innerHTML = cron
+          smartUpdate(cronEl, cron
             .map((c) => {
               const humanSchedule = c.scheduleHuman
                 ? `<div class="cron-schedule-human">${escapeHtml(c.scheduleHuman)}</div>`
@@ -1900,7 +1920,7 @@
                     </div>
                 `;
             })
-            .join("");
+            .join(""));
         }
       }
 
@@ -1915,7 +1935,7 @@
         document.getElementById("nav-operator-count").textContent = operatorsData.length;
 
         if (operatorsData.length === 0) {
-          operatorsEl.innerHTML = `
+          smartUpdate(operatorsEl, `
                     <div class="empty-state">
                         <div class="empty-state-icon">👥</div>
                         <div class="empty-state-text">No operators configured</div>
@@ -1923,9 +1943,9 @@
                             Operators are auto-detected from session activity
                         </div>
                     </div>
-                `;
+                `);
         } else {
-          operatorsEl.innerHTML = operatorsData
+          smartUpdate(operatorsEl, operatorsData
             .map((op) => {
               const roleClass = op.role || "user";
               const initial = (op.name || op.username || "?").charAt(0).toUpperCase();
@@ -1970,7 +1990,7 @@
                     </div>
                     `;
             })
-            .join("");
+            .join(""));
         }
       }
 
