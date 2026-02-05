@@ -642,6 +642,14 @@
               >
                 📱 Telegram
               </button>
+              <button
+                class="filter-btn"
+                data-filter="discord"
+                data-group="session-channel"
+                onclick="setSessionFilter('channel', 'discord')"
+              >
+                🎮 Discord
+              </button>
             </div>
             <div class="filter-group">
               <span class="filter-label">Kind:</span>
@@ -668,6 +676,14 @@
                 onclick="setSessionFilter('kind', 'subagent')"
               >
                 Subagent
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="cron"
+                data-group="session-kind"
+                onclick="setSessionFilter('kind', 'cron')"
+              >
+                ⏰ Cron
               </button>
             </div>
           </div>
