@@ -985,6 +985,7 @@
                   Cerebro tracks conversation topics and threads across sessions.
                 </p>
                 <div
+                  id="cerebro-init-commands"
                   style="
                     background: var(--bg);
                     border-radius: 8px;
@@ -997,11 +998,11 @@
                   <div style="color: var(--text-muted); margin-bottom: 8px">
                     # To initialize Cerebro:
                   </div>
-                  <div style="color: var(--accent)">
-                    mkdir -p ~/.openclaw-workspace/cerebro/topics
+                  <div style="color: var(--accent)" id="cerebro-init-topics-cmd">
+                    mkdir -p ~/cerebro/topics
                   </div>
-                  <div style="color: var(--accent)">
-                    mkdir -p ~/.openclaw-workspace/cerebro/orphans
+                  <div style="color: var(--accent)" id="cerebro-init-orphans-cmd">
+                    mkdir -p ~/cerebro/orphans
                   </div>
                 </div>
               </div>
@@ -2431,11 +2432,18 @@
         const initEl = document.getElementById("cerebro-initialized");
 
         if (!cerebro || !cerebro.initialized) {
-          // Show not initialized state
+          // Show not initialized state with dynamic path
           notInitEl.style.display = "block";
           initEl.style.display = "none";
           document.getElementById("cerebro-count").textContent = "not initialized";
           document.getElementById("nav-cerebro-count").textContent = "-";
+          
+          // Update init commands with actual configured path
+          if (cerebro && cerebro.cerebroPath) {
+            const basePath = cerebro.cerebroPath.replace(/^\/Users\/[^/]+/, '~');
+            document.getElementById("cerebro-init-topics-cmd").textContent = `mkdir -p ${basePath}/topics`;
+            document.getElementById("cerebro-init-orphans-cmd").textContent = `mkdir -p ${basePath}/orphans`;
+          }
           return;
         }
 

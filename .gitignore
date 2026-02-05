@@ -102,3 +102,4 @@ docs/_build/
 # Misc
 *.bak
 *.backup
+config/dashboard.local.json
