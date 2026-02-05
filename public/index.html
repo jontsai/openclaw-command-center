@@ -2566,13 +2566,53 @@
       }
 
       async function fetchSessionDetail(key) {
+        // Handle null/undefined sessionKey
+        if (!key) {
+          console.error("fetchSessionDetail: no session key provided");
+          renderDetailError("No session key provided");
+          return;
+        }
+
+        // Add timeout to prevent hanging forever
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
         try {
-          const res = await fetch(`/api/session?key=${encodeURIComponent(key)}`);
+          const res = await fetch(`/api/session?key=${encodeURIComponent(key)}`, {
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+
           const data = await res.json();
+
+          // Check for API error response
+          if (data.error) {
+            console.error("API error:", data.error);
+            renderDetailError(data.error);
+            return;
+          }
+
           renderDetail(data);
         } catch (e) {
+          clearTimeout(timeoutId);
           console.error("Failed to fetch detail:", e);
+          const msg = e.name === 'AbortError' ? 'Request timed out' : (e.message || 'Failed to load session');
+          renderDetailError(msg);
         }
+      }
+
+      function renderDetailError(message) {
+        const errorHtml = `<em style="color: var(--red, #ff6b6b)">⚠️ ${escapeHtml(message)}</em>`;
+        ["overview", "summary", "links", "attention", "facts", "tools", "messages"].forEach(
+          (id) => {
+            const el = document.getElementById(`detail-${id}`);
+            if (el) el.innerHTML = errorHtml;
+          },
+        );
       }
 
       function renderDetail(data) {
