@@ -149,9 +149,13 @@
           <div class="stat-value" id="active-sessions">-</div>
           <div class="stat-label">Active (15m)</div>
         </div>
-        <div class="stat">
+        <div class="stat" title="What this would cost at API rates (24h)">
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label">Est. Cost</div>
+          <div class="stat-label">API Cost</div>
+        </div>
+        <div class="stat" title="Savings vs API pricing (you pay flat $200/mo)" id="savings-stat" style="display: none;">
+          <div class="stat-value" id="est-savings" style="color: var(--green);">-</div>
+          <div class="stat-label">Savings 💰</div>
         </div>
         <div class="stat" title="Main session capacity">
           <div class="stat-value" id="main-capacity">-</div>
@@ -2017,6 +2021,17 @@ Jonathan Tsai (@jontsai)
         document.getElementById("est-cost").textContent = stats.estCost || "$0.00";
         document.getElementById("nav-tokens").textContent = stats.total || "0";
         document.getElementById("nav-cost").textContent = stats.estCost || "$0.00";
+        
+        // Show savings if positive
+        const savingsStat = document.getElementById("savings-stat");
+        const savingsEl = document.getElementById("est-savings");
+        if (stats.estSavings && savingsStat && savingsEl) {
+          savingsEl.textContent = stats.estSavings;
+          savingsEl.title = `${stats.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo)`;
+          savingsStat.style.display = "block";
+        } else if (savingsStat) {
+          savingsStat.style.display = "none";
+        }
       }
 
       // Render capacity indicators
@@ -2446,6 +2461,16 @@ Jonathan Tsai (@jontsai)
           document.getElementById("est-cost").textContent = data.tokenStats.estCost;
           document.getElementById("nav-tokens").textContent = data.tokenStats.total;
           document.getElementById("nav-cost").textContent = data.tokenStats.estCost;
+          
+          // Show savings if positive
+          const savingsStat = document.getElementById("savings-stat");
+          const savingsEl = document.getElementById("est-savings");
+          if (data.tokenStats.estSavings && savingsStat && savingsEl) {
+            savingsEl.textContent = data.tokenStats.estSavings;
+            savingsStat.style.display = "block";
+          } else if (savingsStat) {
+            savingsStat.style.display = "none";
+          }
         }
 
         // Capacity
