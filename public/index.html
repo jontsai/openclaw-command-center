@@ -2790,7 +2790,7 @@
       function startPolling() {
         if (pollInterval) return; // Already polling
         console.log("[Polling] Starting fallback polling");
-        pollInterval = setInterval(fetchData, 30000);
+        pollInterval = setInterval(fetchData, 2000); // Match SSE heartbeat
         fetchData(); // Immediate fetch
       }
 
