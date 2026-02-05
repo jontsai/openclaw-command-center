@@ -36,7 +36,7 @@ ensure: ## Ensure dashboard is running (idempotent, self-healing)
 	@if ! tmux has-session -t $(TMUX_SESSION) 2>/dev/null; then \
 		echo "Creating tmux session '$(TMUX_SESSION)'..."; \
 		tmux new-session -d -s $(TMUX_SESSION) -c $(DASHBOARD_DIR) \
-			"node lib/server.js 2>&1 | tee -a $(LOG_FILE); echo '[Dashboard exited - shell ready]'; exec bash -l"; \
+			"./scripts/dashboard-loop.sh; echo '[Loop exited - shell ready]'; exec bash -l"; \
 		tmux split-window -h -t $(TMUX_SESSION) -c $(DASHBOARD_DIR) "exec bash -l"; \
 		tmux select-pane -t $(TMUX_SESSION):0.0; \
 		tmux split-window -v -t $(TMUX_SESSION) "tail -f $(LOG_FILE); exec bash -l"; \
