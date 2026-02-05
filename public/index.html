@@ -3522,113 +3522,73 @@
       }
 
       // Fetch and render data (progressive loading)
+      // Unified state fetch - single API call for all dashboard data
       async function fetchData() {
+        try {
+          const response = await fetch("/api/state");
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const state = await response.json();
+          renderFullState(state);
+        } catch (e) {
+          console.error("Failed to fetch state:", e);
+          // Fallback: try individual fetches if unified fails
+          fetchDataLegacy();
+        }
+      }
+      
+      // Render all widgets from unified state
+      function renderFullState(state) {
+        if (!state) return;
+        
+        // Update timestamp
+        const now = new Date().toLocaleTimeString();
+        document.getElementById("last-updated").textContent = now;
+        document.getElementById("sidebar-updated").textContent = `Updated: ${now}`;
+        
+        // Render each section
+        if (state.vitals) renderVitals(state.vitals);
+        if (state.sessions) renderSessions(state.sessions, state.pagination, state.statusCounts);
+        if (state.tokenStats) renderTokenStats(state.tokenStats);
+        if (state.capacity) renderCapacity(state.capacity);
+        if (state.operators) renderOperators(state.operators);
+        if (state.llmUsage) renderLlmUsage(state.llmUsage);
+        if (state.cron) renderCron(state.cron);
+        if (state.memory) renderMemory(state.memory);
+        if (state.cerebro) renderCerebro(state.cerebro);
+        if (state.subagents) renderSubagents(state.subagents);
+      }
+      
+      // Legacy fallback - multiple API calls (used if /api/state fails)
+      async function fetchDataLegacy() {
+        console.log("[Legacy] Falling back to individual API calls");
+        
         // Fire off all requests in parallel
-        const sessionsPromise = fetchSessions(paginationState.page);
-        const cronPromise = fetch("/api/cron")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch cron:", e);
-            return null;
-          });
-        const vitalsPromise = fetch("/api/vitals")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch vitals:", e);
-            return null;
-          });
-        const llmPromise = fetch("/api/llm-usage")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch LLM usage:", e);
-            return null;
-          });
-        const statusPromise = fetch("/api/status")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch status:", e);
-            return null;
-          });
-        const operatorsPromise = fetch("/api/operators")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch operators:", e);
-            return null;
-          });
-        const jobsPromise = fetch("/api/jobs")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch jobs:", e);
-            return null;
-          });
-        const cerebroPromise = fetch("/api/cerebro")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch Cerebro:", e);
-            return null;
-          });
-        const subagentsPromise = fetch("/api/subagents")
-          .then((r) => r.json())
-          .catch((e) => {
-            console.error("Failed to fetch subagents:", e);
-            return null;
-          });
-
-        // Render each section as it arrives (don't wait for slow ones)
-
-        // Fast: Vitals (renders immediately)
-        vitalsPromise.then((data) => {
-          if (data?.vitals) renderVitals(data.vitals);
-        });
-
-        // Fast: Sessions (~1s) - now handled by fetchSessions() which already renders
-        // sessionsPromise is the result of fetchSessions() so no .then needed
-
-        // Fast: LLM usage
-        llmPromise.then((data) => {
-          if (data) renderLlmUsage(data);
-        });
-
-        // Fast: Operators
-        operatorsPromise.then((data) => {
-          if (data) renderOperators(data);
-        });
-
-        // Fast: Jobs count (just for nav badge)
-        jobsPromise.then((data) => {
-          if (data?.jobs) {
-            document.getElementById("nav-jobs-count").textContent = data.jobs.length;
-          }
-        });
-
-        // Fast: Cerebro (API returns cerebro data directly)
-        cerebroPromise.then((data) => {
-          if (data) renderCerebro(data);
-        });
-
-        // Fast: Sub-agents
-        subagentsPromise.then((data) => {
-          if (data?.subagents) renderSubagents(data.subagents);
-        });
-
-        // Slow: Cron (~11s) - don't block other content
-        cronPromise.then((data) => {
-          if (data?.cron) renderCron(data.cron);
-        });
-
-        // Full status (backup, includes everything)
-        statusPromise.then((data) => {
-          if (data) {
-            // Only render things that haven't been rendered yet
-            if (data.memory) renderMemory(data.memory);
-            if (data.cerebro) renderCerebro(data.cerebro);
-            if (data.system) renderSystem(data.system);
-            if (data.activity) renderActivity(data.activity);
-          }
-          const now = new Date().toLocaleTimeString();
-          document.getElementById("last-updated").textContent = now;
-          document.getElementById("sidebar-updated").textContent = `Updated: ${now}`;
-        });
+        const promises = [
+          fetch("/api/vitals").then(r => r.json()).catch(() => null),
+          fetch("/api/sessions").then(r => r.json()).catch(() => null),
+          fetch("/api/operators").then(r => r.json()).catch(() => null),
+          fetch("/api/llm-usage").then(r => r.json()).catch(() => null),
+          fetch("/api/cron").then(r => r.json()).catch(() => null),
+          fetch("/api/memory").then(r => r.json()).catch(() => null),
+          fetch("/api/cerebro").then(r => r.json()).catch(() => null),
+          fetch("/api/subagents").then(r => r.json()).catch(() => null),
+        ];
+        
+        const [vitals, sessions, operators, llm, cron, memory, cerebro, subagents] = await Promise.all(promises);
+        
+        if (vitals?.vitals) renderVitals(vitals.vitals);
+        if (sessions?.sessions) renderSessions(sessions.sessions, sessions.pagination, sessions.statusCounts);
+        if (sessions?.tokenStats) renderTokenStats(sessions.tokenStats);
+        if (operators) renderOperators(operators);
+        if (llm) renderLlmUsage(llm);
+        if (cron?.cron) renderCron(cron.cron);
+        if (memory?.memory) renderMemory(memory.memory);
+        if (cerebro) renderCerebro(cerebro);
+        if (subagents?.subagents) renderSubagents(subagents.subagents);
+        
+        const now = new Date().toLocaleTimeString();
+        document.getElementById("last-updated").textContent = now;
+        document.getElementById("sidebar-updated").textContent = `Updated: ${now}`;
       }
 
       // Render just sessions (for progressive loading)
@@ -4700,22 +4660,13 @@
       }
 
       function handleSSEUpdate(data) {
-        // Update timestamp
+        // Update timestamp with live indicator
         const now = new Date().toLocaleTimeString();
         document.getElementById("last-updated").textContent = now + " ⚡";
         document.getElementById("sidebar-updated").textContent = `Live: ${now}`;
 
-        // Render all the data
-        if (data.vitals) renderVitals(data.vitals);
-        if (data.sessions) {
-          renderSessions(data.sessions, data.pagination, data.statusCounts);
-          if (data.tokenStats) renderTokenStats(data.tokenStats);
-          if (data.capacity) renderCapacity(data.capacity);
-        }
-        if (data.cron) renderCron(data.cron);
-        if (data.memory) renderMemory(data.memory);
-        if (data.cerebro) renderCerebro(data.cerebro);
-        if (data.llmUsage) renderLlmUsage(data.llmUsage);
+        // Render full state (unified approach)
+        renderFullState(data);
       }
 
       // Polling fallback
