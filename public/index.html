@@ -2190,6 +2190,69 @@
       }
 
       function renderLlmUsage(data) {
+        // Handle auth errors - show clear error state instead of 0%
+        if (data?.errorType === "auth" || data?.claude?.session?.error) {
+          const errorMsg = "⚠️ Auth Error";
+          const errorDetail = "API key lacks user:profile scope";
+          
+          // Session card
+          document.getElementById("claude-session-pct").innerHTML = 
+            '<span style="color:#f59e0b">N/A</span>';
+          document.getElementById("claude-session-bar").style.width = "0%";
+          document.getElementById("claude-session-bar").className = "vital-bar-fill gray";
+          document.getElementById("claude-session-remaining").textContent = "N/A";
+          document.getElementById("claude-session-reset").textContent = "Auth Error";
+          
+          // Weekly card
+          document.getElementById("claude-weekly-pct").innerHTML = 
+            '<span style="color:#f59e0b">N/A</span>';
+          document.getElementById("claude-weekly-bar").style.width = "0%";
+          document.getElementById("claude-weekly-bar").className = "vital-bar-fill gray";
+          document.getElementById("claude-weekly-remaining").textContent = "N/A";
+          document.getElementById("claude-weekly-reset").textContent = "Auth Error";
+          
+          // Sonnet card
+          document.getElementById("sonnet-weekly-pct").innerHTML = 
+            '<span style="color:#f59e0b">N/A</span>';
+          document.getElementById("sonnet-weekly-bar").style.width = "0%";
+          document.getElementById("sonnet-weekly-bar").className = "vital-bar-fill gray";
+          document.getElementById("sonnet-weekly-remaining").textContent = "N/A";
+          document.getElementById("sonnet-weekly-reset").textContent = "Auth Error";
+          
+          // Compact cards
+          const compactSessionEl = document.getElementById("claude-compact-session-pct");
+          const compactSessionBar = document.getElementById("claude-compact-session-bar");
+          if (compactSessionEl) compactSessionEl.textContent = "N/A";
+          if (compactSessionBar) {
+            compactSessionBar.style.width = "0%";
+            compactSessionBar.className = "quota-bar-fill gray";
+          }
+          const compactWeekEl = document.getElementById("claude-compact-week-pct");
+          const compactWeekBar = document.getElementById("claude-compact-week-bar");
+          if (compactWeekEl) compactWeekEl.textContent = "N/A";
+          if (compactWeekBar) {
+            compactWeekBar.style.width = "0%";
+            compactWeekBar.className = "quota-bar-fill gray";
+          }
+          
+          document.getElementById("llm-sync-time").textContent = errorMsg;
+          
+          // Still render routing data if available
+          if (data.routing) {
+            const ct = data.routing.claudeTasks || 0;
+            const cx = data.routing.codexTasks || 0;
+            const total = data.routing.total || 0;
+            document.getElementById("llm-routing-summary").textContent =
+              total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet";
+            
+            // Task routing counts
+            document.getElementById("codex-tasks").textContent = total + " total";
+            document.getElementById("claude-task-count").textContent = ct;
+            document.getElementById("codex-task-count").textContent = cx;
+          }
+          return;
+        }
+        
         if (!data || data.error) {
           document.getElementById("llm-sync-time").textContent = data?.needsSync
             ? "Needs sync"
@@ -2203,6 +2266,8 @@
           const ago = Math.round((Date.now() - synced) / 60000);
           document.getElementById("llm-sync-time").textContent =
             ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`;
+        } else if (data.source === "live") {
+          document.getElementById("llm-sync-time").textContent = "Live";
         }
 
         // Routing summary - show task counts clearly

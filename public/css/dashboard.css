@@ -1288,6 +1288,9 @@
       .vital-bar-fill.purple {
         background: linear-gradient(90deg, #8957e5, #a371f7);
       }
+      .vital-bar-fill.gray {
+        background: linear-gradient(90deg, #484f58, #6e7681);
+      }
 
       .vital-detail {
         display: flex;
