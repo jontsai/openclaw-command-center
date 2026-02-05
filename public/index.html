@@ -2408,7 +2408,7 @@
         // Recent files
         const recentEl = document.getElementById("memory-recent-files");
         if (memory.recentFiles && memory.recentFiles.length > 0) {
-          recentEl.innerHTML = memory.recentFiles
+          smartUpdate(recentEl, memory.recentFiles
             .map(
               (f) => `
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;">
@@ -2417,10 +2417,10 @@
                     </div>
                 `,
             )
-            .join("");
+            .join(""));
         } else {
-          recentEl.innerHTML =
-            '<em style="color: var(--text-muted); font-size: 0.8rem;">No memory files yet</em>';
+          smartUpdate(recentEl,
+            '<em style="color: var(--text-muted); font-size: 0.8rem;">No memory files yet</em>');
         }
       }
 
@@ -2457,7 +2457,7 @@
         // Recent topics with action buttons
         const recentEl = document.getElementById("cerebro-recent-topics");
         if (cerebro.recentTopics && cerebro.recentTopics.length > 0) {
-          recentEl.innerHTML = cerebro.recentTopics
+          smartUpdate(recentEl, cerebro.recentTopics
             .map((t) => {
               const statusIcon =
                 t.status === "active" ? "🟢" : t.status === "resolved" ? "✅" : "⏸️";
@@ -2495,10 +2495,10 @@
                         </div>
                     `;
             })
-            .join("");
+            .join(""));
         } else {
-          recentEl.innerHTML =
-            '<em style="color: var(--text-muted); font-size: 0.8rem;">No active topics yet</em>';
+          smartUpdate(recentEl,
+            '<em style="color: var(--text-muted); font-size: 0.8rem;">No active topics yet</em>');
         }
 
         // Last updated
