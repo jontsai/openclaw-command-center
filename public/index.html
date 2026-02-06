@@ -1860,7 +1860,16 @@ Jonathan Tsai (@jontsai)
         // Always use paginationState.total if we have it (survives SSE updates)
         // Only fall back to sessions.length if we've never received pagination data
         const displayCount = paginationState.total > 0 ? paginationState.total : sessions.length;
-        $set("session-count", "textContent", displayCount);
+        
+        // Filter out hidden sessions
+        const visibleSessions = sessions.filter(s => !isSessionHidden(s));
+        const hiddenSessionsCount = sessions.length - visibleSessions.length;
+        
+        // Show hidden count breakdown if any hidden
+        const sessionCountText = hiddenSessionsCount > 0
+          ? `${displayCount} (${hiddenSessionsCount} hidden)`
+          : displayCount;
+        $set("session-count", "textContent", sessionCountText);
         $set("nav-session-count", "textContent", displayCount);
 
         // Use server-provided statusCounts for ALL sessions, not just current page
@@ -1869,9 +1878,6 @@ Jonathan Tsai (@jontsai)
           updateFilterCountsFromServer(statusCounts);
         }
         // Removed: fallback to updateFilterCounts(sessions) which only counted current page
-
-        // Filter out hidden sessions
-        const visibleSessions = sessions.filter(s => !isSessionHidden(s));
         
         if (visibleSessions.length === 0) {
           smartUpdate(sessionsEl, `
@@ -2756,8 +2762,16 @@ Jonathan Tsai (@jontsai)
         if (notInitEl) notInitEl.style.display = "none";
         if (initEl) initEl.style.display = "block";
 
-        // Update counts (unfiltered totals)
-        $set("cerebro-count", "textContent", `${cerebro.topics.total} topics`);
+        // Calculate hidden topics count
+        const allTopics = cerebro.recentTopics || [];
+        const hiddenTopicsCount = allTopics.filter(t => isTopicHidden(t.name) || isTopicHidden(t.title)).length;
+        const visibleTopicsCount = allTopics.length - hiddenTopicsCount;
+        
+        // Update counts with hidden breakdown
+        const countText = hiddenTopicsCount > 0 
+          ? `${cerebro.topics.total} topics (${visibleTopicsCount} visible, ${hiddenTopicsCount} hidden)`
+          : `${cerebro.topics.total} topics`;
+        $set("cerebro-count", "textContent", countText);
         $set("nav-cerebro-count", "textContent", cerebro.topics.total);
 
         $set("cerebro-active", "textContent", cerebro.topics.active || 0);
@@ -2770,7 +2784,7 @@ Jonathan Tsai (@jontsai)
 
         // Recent topics with action buttons (filtered by privacy settings)
         const recentEl = document.getElementById("cerebro-recent-topics");
-        const visibleTopics = (cerebro.recentTopics || []).filter(t => !isTopicHidden(t.name) && !isTopicHidden(t.title));
+        const visibleTopics = allTopics.filter(t => !isTopicHidden(t.name) && !isTopicHidden(t.title));
         
         if (visibleTopics.length > 0) {
           smartUpdate(recentEl, visibleTopics
