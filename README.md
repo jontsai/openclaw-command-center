@@ -312,6 +312,38 @@ Browse your agent's memory files — daily logs, long-term memory, and workspace
   <img src="docs/screenshots/memory-panel.png" alt="Memory Panel" width="800">
 </p>
 
+### Cost Breakdown Modal
+
+Click on any cost stat to see detailed breakdowns: token usage by type, pricing rates, and calculation methodology. Includes estimated savings vs. manual work.
+
+<p align="center">
+  <img src="docs/screenshots/cost-modal.png" alt="Cost Breakdown Modal" width="800">
+</p>
+
+### Operator Details
+
+Click on an operator card to see their session history, stats, and activity timeline.
+
+<p align="center">
+  <img src="docs/screenshots/operator-modal.png" alt="Operator Details Modal" width="800">
+</p>
+
+### Privacy Settings
+
+Control what's visible for demos and screenshots. Hide sensitive topics, sessions, or cron jobs. Settings sync to the server automatically.
+
+<p align="center">
+  <img src="docs/screenshots/privacy-modal.png" alt="Privacy Settings Modal" width="800">
+</p>
+
+### Session Details
+
+Click any session card to see detailed information: summary, key facts, tools used, and recent messages.
+
+<p align="center">
+  <img src="docs/screenshots/session-detail.png" alt="Session Details Panel" width="800">
+</p>
+
 ### Full Dashboard
 
 The complete dashboard with all panels visible.
