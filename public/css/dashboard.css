@@ -887,6 +887,10 @@
         border-color: var(--accent);
         color: var(--accent);
       }
+      .topic-action-btn.hide:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
 
       /* Toast notifications */
       .toast-container {

@@ -2784,16 +2784,19 @@ Jonathan Tsai (@jontsai)
                     ? "var(--accent)"
                     : "var(--text-muted)";
 
-              // Action buttons based on status
+              // Action buttons based on status (always include hide button)
+              const hideBtn = `<button class="topic-action-btn hide" onclick="quickHideTopic('${escapeHtml(t.name).replace(/'/g, "\\'")}'); event.stopPropagation();" title="Hide topic">👁️</button>`;
               let actionButtons = "";
               if (t.status === "active") {
                 actionButtons = `
                             <button class="topic-action-btn resolve" onclick="updateTopicStatus('${escapeHtml(t.name)}', 'resolved')" title="Mark as resolved">✓</button>
                             <button class="topic-action-btn park" onclick="updateTopicStatus('${escapeHtml(t.name)}', 'parked')" title="Park topic">⏸</button>
+                            ${hideBtn}
                         `;
               } else {
                 actionButtons = `
                             <button class="topic-action-btn reactivate" onclick="updateTopicStatus('${escapeHtml(t.name)}', 'active')" title="Reactivate topic">↩</button>
+                            ${hideBtn}
                         `;
               }
 
@@ -3138,6 +3141,16 @@ Jonathan Tsai (@jontsai)
       }
       
       // Quick-hide from card (called by hide icon on cards)
+      function quickHideTopic(name) {
+        const hidden = getHiddenTopics();
+        if (!hidden.some(h => h.toLowerCase() === name.toLowerCase())) {
+          hidden.push(name);
+          setHiddenTopics(hidden);
+        }
+        refreshAllViews();
+        showToast(`Topic "${name}" hidden. Open Privacy Settings to unhide.`);
+      }
+      
       function quickHideSession(label) {
         const hidden = getHiddenSessions();
         if (!hidden.some(h => h.toLowerCase() === label.toLowerCase())) {
