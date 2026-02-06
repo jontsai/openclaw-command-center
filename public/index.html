@@ -168,9 +168,17 @@
           <div class="stat-value" id="est-cost">-</div>
           <div class="stat-label">Est. Cost (24h) 📊</div>
         </div>
-        <div class="stat" title="Click for cost breakdown" id="savings-stat" style="display: none; cursor: pointer;" onclick="openCostModal()">
-          <div class="stat-value" id="est-savings" style="color: var(--green);">-</div>
-          <div class="stat-label">Est. Savings 💰</div>
+        <div class="stat" title="Click for cost breakdown" id="savings-stat" style="display: none; cursor: pointer;">
+          <div class="stat-value" id="est-savings" style="color: var(--green);" onclick="openCostModal()">-</div>
+          <div class="stat-label" style="display: flex; align-items: center; gap: 4px;">
+            <span onclick="openCostModal()">Est. Savings</span>
+            <select id="savings-window-select" style="font-size: 0.7rem; padding: 1px 2px; background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 3px; cursor: pointer;" onclick="event.stopPropagation()">
+              <option value="24h">24h</option>
+              <option value="3da">3da</option>
+              <option value="7da">7da</option>
+            </select>
+            💰
+          </div>
         </div>
         <div class="stat" title="Main session capacity">
           <div class="stat-value" id="main-capacity">-</div>
@@ -2147,9 +2155,48 @@ Jonathan Tsai (@jontsai)
         }
       }
 
+      // Store current token stats for window switching
+      let currentTokenStats = null;
+      
+      // Get saved savings window preference
+      function getSavingsWindowPref() {
+        return localStorage.getItem('savingsWindow') || '24h';
+      }
+      
+      // Save savings window preference
+      function setSavingsWindowPref(window) {
+        localStorage.setItem('savingsWindow', window);
+      }
+      
+      // Update savings display based on selected window
+      function updateSavingsDisplay(stats, windowKey) {
+        const savingsStat = document.getElementById("savings-stat");
+        const savingsEl = document.getElementById("est-savings");
+        
+        if (!stats || !savingsStat || !savingsEl) return;
+        
+        // Get the window-specific data or fall back to 24h
+        const windowData = stats.savingsWindows?.[windowKey] || stats.savingsWindows?.['24h'];
+        
+        if (windowData?.estSavings) {
+          savingsEl.textContent = windowData.estSavings;
+          savingsEl.title = `${windowData.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo) [${windowData.label}]`;
+          savingsStat.style.display = "block";
+        } else if (stats.estSavings) {
+          // Fallback to legacy 24h savings
+          savingsEl.textContent = stats.estSavings;
+          savingsEl.title = `${stats.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo)`;
+          savingsStat.style.display = "block";
+        } else {
+          savingsStat.style.display = "none";
+        }
+      }
+
       // Render token stats
       function renderTokenStats(stats) {
         if (!stats) return;
+        currentTokenStats = stats; // Store for window switching
+        
         document.getElementById("total-tokens").textContent = stats.total || "0";
         document.getElementById("active-sessions").textContent = stats.activeCount || 0;
         document.getElementById("input-tokens").textContent = stats.input || "0";
@@ -2161,16 +2208,15 @@ Jonathan Tsai (@jontsai)
         document.getElementById("nav-avg-tokens").textContent = stats.avgTokensPerSession || "-";
         document.getElementById("nav-avg-cost").textContent = stats.avgCostPerSession || "-";
         
-        // Show savings if positive
-        const savingsStat = document.getElementById("savings-stat");
-        const savingsEl = document.getElementById("est-savings");
-        if (stats.estSavings && savingsStat && savingsEl) {
-          savingsEl.textContent = stats.estSavings;
-          savingsEl.title = `${stats.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo)`;
-          savingsStat.style.display = "block";
-        } else if (savingsStat) {
-          savingsStat.style.display = "none";
+        // Load preference and update selector
+        const savedWindow = getSavingsWindowPref();
+        const windowSelect = document.getElementById("savings-window-select");
+        if (windowSelect) {
+          windowSelect.value = savedWindow;
         }
+        
+        // Show savings for selected window
+        updateSavingsDisplay(stats, savedWindow);
       }
 
       // Render capacity indicators
@@ -3010,27 +3056,53 @@ Jonathan Tsai (@jontsai)
           </div>
         `;
         
-        // Savings (compare monthly to monthly)
-        const monthlyApiCost = (data.totalCost || 0) * 30;
+        // Savings - show all three windows (24h, 3da, 7da)
         const planCost = data.planCost || 200;
-        const monthlySavings = monthlyApiCost - planCost;
-        const savingsPercent = monthlyApiCost > 0 ? Math.round((monthlySavings / monthlyApiCost) * 100) : 0;
-        document.getElementById("cost-savings").innerHTML = monthlySavings > 0 ? `
-          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Code Max'}</span><span class="detail-value">$${planCost}/month</span></div>
-          <div class="detail-row"><span class="detail-label">Est. API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
-          <div class="detail-row"><span class="detail-label">Est. Monthly API Cost</span><span class="detail-value">$${Math.round(monthlyApiCost).toLocaleString()}/month</span></div>
-          <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
-            <span class="detail-label"><strong>Est. Savings</strong></span>
-            <span class="detail-value" style="color: var(--green);"><strong>$${Math.round(monthlySavings).toLocaleString()}/mo (${savingsPercent}%)</strong></span>
-          </div>
-        ` : `
-          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Code Max'}</span><span class="detail-value">$${planCost}/month</span></div>
-          <div class="detail-row"><span class="detail-label">Est. API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
-          <div class="detail-row"><span class="detail-label">Est. Monthly API Cost</span><span class="detail-value">$${Math.round(monthlyApiCost).toLocaleString()}/month</span></div>
-          <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-            📈 Keep going! Once your monthly cost exceeds $${planCost}, you'll start seeing savings.
-          </p>
+        const planName = data.planName || 'Claude Code Max';
+        const windows = data.windows || {};
+        
+        // Build savings rows for each window
+        const windowOrder = ['24h', '3d', '7d'];
+        const windowLabels = { '24h': '24h', '3d': '3-day avg', '7d': '7-day avg' };
+        
+        let savingsHtml = `
+          <div class="detail-row"><span class="detail-label">${planName}</span><span class="detail-value">$${planCost}/month</span></div>
+          <div style="margin-top: 12px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">Projected Monthly Cost by Window:</div>
         `;
+        
+        let hasSavings = false;
+        for (const key of windowOrder) {
+          const w = windows[key];
+          if (!w) continue;
+          
+          const dailyAvg = w.dailyAvg || 0;
+          const monthlyProjected = w.monthlyProjected || 0;
+          const savings = w.monthlySavings || 0;
+          const pct = w.savingsPercent || 0;
+          
+          if (savings > 0) hasSavings = true;
+          
+          const savingsStr = savings > 0 
+            ? `<span style="color: var(--green);">↓$${Math.round(savings).toLocaleString()}/mo (${pct}%)</span>`
+            : `<span style="color: var(--text-muted);">-</span>`;
+          
+          savingsHtml += `
+            <div class="detail-row">
+              <span class="detail-label">${windowLabels[key]}</span>
+              <span class="detail-value">$${Math.round(monthlyProjected).toLocaleString()}/mo ${savingsStr}</span>
+            </div>
+          `;
+        }
+        
+        if (!hasSavings) {
+          savingsHtml += `
+            <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
+              📈 Keep going! Once your monthly cost exceeds $${planCost}, you'll start seeing savings.
+            </p>
+          `;
+        }
+        
+        document.getElementById("cost-savings").innerHTML = savingsHtml;
         
         // Top sessions by tokens
         const topSessions = data.topSessions || [];
@@ -3559,6 +3631,22 @@ Jonathan Tsai (@jontsai)
         // Fetch data after short delay to ensure DOM is ready
         // This fixes a race condition on initial page load
         setTimeout(fetchData, 100);
+        
+        // Set up savings window selector
+        const windowSelect = document.getElementById("savings-window-select");
+        if (windowSelect) {
+          // Load saved preference
+          windowSelect.value = getSavingsWindowPref();
+          
+          // Handle changes
+          windowSelect.addEventListener("change", function(e) {
+            const newWindow = e.target.value;
+            setSavingsWindowPref(newWindow);
+            if (currentTokenStats) {
+              updateSavingsDisplay(currentTokenStats, newWindow);
+            }
+          });
+        }
       }
 
       // Ensure DOM is ready before initializing
