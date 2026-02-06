@@ -3896,17 +3896,13 @@ Jonathan Tsai (@jontsai)
       // Quick Actions
       async function runHealthCheck() {
         try {
-          const response = await fetch("/api/action", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "health-check" }),
-          });
+          const response = await fetch("/api/action?action=health-check");
           const data = await response.json();
 
           if (data.success) {
-            showToast("✅ Health check completed: " + data.output, "success");
+            showToast("✅ Health check passed", "success");
           } else {
-            showToast("❌ Health check failed: " + data.output, "error");
+            showToast("❌ Health check failed: " + (data.error || data.output), "error");
           }
         } catch (e) {
           showToast("❌ Health check error: " + e.message, "error");
@@ -3915,17 +3911,13 @@ Jonathan Tsai (@jontsai)
 
       async function getGatewayStatus() {
         try {
-          const response = await fetch("/api/action", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "gateway-status" }),
-          });
+          const response = await fetch("/api/action?action=gateway-status");
           const data = await response.json();
 
           if (data.success) {
             showToast("🚪 Gateway: " + data.output, "success");
           } else {
-            showToast("❌ Gateway status failed: " + data.output, "error");
+            showToast("❌ Gateway status failed: " + (data.error || data.output), "error");
           }
         } catch (e) {
           showToast("❌ Gateway error: " + e.message, "error");
@@ -3934,17 +3926,13 @@ Jonathan Tsai (@jontsai)
 
       async function pruneStalesSessions() {
         try {
-          const response = await fetch("/api/action", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "prune-stale" }),
-          });
+          const response = await fetch("/api/action?action=prune-stale");
           const data = await response.json();
 
           if (data.success) {
             showToast("🧹 " + data.output, "success");
           } else {
-            showToast("❌ Cleanup failed: " + data.output, "error");
+            showToast("❌ Cleanup failed: " + (data.error || data.output), "error");
           }
         } catch (e) {
           showToast("❌ Cleanup error: " + e.message, "error");
