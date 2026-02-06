@@ -1431,6 +1431,10 @@ Jonathan Tsai (@jontsai)
           <h3>✨ Est. Savings</h3>
           <div class="detail-box" id="cost-savings"></div>
         </div>
+        <div class="detail-section">
+          <h3>🔥 Top Sessions by Tokens (24h)</h3>
+          <div class="detail-box" id="cost-top-sessions" style="font-size: 0.85rem;"></div>
+        </div>
       </div>
     </div>
 
@@ -2867,6 +2871,25 @@ Jonathan Tsai (@jontsai)
             📈 Keep going! Once your monthly cost exceeds $${planCost}, you'll start seeing savings.
           </p>
         `;
+        
+        // Top sessions by tokens
+        const topSessions = data.topSessions || [];
+        if (topSessions.length > 0) {
+          document.getElementById("cost-top-sessions").innerHTML = topSessions.map((s, i) => {
+            const tokensFormatted = s.tokens >= 1000000 
+              ? (s.tokens / 1000000).toFixed(1) + 'M' 
+              : s.tokens >= 1000 
+                ? (s.tokens / 1000).toFixed(1) + 'k' 
+                : s.tokens;
+            const statusIcon = s.active ? '🟢' : '⚪';
+            return `<div class="detail-row">
+              <span class="detail-label">${statusIcon} ${s.label.substring(0, 30)}${s.label.length > 30 ? '...' : ''}</span>
+              <span class="detail-value">${tokensFormatted}</span>
+            </div>`;
+          }).join('');
+        } else {
+          document.getElementById("cost-top-sessions").innerHTML = '<em style="color: var(--text-muted)">No session data available</em>';
+        }
       }
 
       async function fetchSessionDetail(key) {
