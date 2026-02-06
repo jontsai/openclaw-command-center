@@ -2761,12 +2761,12 @@ Jonathan Tsai (@jontsai)
         if (notInitEl) notInitEl.style.display = "none";
         if (initEl) initEl.style.display = "block";
 
-        // Calculate hidden topics count
+        // Calculate hidden topics count from current view
         const allTopics = cerebro.recentTopics || [];
         const hiddenTopicsCount = allTopics.filter(t => isTopicHidden(t.name) || isTopicHidden(t.title)).length;
         const visibleTopicsCount = allTopics.length - hiddenTopicsCount;
         
-        // Update counts with hidden breakdown
+        // Update counts with hidden breakdown (updates dynamically on hide/unhide)
         const countText = hiddenTopicsCount > 0 
           ? `${cerebro.topics.total} topics (${visibleTopicsCount} visible, ${hiddenTopicsCount} hidden)`
           : `${cerebro.topics.total} topics`;
