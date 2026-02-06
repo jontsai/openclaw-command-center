@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jobs - OpenClaw Command Center</title>
+    <title>AI Jobs - OpenClaw Command Center</title>
     <style>
       :root {
         --bg: #0d1117;
@@ -863,7 +863,7 @@
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-logo">🤖</span>
+        <span class="sidebar-logo">🦞</span>
         <span class="sidebar-title">Command Center</span>
         <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">◀</button>
       </div>
@@ -881,27 +881,32 @@
           <a href="/#sessions-section" class="nav-item" data-tooltip="Sessions">
             <span class="nav-icon">📡</span>
             <span>Sessions</span>
+            <span class="nav-badge" id="nav-session-count">-</span>
           </a>
-          <a href="/#cron-section" class="nav-item" data-tooltip="Scheduled Jobs">
+          <a href="/#cron-section" class="nav-item" data-tooltip="Cron Jobs">
             <span class="nav-icon">⏰</span>
             <span>Cron Jobs</span>
+            <span class="nav-badge" id="nav-cron-count">-</span>
           </a>
-          <a href="/jobs.html" class="nav-item active" data-tooltip="Jobs Dashboard">
-            <span class="nav-icon">⚙️</span>
-            <span>Jobs</span>
+          <a href="/jobs.html" class="nav-item active" data-tooltip="AI Jobs Dashboard">
+            <span class="nav-icon">🤖</span>
+            <span>AI Jobs</span>
             <span class="nav-badge" id="nav-jobs-count">—</span>
           </a>
           <a href="/#memory-section" class="nav-item" data-tooltip="Memory">
             <span class="nav-icon">🧠</span>
             <span>Memory</span>
+            <span class="nav-badge" id="nav-memory-count">-</span>
           </a>
           <a href="/#cerebro-section" class="nav-item" data-tooltip="Cerebro">
             <span class="nav-icon">🔮</span>
             <span>Cerebro</span>
+            <span class="nav-badge" id="nav-cerebro-count">-</span>
           </a>
           <a href="/#operators-section" class="nav-item" data-tooltip="Operators">
             <span class="nav-icon">👥</span>
             <span>Operators</span>
+            <span class="nav-badge" id="nav-operator-count">-</span>
           </a>
         </div>
       </div>
@@ -915,7 +920,7 @@
     <div class="main-wrapper" id="main-wrapper">
       <header>
         <div class="header-left">
-          <h1 class="page-title">⚙️ Jobs Dashboard</h1>
+          <h1 class="page-title">🤖 AI Jobs Dashboard</h1>
         </div>
         <div class="header-actions">
           <button class="job-action-btn" onclick="refreshJobs()" title="Refresh">🔄 Refresh</button>
