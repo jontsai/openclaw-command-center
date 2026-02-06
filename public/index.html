@@ -3049,62 +3049,149 @@ Jonathan Tsai (@jontsai)
       }
       
       // Privacy Settings - Topics, Sessions, Crons, Display Options
+      // Server-side storage with localStorage as cache/fallback
       const HIDDEN_TOPICS_KEY = 'openclawHiddenTopics';
       const HIDDEN_SESSIONS_KEY = 'openclawHiddenSessions';
       const HIDDEN_CRONS_KEY = 'openclawHiddenCrons';
       const HIDE_HOSTNAME_KEY = 'openclawHideHostname';
+      const PRIVACY_CACHE_KEY = 'openclawPrivacyCache';
       
-      // Generic localStorage helpers
-      // Storage format: [{id: "...", name: "..."}, ...]
-      // For backwards compatibility, also handles old string array format
-      function getHiddenItems(key) {
+      // In-memory cache of privacy settings (populated from server on load)
+      let privacySettingsCache = null;
+      
+      // Load privacy settings from server (called on page load)
+      async function loadPrivacyFromServer() {
+        try {
+          const res = await fetch('/api/privacy');
+          if (res.ok) {
+            const settings = await res.json();
+            privacySettingsCache = settings;
+            // Update localStorage cache
+            localStorage.setItem(PRIVACY_CACHE_KEY, JSON.stringify(settings));
+            // Migrate old localStorage data if server is empty
+            if ((!settings.hiddenTopics || settings.hiddenTopics.length === 0) && 
+                (!settings.hiddenSessions || settings.hiddenSessions.length === 0) &&
+                (!settings.hiddenCrons || settings.hiddenCrons.length === 0)) {
+              await migrateLocalStorageToServer();
+            }
+            return settings;
+          }
+        } catch (e) {
+          console.warn('Failed to load privacy from server, using localStorage cache:', e.message);
+        }
+        // Fallback to localStorage cache
+        try {
+          const cached = localStorage.getItem(PRIVACY_CACHE_KEY);
+          if (cached) {
+            privacySettingsCache = JSON.parse(cached);
+            return privacySettingsCache;
+          }
+        } catch (e) {}
+        // Final fallback - empty settings
+        privacySettingsCache = { hiddenTopics: [], hiddenSessions: [], hiddenCrons: [], hideHostname: false };
+        return privacySettingsCache;
+      }
+      
+      // Save privacy settings to server (debounced)
+      let privacySaveTimeout = null;
+      async function savePrivacyToServer() {
+        // Debounce saves to avoid excessive API calls
+        if (privacySaveTimeout) clearTimeout(privacySaveTimeout);
+        privacySaveTimeout = setTimeout(async () => {
+          try {
+            const res = await fetch('/api/privacy', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(privacySettingsCache)
+            });
+            if (res.ok) {
+              // Update localStorage cache
+              localStorage.setItem(PRIVACY_CACHE_KEY, JSON.stringify(privacySettingsCache));
+              console.log('[Privacy] Settings saved to server');
+            } else {
+              console.warn('[Privacy] Failed to save to server:', await res.text());
+            }
+          } catch (e) {
+            console.warn('[Privacy] Failed to save to server:', e.message);
+          }
+        }, 500);
+      }
+      
+      // Migrate old localStorage data to server (one-time migration)
+      async function migrateLocalStorageToServer() {
+        const oldTopics = getLocalHiddenItems(HIDDEN_TOPICS_KEY);
+        const oldSessions = getLocalHiddenItems(HIDDEN_SESSIONS_KEY);
+        const oldCrons = getLocalHiddenItems(HIDDEN_CRONS_KEY);
+        const oldHostname = localStorage.getItem(HIDE_HOSTNAME_KEY) === 'true';
+        
+        if (oldTopics.length || oldSessions.length || oldCrons.length || oldHostname) {
+          console.log('[Privacy] Migrating localStorage data to server...');
+          privacySettingsCache = {
+            hiddenTopics: oldTopics,
+            hiddenSessions: oldSessions,
+            hiddenCrons: oldCrons,
+            hideHostname: oldHostname
+          };
+          await savePrivacyToServer();
+          // Clear old localStorage keys after migration
+          localStorage.removeItem(HIDDEN_TOPICS_KEY);
+          localStorage.removeItem(HIDDEN_SESSIONS_KEY);
+          localStorage.removeItem(HIDDEN_CRONS_KEY);
+          localStorage.removeItem(HIDE_HOSTNAME_KEY);
+        }
+      }
+      
+      // Generic localStorage helpers (for migration/fallback only)
+      function getLocalHiddenItems(key) {
         try {
           const stored = localStorage.getItem(key);
           if (!stored) return [];
           const parsed = JSON.parse(stored);
-          // Migrate old string format to new object format
-          return parsed.map(item => {
-            if (typeof item === 'string') {
-              return { id: item, name: item };
-            }
-            return item;
-          });
+          return parsed.map(item => typeof item === 'string' ? { id: item, name: item } : item);
         } catch (e) {
           return [];
         }
       }
       
-      function setHiddenItems(key, items) {
-        try {
-          localStorage.setItem(key, JSON.stringify(items));
-        } catch (e) {
-          console.error('Failed to save hidden items:', e);
-        }
+      // Topic-specific functions (use in-memory cache backed by server)
+      function getHiddenTopics() { 
+        return privacySettingsCache?.hiddenTopics || []; 
       }
-      
-      // Topic-specific functions
-      function getHiddenTopics() { return getHiddenItems(HIDDEN_TOPICS_KEY); }
-      function setHiddenTopics(topics) { setHiddenItems(HIDDEN_TOPICS_KEY, topics); }
+      function setHiddenTopics(topics) { 
+        if (!privacySettingsCache) privacySettingsCache = {};
+        privacySettingsCache.hiddenTopics = topics; 
+        savePrivacyToServer();
+      }
       function isTopicHidden(topicId) {
         const hidden = getHiddenTopics();
         const normalized = (topicId || '').toLowerCase().trim();
-        // Match on id only (exact match)
         return hidden.some(h => (h.id || '').toLowerCase().trim() === normalized);
       }
       
       // Session-specific functions  
-      function getHiddenSessions() { return getHiddenItems(HIDDEN_SESSIONS_KEY); }
-      function setHiddenSessions(sessions) { setHiddenItems(HIDDEN_SESSIONS_KEY, sessions); }
+      function getHiddenSessions() { 
+        return privacySettingsCache?.hiddenSessions || []; 
+      }
+      function setHiddenSessions(sessions) { 
+        if (!privacySettingsCache) privacySettingsCache = {};
+        privacySettingsCache.hiddenSessions = sessions; 
+        savePrivacyToServer();
+      }
       function isSessionHidden(session) {
         const hidden = getHiddenSessions();
         const key = (session.sessionKey || session.key || '').toLowerCase().trim();
-        // Match on sessionKey (id) only
         return hidden.some(h => (h.id || '').toLowerCase().trim() === key);
       }
       
       // Cron-specific functions
-      function getHiddenCrons() { return getHiddenItems(HIDDEN_CRONS_KEY); }
-      function setHiddenCrons(crons) { setHiddenItems(HIDDEN_CRONS_KEY, crons); }
+      function getHiddenCrons() { 
+        return privacySettingsCache?.hiddenCrons || []; 
+      }
+      function setHiddenCrons(crons) { 
+        if (!privacySettingsCache) privacySettingsCache = {};
+        privacySettingsCache.hiddenCrons = crons; 
+        savePrivacyToServer();
+      }
       function isCronHidden(cron) {
         const hidden = getHiddenCrons();
         const id = (cron.id || cron.jobId || '').toLowerCase().trim();
@@ -3228,19 +3315,15 @@ Jonathan Tsai (@jontsai)
         refreshAllViews();
       }
       
-      // Hostname privacy
+      // Hostname privacy (use server-backed cache)
       function isHostnameHidden() {
-        try {
-          return localStorage.getItem(HIDE_HOSTNAME_KEY) === 'true';
-        } catch (e) {
-          return false;
-        }
+        return privacySettingsCache?.hideHostname || false;
       }
       
       function setHideHostname(hide) {
-        try {
-          localStorage.setItem(HIDE_HOSTNAME_KEY, hide ? 'true' : 'false');
-        } catch (e) {}
+        if (!privacySettingsCache) privacySettingsCache = {};
+        privacySettingsCache.hideHostname = hide;
+        savePrivacyToServer();
       }
       
       function toggleHideHostname() {
@@ -3962,7 +4045,11 @@ Jonathan Tsai (@jontsai)
       }
 
       // Init - try SSE first, fall back to polling
-      function init() {
+      async function init() {
+        // Load privacy settings from server first (before rendering any data)
+        await loadPrivacyFromServer();
+        console.log('[Privacy] Settings loaded from server');
+        
         connectSSE();
         // Fetch data after short delay to ensure DOM is ready
         // This fixes a race condition on initial page load
@@ -3970,6 +4057,12 @@ Jonathan Tsai (@jontsai)
         
         // Apply privacy settings on load
         updateHostnameDisplay();
+        
+        // Initialize privacy checkbox state
+        const hostnameCheckbox = document.getElementById('privacy-hide-hostname');
+        if (hostnameCheckbox) {
+          hostnameCheckbox.checked = isHostnameHidden();
+        }
         
         // Set up savings window selector
         const windowSelect = document.getElementById("savings-window-select");
