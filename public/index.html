@@ -94,15 +94,30 @@
         </div>
         <div class="nav-section">
           <div class="nav-section-title">Quick Stats</div>
-          <div class="nav-item" style="cursor: default" data-tooltip="Tokens">
+          <div class="nav-item" style="cursor: default" data-tooltip="Total tokens (24h)">
             <span class="nav-icon">🎫</span>
             <span>Tokens</span>
             <span class="nav-badge" id="nav-tokens">-</span>
           </div>
-          <div class="nav-item" style="cursor: default" data-tooltip="Est. Cost">
+          <div class="nav-item" style="cursor: default; cursor: pointer;" onclick="openCostModal()" data-tooltip="Click for breakdown">
             <span class="nav-icon">💰</span>
-            <span>Est. Cost</span>
+            <span>Est. Daily</span>
             <span class="nav-badge" id="nav-cost">-</span>
+          </div>
+          <div class="nav-item" style="cursor: default; cursor: pointer;" onclick="openCostModal()" data-tooltip="Projected monthly cost">
+            <span class="nav-icon">📅</span>
+            <span>Est. Monthly</span>
+            <span class="nav-badge" id="nav-monthly-cost">-</span>
+          </div>
+          <div class="nav-item" style="cursor: default" data-tooltip="Average tokens per session">
+            <span class="nav-icon">📊</span>
+            <span>Avg Tok/Sess</span>
+            <span class="nav-badge" id="nav-avg-tokens">-</span>
+          </div>
+          <div class="nav-item" style="cursor: default" data-tooltip="Average cost per session">
+            <span class="nav-icon">💵</span>
+            <span>Avg $/Sess</span>
+            <span class="nav-badge" id="nav-avg-cost">-</span>
           </div>
         </div>
       </div>
@@ -2091,6 +2106,9 @@ Jonathan Tsai (@jontsai)
         document.getElementById("est-cost").textContent = stats.estCost || "$0.00";
         document.getElementById("nav-tokens").textContent = stats.total || "0";
         document.getElementById("nav-cost").textContent = stats.estCost || "$0.00";
+        document.getElementById("nav-monthly-cost").textContent = stats.estMonthlyCost || "-";
+        document.getElementById("nav-avg-tokens").textContent = stats.avgTokensPerSession || "-";
+        document.getElementById("nav-avg-cost").textContent = stats.avgCostPerSession || "-";
         
         // Show savings if positive
         const savingsStat = document.getElementById("savings-stat");
@@ -2549,6 +2567,9 @@ Jonathan Tsai (@jontsai)
           document.getElementById("est-cost").textContent = data.tokenStats.estCost;
           document.getElementById("nav-tokens").textContent = data.tokenStats.total;
           document.getElementById("nav-cost").textContent = data.tokenStats.estCost;
+          document.getElementById("nav-monthly-cost").textContent = data.tokenStats.estMonthlyCost || "-";
+          document.getElementById("nav-avg-tokens").textContent = data.tokenStats.avgTokensPerSession || "-";
+          document.getElementById("nav-avg-cost").textContent = data.tokenStats.avgCostPerSession || "-";
           
           // Show savings if positive
           const savingsStat = document.getElementById("savings-stat");
