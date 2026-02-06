@@ -8,6 +8,16 @@ Welcome, AI agent. This document defines how you should interact with this codeb
 
 OpenClaw Command Center is the central dashboard for AI assistant management. Your mission is to help build, maintain, and improve this system while maintaining the Starcraft/Zerg thematic elements that make it unique.
 
+## 🏛️ Architecture
+
+**Read First**: [`docs/architecture/OVERVIEW.md`](docs/architecture/OVERVIEW.md)
+
+Key architectural principles:
+1. **DRY** — Don't Repeat Yourself. Extract shared code to partials/modules.
+2. **Zero Build Step** — Plain HTML/CSS/JS, no compilation needed.
+3. **Real-Time First** — SSE for live updates, polling as fallback.
+4. **Progressive Enhancement** — Works without JS, enhanced with JS.
+
 ## 📁 Workspace Structure
 
 ```
@@ -20,15 +30,19 @@ openclaw-command-center/
 │   └── topic-classifier.js # NLP-based topic classification
 ├── public/                 # Frontend assets
 │   ├── index.html          # Main dashboard UI
-│   └── jobs.html           # Jobs management UI
+│   ├── jobs.html           # AI Jobs management UI
+│   ├── partials/           # ⭐ Shared HTML partials (DRY!)
+│   │   └── sidebar.html    # Navigation sidebar component
+│   ├── css/
+│   │   └── dashboard.css   # Shared styles
+│   └── js/
+│       ├── sidebar.js      # Sidebar loader + SSE badges
+│       ├── app.js          # Main dashboard logic
+│       └── lib/            # Third-party libraries
 ├── scripts/                # Operational scripts
-│   ├── setup.sh            # First-time setup
-│   ├── start.sh            # Start server (with optional tunnel)
-│   ├── stop.sh             # Stop server
-│   └── tmux-dashboard.sh   # Multi-pane tmux layout
 ├── config/                 # Configuration (be careful!)
-│   └── dashboard.example.json
 ├── docs/                   # Documentation
+│   └── architecture/       # Architecture Decision Records
 ├── tests/                  # Test files
 ├── SKILL.md                # ClawHub skill metadata
 └── package.json            # Version and dependencies
@@ -216,6 +230,38 @@ When handing off to another AI or ending a session:
 2. Document current state in a comment or commit message
 3. List any unfinished tasks
 4. Note any decisions that need human input
+
+## 📖 Lessons Learned
+
+### DRY is Non-Negotiable
+**Problem**: Sidebar was duplicated across `index.html` and `jobs.html`, causing inconsistencies.
+**Solution**: Extract to `/partials/sidebar.html` + `/js/sidebar.js` for loading.
+**Lesson**: When you see similar code in multiple places, stop and extract it. The cost of extraction is always lower than maintaining duplicates.
+
+### Naming Consistency Matters
+**Problem**: "Scheduled Jobs" vs "Cron Jobs" vs "Jobs" caused confusion.
+**Solution**: Established naming convention: "Cron Jobs" for OpenClaw scheduled tasks, "AI Jobs" for advanced agent jobs.
+**Lesson**: Agree on terminology early. Document it. Enforce it.
+
+### Zero-Build Architecture Has Trade-offs
+**Context**: No build step keeps things simple but limits some patterns.
+**Solution**: Use `fetch()` to load partials dynamically, `<script>` for shared JS.
+**Lesson**: This works well for dashboards. Evaluate trade-offs for your use case.
+
+### SSE Connection Per Component = Wasteful
+**Problem**: Multiple components each opening SSE connections.
+**Solution**: Single SSE connection in `sidebar.js`, shared state management.
+**Lesson**: Centralize real-time connections. Components subscribe to state, not sources.
+
+### Test After Every Significant Change
+**Problem**: Easy to break things when refactoring HTML structure.
+**Solution**: `make restart` + browser check after each change.
+**Lesson**: Keep feedback loops tight. Visual changes need visual verification.
+
+### Document Architectural Decisions
+**Problem**: Future agents (or humans) don't know why things are the way they are.
+**Solution**: Create `docs/architecture/OVERVIEW.md` and ADRs.
+**Lesson**: Write down the "why", not just the "what".
 
 ## 📚 Key Resources
 

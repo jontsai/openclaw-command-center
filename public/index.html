@@ -7,125 +7,12 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="stylesheet" href="css/dashboard.css">
     <script src="js/lib/morphdom.min.js"></script>
+    <!-- Shared Sidebar Loader -->
+    <script src="js/sidebar.js"></script>
   </head>
   <body>
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <span class="sidebar-logo">🦞</span>
-        <span class="sidebar-title">Command Center</span>
-        <button
-          class="sidebar-toggle"
-          id="sidebar-toggle-btn"
-          onclick="toggleSidebar()"
-          title="Toggle sidebar"
-        >
-          ◀
-        </button>
-      </div>
-      <div class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Navigation</div>
-          <a
-            href="#vitals-section"
-            class="nav-item active"
-            data-section="vitals"
-            data-tooltip="System Vitals"
-          >
-            <span class="nav-icon">🖥️</span>
-            <span>System Vitals</span>
-          </a>
-          <a href="#llm-section" class="nav-item" data-section="llm" data-tooltip="LLM Fuel Gauges">
-            <span class="nav-icon">⛽</span>
-            <span>LLM Usage</span>
-          </a>
-          <a
-            href="#sessions-section"
-            class="nav-item"
-            data-section="sessions"
-            data-tooltip="Sessions"
-          >
-            <span class="nav-icon">📡</span>
-            <span>Sessions</span>
-            <span class="nav-badge" id="nav-session-count">0</span>
-          </a>
-          <a
-            href="#cron-section"
-            class="nav-item"
-            data-section="cron"
-            data-tooltip="Cron Jobs"
-          >
-            <span class="nav-icon">⏰</span>
-            <span>Cron Jobs</span>
-            <span class="nav-badge" id="nav-cron-count">0</span>
-          </a>
-          <a href="/jobs.html" class="nav-item" data-tooltip="AI Jobs Dashboard">
-            <span class="nav-icon">🤖</span>
-            <span>AI Jobs</span>
-            <span class="nav-badge" id="nav-jobs-count">-</span>
-          </a>
-          <a href="#memory-section" class="nav-item" data-section="memory" data-tooltip="Memory">
-            <span class="nav-icon">🧠</span>
-            <span>Memory</span>
-            <span class="nav-badge" id="nav-memory-count">0</span>
-          </a>
-          <a href="#cerebro-section" class="nav-item" data-section="cerebro" data-tooltip="Cerebro">
-            <span class="nav-icon">🔮</span>
-            <span>Cerebro</span>
-            <span class="nav-badge" id="nav-cerebro-count">0</span>
-          </a>
-          <a
-            href="#operators-section"
-            class="nav-item"
-            data-section="operators"
-            data-tooltip="Operators"
-          >
-            <span class="nav-icon">👥</span>
-            <span>Operators</span>
-            <span class="nav-badge" id="nav-operator-count">0</span>
-          </a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">Info</div>
-          <a href="#about-section" class="nav-item" data-section="about" data-tooltip="About">
-            <span class="nav-icon">ℹ️</span>
-            <span>About</span>
-          </a>
-        </div>
-        <div class="nav-section">
-          <div class="nav-section-title">Quick Stats</div>
-          <div class="nav-item" style="cursor: default" data-tooltip="Total tokens (24h)">
-            <span class="nav-icon">🎫</span>
-            <span>Tokens</span>
-            <span class="nav-badge" id="nav-tokens">-</span>
-          </div>
-          <div class="nav-item" style="cursor: default; cursor: pointer;" onclick="openCostModal()" data-tooltip="Click for breakdown">
-            <span class="nav-icon">💰</span>
-            <span>Est. Daily</span>
-            <span class="nav-badge" id="nav-cost">-</span>
-          </div>
-          <div class="nav-item" style="cursor: default; cursor: pointer;" onclick="openCostModal()" data-tooltip="Projected monthly cost">
-            <span class="nav-icon">📅</span>
-            <span>Est. Monthly</span>
-            <span class="nav-badge" id="nav-monthly-cost">-</span>
-          </div>
-          <div class="nav-item" style="cursor: default" data-tooltip="Average tokens per session">
-            <span class="nav-icon">📊</span>
-            <span>Avg Tok/Sess</span>
-            <span class="nav-badge" id="nav-avg-tokens">-</span>
-          </div>
-          <div class="nav-item" style="cursor: default" data-tooltip="Average cost per session">
-            <span class="nav-icon">💵</span>
-            <span>Avg $/Sess</span>
-            <span class="nav-badge" id="nav-avg-cost">-</span>
-          </div>
-        </div>
-      </div>
-      <div class="sidebar-footer">
-        Auto-refresh: 30s<br />
-        <span id="sidebar-updated">-</span>
-      </div>
-    </nav>
+    <!-- Sidebar container (populated by sidebar.js) -->
+    <div id="sidebar-container"></div>
 
     <!-- Main Content -->
     <div class="main-wrapper" id="main-wrapper">

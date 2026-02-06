@@ -65,6 +65,14 @@
   }
 
   /**
+   * Check if we're on the main page
+   */
+  function isMainPage() {
+    const path = window.location.pathname;
+    return path === '/' || path === '/index.html';
+  }
+
+  /**
    * Set the active nav item based on current URL
    */
   function setActiveNavItem() {
@@ -78,21 +86,47 @@
       const itemHref = item.getAttribute('href');
       
       // Check if this nav item matches the current page
-      if (itemPage === currentPath) {
-        // For main page sections, only highlight if on main page
-        if (currentPath === '/' || currentPath === '/index.html') {
-          // If there's a hash, check if it matches
-          if (currentHash && itemHref && itemHref.includes(currentHash)) {
-            item.classList.add('active');
-          } else if (!currentHash && item.dataset.section === 'vitals') {
-            // Default to vitals on main page with no hash
-            item.classList.add('active');
-          }
+      if (itemPage === '/' && isMainPage()) {
+        // For main page sections
+        if (currentHash && itemHref && itemHref === currentHash) {
+          item.classList.add('active');
+        } else if (!currentHash && item.dataset.section === 'vitals') {
+          // Default to vitals on main page with no hash
+          item.classList.add('active');
         }
-      } else if (itemHref === currentPath || itemHref === currentPath.replace('/index.html', '/')) {
+      } else if (itemHref === currentPath) {
         // Exact page match (like /jobs.html)
         item.classList.add('active');
       }
+    });
+  }
+
+  /**
+   * Set up navigation click handlers
+   * - Hash links on main page: smooth scroll
+   * - Hash links on other pages: navigate to main page with hash
+   */
+  function setupNavigation() {
+    document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+      item.addEventListener('click', (e) => {
+        const section = item.dataset.section;
+        const targetHash = `#${section}-section`;
+        
+        if (isMainPage()) {
+          // On main page: smooth scroll to section
+          e.preventDefault();
+          const target = document.querySelector(targetHash);
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+            history.pushState(null, '', targetHash);
+            setActiveNavItem();
+          }
+        } else {
+          // On other page: navigate to main page with hash
+          e.preventDefault();
+          window.location.href = '/' + targetHash;
+        }
+      });
     });
   }
 
@@ -294,6 +328,7 @@
   function init() {
     loadSidebar().then(() => {
       restoreSidebarState();
+      setupNavigation();
       fetchJobsCount();
     });
 
