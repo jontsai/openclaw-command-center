@@ -1952,6 +1952,13 @@ Jonathan Tsai (@jontsai)
                   ? Math.floor(m.minutesActive / 60) + "h " + (m.minutesActive % 60) + "m"
                   : m.minutesActive + "m";
 
+              // Format tokens for display
+              const tokensFormatted = s.tokens > 1000000 
+                ? (s.tokens / 1000000).toFixed(1) + "M" 
+                : s.tokens > 1000 
+                  ? (s.tokens / 1000).toFixed(1) + "k" 
+                  : s.tokens || 0;
+
               const metricsHtml = `
                         <div class="metrics-bar">
                             <div class="metric-ring burn ${burnRateClass}" title="Token burn rate: ${m.burnRate} tokens/min">
@@ -1959,10 +1966,10 @@ Jonathan Tsai (@jontsai)
                                 <span class="metric-value">${burnRateFormatted}</span>
                                 <span class="metric-label">tok/min</span>
                             </div>
-                            <div class="metric-ring tools" title="Tool calls this session: ${m.toolCalls}">
-                                <span class="metric-icon">🔧</span>
-                                <span class="metric-value">${m.toolCalls}</span>
-                                <span class="metric-label">tools</span>
+                            <div class="metric-ring tokens" title="Total tokens this session: ${(s.tokens || 0).toLocaleString()}">
+                                <span class="metric-icon">🎫</span>
+                                <span class="metric-value">${tokensFormatted}</span>
+                                <span class="metric-label">tokens</span>
                             </div>
                             <div class="metric-ring time" title="Time active: ${m.minutesActive} minutes">
                                 <span class="metric-icon">⏱️</span>
