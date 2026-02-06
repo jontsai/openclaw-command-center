@@ -79,6 +79,9 @@ DASHBOARD_AUTH_MODE=tailscale node lib/server.js
 | 🧠 **Cerebro Topics** | Automatic conversation tagging |
 | 👥 **Operators** | Who's talking to your agents |
 | 📝 **Memory Browser** | View agent memory files |
+| 🔒 **Privacy Controls** | Hide sensitive topics for demos/screenshots |
+| 💰 **Cost Breakdown** | Detailed per-model cost analysis |
+| 📈 **Savings Projections** | Monthly cost vs. manual estimates |
 
 ---
 
@@ -143,6 +146,46 @@ If you have `memory/` or `state/` directories, you're good to go.
 | `cloudflare` | Public deploy | `DASHBOARD_AUTH_MODE=cloudflare` |
 | `allowlist` | IP whitelist | `DASHBOARD_AUTH_MODE=allowlist DASHBOARD_ALLOWED_IPS=...` |
 
+### 📋 Recommended OpenClaw Settings
+
+For the best Command Center experience, configure your OpenClaw gateway:
+
+#### Slack Threading (Critical)
+
+Enable threading for all messages to get proper topic tracking:
+
+```yaml
+# In your OpenClaw config (gateway.yaml or via openclaw gateway config)
+slack:
+  capabilities:
+    threading: all  # Options: all, dm, group, none
+```
+
+**Why this matters:** Without threading, the dashboard can't track conversation topics properly. Each thread becomes a trackable unit of work.
+
+#### Session Labels
+
+Use descriptive session labels for better dashboard visibility:
+
+```yaml
+sessions:
+  labelFormat: "{channel}:{topic}"  # Customize as needed
+```
+
+#### Cerebro (Topic Tracking)
+
+Enable Cerebro for automatic conversation tagging:
+
+```bash
+# Initialize Cerebro directories
+mkdir -p ~/your-workspace/cerebro/topics
+mkdir -p ~/your-workspace/cerebro/orphans
+```
+
+The dashboard will automatically detect and display topic data.
+
+---
+
 ### Multi-Profile Support
 
 Running multiple OpenClaw instances?
@@ -186,6 +229,36 @@ command-center/
     ├── setup.sh            # First-time setup
     └── verify.sh           # Health check
 ```
+
+---
+
+## 🚀 Coming Soon
+
+### Advanced Job Scheduling
+
+Building on OpenClaw's native cron system with intelligent scheduling primitives:
+
+| Primitive | Description |
+|-----------|-------------|
+| **run-if-not** | Skip if job already running (dedupe) |
+| **run-if-idle** | Only execute when system capacity available |
+| **run-after** | Dependency chains between jobs |
+| **run-with-backoff** | Exponential retry on failure |
+| **priority-queue** | Critical vs. background work prioritization |
+
+### Multi-Agent Orchestration
+
+- Agent-to-agent handoffs
+- Swarm coordination patterns
+- Specialized agent routing (data analysis, documentation, testing)
+- Cross-session context sharing
+
+### Integration Ecosystem
+
+- Webhook triggers for external systems
+- Slack slash commands for quick actions
+- API for custom integrations
+- Plugin architecture for specialized agents
 
 ---
 
