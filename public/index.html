@@ -2030,8 +2030,13 @@ Jonathan Tsai (@jontsai)
         
         // Filter out hidden crons
         const visibleCrons = cron.filter(c => !isCronHidden(c));
+        const hiddenCronsCount = cron.length - visibleCrons.length;
         
-        $set("cron-count", "textContent", cron.length);
+        // Show hidden count breakdown if any are hidden
+        const cronCountText = hiddenCronsCount > 0
+          ? `${cron.length} (${visibleCrons.length} visible, ${hiddenCronsCount} hidden)`
+          : cron.length;
+        $set("cron-count", "textContent", cronCountText);
         $set("nav-cron-count", "textContent", cron.length);
 
         if (visibleCrons.length === 0) {
