@@ -907,6 +907,7 @@
               🔮 Cerebro <span class="section-count" id="cerebro-count">0 topics</span>
             </div>
             <div class="section-actions">
+              <button class="btn-secondary" onclick="openPrivacyModal()" title="Privacy Settings">🔒</button>
               <button class="btn-secondary" onclick="refreshCerebro()" title="Refresh">🔄</button>
             </div>
           </div>
@@ -1366,6 +1367,38 @@ Jonathan Tsai (@jontsai)
       </div>
       <div class="detail-content" id="operator-modal-content">
         <div class="loading-state">Loading user stats...</div>
+      </div>
+    </div>
+
+    <!-- Privacy Settings Modal -->
+    <div id="privacy-modal-overlay" class="detail-overlay hidden" onclick="closePrivacyModal()"></div>
+    <div id="privacy-modal" class="detail-panel hidden" style="max-width: 500px;">
+      <div class="detail-header">
+        <h2>🔒 Privacy Settings</h2>
+        <button class="close-btn" onclick="closePrivacyModal()">✕</button>
+      </div>
+      <div class="detail-content" id="privacy-modal-content">
+        <div style="margin-bottom: 16px;">
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+            Hide topics from display for privacy during demos/screenshots. Hidden topics are stored in your browser only.
+          </p>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <label style="font-size: 0.9rem; font-weight: 600;">Add topic to hide:</label>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <input type="text" id="privacy-add-topic" placeholder="Topic name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
+            <button class="btn-primary" onclick="addHiddenTopic()">Add</button>
+          </div>
+        </div>
+        <div>
+          <label style="font-size: 0.9rem; font-weight: 600;">Hidden topics:</label>
+          <div id="hidden-topics-list" style="margin-top: 8px; min-height: 40px;">
+            <em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>
+          </div>
+        </div>
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
+          <button class="btn-secondary" onclick="clearAllHiddenTopics()" style="width: 100%;">Clear All Hidden Topics</button>
+        </div>
       </div>
     </div>
 
@@ -1835,13 +1868,13 @@ Jonathan Tsai (@jontsai)
               const cardClass = s.active ? "active" : s.recentlyActive ? "recent-active" : "";
               const status = s.active ? "live" : s.recentlyActive ? "recent" : "idle";
 
-              // Generate topic pills
+              // Generate topic pills (filtered by privacy settings)
               let topicHtml = "";
               if (s.topic) {
                 const topics = s.topic
                   .split(", ")
                   .map((t) => t.trim())
-                  .filter((t) => t);
+                  .filter((t) => t && !isTopicHidden(t));
                 if (topics.length > 0) {
                   const pills = topics
                     .map((t) => {
@@ -1855,7 +1888,8 @@ Jonathan Tsai (@jontsai)
               const previewHtml = s.preview
                 ? `<div class="card-preview">${escapeHtml(s.preview)}</div>`
                 : "";
-              const cerebroTagHtml = s.cerebroTopic
+              // Cerebro tag (filtered by privacy settings)
+              const cerebroTagHtml = s.cerebroTopic && !isTopicHidden(s.cerebroTopic)
                 ? `<span class="cerebro-tag" title="Cerebro topic: ${escapeHtml(s.cerebroTopic)}">🏷️ ${escapeHtml(s.cerebroTopic)}</span>`
                 : "";
 
@@ -2659,6 +2693,9 @@ Jonathan Tsai (@jontsai)
 
       // Cerebro rendering
       function renderCerebro(cerebro) {
+        // Store for re-rendering when privacy settings change
+        window.lastCerebroData = cerebro;
+        
         const notInitEl = document.getElementById("cerebro-not-initialized");
         const initEl = document.getElementById("cerebro-initialized");
 
@@ -2682,7 +2719,7 @@ Jonathan Tsai (@jontsai)
         if (notInitEl) notInitEl.style.display = "none";
         if (initEl) initEl.style.display = "block";
 
-        // Update counts
+        // Update counts (unfiltered totals)
         $set("cerebro-count", "textContent", `${cerebro.topics.total} topics`);
         $set("nav-cerebro-count", "textContent", cerebro.topics.total);
 
@@ -2694,10 +2731,12 @@ Jonathan Tsai (@jontsai)
         $set("cerebro-threads", "textContent", cerebro.threads || 0);
         $set("cerebro-orphans", "textContent", cerebro.orphans || 0);
 
-        // Recent topics with action buttons
+        // Recent topics with action buttons (filtered by privacy settings)
         const recentEl = document.getElementById("cerebro-recent-topics");
-        if (cerebro.recentTopics && cerebro.recentTopics.length > 0) {
-          smartUpdate(recentEl, cerebro.recentTopics
+        const visibleTopics = (cerebro.recentTopics || []).filter(t => !isTopicHidden(t.name) && !isTopicHidden(t.title));
+        
+        if (visibleTopics.length > 0) {
+          smartUpdate(recentEl, visibleTopics
             .map((t) => {
               const statusIcon =
                 t.status === "active" ? "🟢" : t.status === "resolved" ? "✅" : "⏸️";
@@ -2952,6 +2991,104 @@ Jonathan Tsai (@jontsai)
         setTimeout(() => {
           document.getElementById("operator-modal").classList.add("hidden");
           document.getElementById("operator-modal-overlay").classList.add("hidden");
+        }, 200);
+      }
+      
+      // Privacy Settings
+      const HIDDEN_TOPICS_KEY = 'openclawHiddenTopics';
+      
+      function getHiddenTopics() {
+        try {
+          const stored = localStorage.getItem(HIDDEN_TOPICS_KEY);
+          return stored ? JSON.parse(stored) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      
+      function setHiddenTopics(topics) {
+        try {
+          localStorage.setItem(HIDDEN_TOPICS_KEY, JSON.stringify(topics));
+        } catch (e) {
+          console.error('Failed to save hidden topics:', e);
+        }
+      }
+      
+      function isTopicHidden(topicName) {
+        const hidden = getHiddenTopics();
+        const normalized = (topicName || '').toLowerCase().trim();
+        return hidden.some(h => h.toLowerCase().trim() === normalized);
+      }
+      
+      function addHiddenTopic() {
+        const input = document.getElementById('privacy-add-topic');
+        const topic = (input.value || '').trim();
+        if (!topic) return;
+        
+        const hidden = getHiddenTopics();
+        if (!hidden.some(h => h.toLowerCase() === topic.toLowerCase())) {
+          hidden.push(topic);
+          setHiddenTopics(hidden);
+        }
+        input.value = '';
+        renderHiddenTopicsList();
+        
+        // Re-render Cerebro and sessions to apply filter
+        if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
+        renderSessions(sessionsData);
+      }
+      
+      function removeHiddenTopic(topic) {
+        const hidden = getHiddenTopics();
+        const filtered = hidden.filter(h => h.toLowerCase() !== topic.toLowerCase());
+        setHiddenTopics(filtered);
+        renderHiddenTopicsList();
+        
+        // Re-render Cerebro and sessions to apply filter
+        if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
+        renderSessions(sessionsData);
+      }
+      
+      function clearAllHiddenTopics() {
+        setHiddenTopics([]);
+        renderHiddenTopicsList();
+        
+        // Re-render Cerebro and sessions to apply filter
+        if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
+        renderSessions(sessionsData);
+      }
+      
+      function renderHiddenTopicsList() {
+        const container = document.getElementById('hidden-topics-list');
+        const hidden = getHiddenTopics();
+        
+        if (hidden.length === 0) {
+          container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>';
+          return;
+        }
+        
+        container.innerHTML = hidden.map(topic => `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg); border-radius: 6px; margin-bottom: 6px;">
+            <span style="font-size: 0.9rem;">${escapeHtml(topic)}</span>
+            <button onclick="removeHiddenTopic('${escapeHtml(topic).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1rem;" title="Remove">✕</button>
+          </div>
+        `).join('');
+      }
+      
+      function openPrivacyModal() {
+        document.getElementById("privacy-modal").classList.remove("hidden");
+        document.getElementById("privacy-modal").classList.add("visible");
+        document.getElementById("privacy-modal-overlay").classList.remove("hidden");
+        document.getElementById("privacy-modal-overlay").classList.add("visible");
+        renderHiddenTopicsList();
+      }
+      
+      function closePrivacyModal() {
+        document.getElementById("privacy-modal").classList.remove("visible");
+        document.getElementById("privacy-modal-overlay").classList.remove("visible");
+        setTimeout(() => {
+          document.getElementById("privacy-modal").classList.add("hidden");
+          document.getElementById("privacy-modal-overlay").classList.add("hidden");
         }, 200);
       }
       
