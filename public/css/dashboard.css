@@ -26,6 +26,33 @@
         display: flex;
       }
 
+      /* Buttons */
+      .btn-primary, .btn-secondary {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        border: 1px solid var(--border);
+        transition: all 0.15s ease;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+      .btn-primary:hover {
+        background: #4c9aed;
+        border-color: #4c9aed;
+      }
+      .btn-secondary {
+        background: var(--card-bg);
+        color: var(--text);
+      }
+      .btn-secondary:hover {
+        background: var(--card-hover);
+        border-color: var(--accent);
+      }
+
       /* Sidebar */
       .sidebar {
         width: var(--sidebar-width);
