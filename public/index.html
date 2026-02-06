@@ -1383,7 +1383,7 @@ Jonathan Tsai (@jontsai)
         
         <!-- Hidden Topics Section -->
         <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">🏷️ Hidden Topics</label>
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">🏷️ Hidden Topics <span id="privacy-topics-count" style="color: var(--text-muted); font-weight: normal;">(0)</span></label>
           <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <input type="text" id="privacy-add-topic" placeholder="Topic name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
             <button class="btn-primary" onclick="addHiddenTopic()">Add</button>
@@ -1395,7 +1395,7 @@ Jonathan Tsai (@jontsai)
         
         <!-- Hidden Sessions Section -->
         <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">📋 Hidden Sessions</label>
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">📋 Hidden Sessions <span id="privacy-sessions-count" style="color: var(--text-muted); font-weight: normal;">(0)</span></label>
           <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <input type="text" id="privacy-add-session" placeholder="Session label or key..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
             <button class="btn-primary" onclick="addHiddenSession()">Add</button>
@@ -1410,7 +1410,7 @@ Jonathan Tsai (@jontsai)
         
         <!-- Hidden Cron Jobs Section -->
         <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">⏰ Hidden Cron Jobs</label>
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">⏰ Hidden Cron Jobs <span id="privacy-crons-count" style="color: var(--text-muted); font-weight: normal;">(0)</span></label>
           <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <input type="text" id="privacy-add-cron" placeholder="Cron job name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
             <button class="btn-primary" onclick="addHiddenCron()">Add</button>
@@ -3282,6 +3282,10 @@ Jonathan Tsai (@jontsai)
         if (!container) return;
         const hidden = getHiddenTopics();
         
+        // Update count in heading
+        const countEl = document.getElementById('privacy-topics-count');
+        if (countEl) countEl.textContent = `(${hidden.length})`;
+        
         if (hidden.length === 0) {
           container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>';
           return;
@@ -3300,6 +3304,10 @@ Jonathan Tsai (@jontsai)
         if (!container) return;
         const hidden = getHiddenSessions();
         
+        // Update count in heading
+        const countEl = document.getElementById('privacy-sessions-count');
+        if (countEl) countEl.textContent = `(${hidden.length})`;
+        
         if (hidden.length === 0) {
           container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No sessions hidden</em>';
           return;
@@ -3317,6 +3325,10 @@ Jonathan Tsai (@jontsai)
         const container = document.getElementById('hidden-crons-list');
         if (!container) return;
         const hidden = getHiddenCrons();
+        
+        // Update count in heading
+        const countEl = document.getElementById('privacy-crons-count');
+        if (countEl) countEl.textContent = `(${hidden.length})`;
         
         if (hidden.length === 0) {
           container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>';
