@@ -2009,7 +2009,7 @@ Jonathan Tsai (@jontsai)
                             </div>
                             ${activityHtml}
                             <span class="card-badge ${badgeClass}">${badgeText}</span>
-                            <button class="hide-btn" onclick="event.stopPropagation(); quickHideSession('${escapeHtml(s.label).replace(/'/g, "\\'")}');" title="Hide session">👁️</button>
+                            <button class="hide-btn" onclick="event.stopPropagation(); quickHideSession('${escapeHtml(s.sessionKey).replace(/'/g, "\\'")}', '${escapeHtml(s.label).replace(/'/g, "\\'")}');" title="Hide session">👁️</button>
                         </div>
                         ${topicHtml}
                         ${previewHtml}
@@ -2072,7 +2072,7 @@ Jonathan Tsai (@jontsai)
                                 ${c.enabled !== false ? "✓ Enabled" : "○ Disabled"}
                             </span>
                             <div class="cron-next">${c.nextRun}</div>
-                            <button class="hide-btn" onclick="event.stopPropagation(); quickHideCron('${escapeHtml(c.name).replace(/'/g, "\\'")}');" title="Hide cron job">👁️</button>
+                            <button class="hide-btn" onclick="event.stopPropagation(); quickHideCron('${escapeHtml(c.id || c.name).replace(/'/g, "\\'")}', '${escapeHtml(c.name).replace(/'/g, "\\'")}');" title="Hide cron job">👁️</button>
                         </div>
                     </div>
                 `;
@@ -2775,7 +2775,7 @@ Jonathan Tsai (@jontsai)
 
         // Calculate hidden topics count from current view
         const allTopics = cerebro.recentTopics || [];
-        const hiddenTopicsCount = allTopics.filter(t => isTopicHidden(t.name) || isTopicHidden(t.title)).length;
+        const hiddenTopicsCount = allTopics.filter(t => isTopicHidden(t.name)).length;
         const visibleTopicsCount = allTopics.length - hiddenTopicsCount;
         
         // Update counts with hidden breakdown (updates dynamically on hide/unhide)
@@ -2795,7 +2795,7 @@ Jonathan Tsai (@jontsai)
 
         // Recent topics with action buttons (filtered by privacy settings)
         const recentEl = document.getElementById("cerebro-recent-topics");
-        const visibleTopics = allTopics.filter(t => !isTopicHidden(t.name) && !isTopicHidden(t.title));
+        const visibleTopics = allTopics.filter(t => !isTopicHidden(t.name));
         
         if (visibleTopics.length > 0) {
           smartUpdate(recentEl, visibleTopics
@@ -2810,7 +2810,7 @@ Jonathan Tsai (@jontsai)
                     : "var(--text-muted)";
 
               // Action buttons based on status (always include hide button)
-              const hideBtn = `<button class="topic-action-btn hide" onclick="quickHideTopic('${escapeHtml(t.name).replace(/'/g, "\\'")}'); event.stopPropagation();" title="Hide topic">👁️</button>`;
+              const hideBtn = `<button class="topic-action-btn hide" onclick="quickHideTopic('${escapeHtml(t.name).replace(/'/g, "\\'")}', '${escapeHtml(t.title || t.name).replace(/'/g, "\\'")}'); event.stopPropagation();" title="Hide topic">👁️</button>`;
               let actionButtons = "";
               if (t.status === "active") {
                 actionButtons = `
@@ -3055,10 +3055,20 @@ Jonathan Tsai (@jontsai)
       const HIDE_HOSTNAME_KEY = 'openclawHideHostname';
       
       // Generic localStorage helpers
+      // Storage format: [{id: "...", name: "..."}, ...]
+      // For backwards compatibility, also handles old string array format
       function getHiddenItems(key) {
         try {
           const stored = localStorage.getItem(key);
-          return stored ? JSON.parse(stored) : [];
+          if (!stored) return [];
+          const parsed = JSON.parse(stored);
+          // Migrate old string format to new object format
+          return parsed.map(item => {
+            if (typeof item === 'string') {
+              return { id: item, name: item };
+            }
+            return item;
+          });
         } catch (e) {
           return [];
         }
@@ -3072,29 +3082,24 @@ Jonathan Tsai (@jontsai)
         }
       }
       
-      function isItemHidden(key, itemName) {
-        const hidden = getHiddenItems(key);
-        const normalized = (itemName || '').toLowerCase().trim();
-        return hidden.some(h => h.toLowerCase().trim() === normalized);
-      }
-      
       // Topic-specific functions
       function getHiddenTopics() { return getHiddenItems(HIDDEN_TOPICS_KEY); }
       function setHiddenTopics(topics) { setHiddenItems(HIDDEN_TOPICS_KEY, topics); }
-      function isTopicHidden(topicName) { return isItemHidden(HIDDEN_TOPICS_KEY, topicName); }
+      function isTopicHidden(topicId) {
+        const hidden = getHiddenTopics();
+        const normalized = (topicId || '').toLowerCase().trim();
+        // Match on id only (exact match)
+        return hidden.some(h => (h.id || '').toLowerCase().trim() === normalized);
+      }
       
       // Session-specific functions  
       function getHiddenSessions() { return getHiddenItems(HIDDEN_SESSIONS_KEY); }
       function setHiddenSessions(sessions) { setHiddenItems(HIDDEN_SESSIONS_KEY, sessions); }
       function isSessionHidden(session) {
         const hidden = getHiddenSessions();
-        const label = (session.label || '').toLowerCase().trim();
         const key = (session.sessionKey || session.key || '').toLowerCase().trim();
-        return hidden.some(h => {
-          const hLower = h.toLowerCase().trim();
-          // Exact match only (label or key)
-          return hLower === label || hLower === key;
-        });
+        // Match on sessionKey (id) only
+        return hidden.some(h => (h.id || '').toLowerCase().trim() === key);
       }
       
       // Cron-specific functions
@@ -3102,24 +3107,20 @@ Jonathan Tsai (@jontsai)
       function setHiddenCrons(crons) { setHiddenItems(HIDDEN_CRONS_KEY, crons); }
       function isCronHidden(cron) {
         const hidden = getHiddenCrons();
-        const name = (cron.name || cron.label || '').toLowerCase().trim();
         const id = (cron.id || cron.jobId || '').toLowerCase().trim();
-        return hidden.some(h => {
-          const hLower = h.toLowerCase().trim();
-          // Exact match only (name or id)
-          return hLower === name || hLower === id;
-        });
+        // Match on id only (exact match)
+        return hidden.some(h => (h.id || '').toLowerCase().trim() === id);
       }
       
-      // Add functions
+      // Add functions (manual entry - uses input as both id and name)
       function addHiddenTopic() {
         const input = document.getElementById('privacy-add-topic');
         const topic = (input.value || '').trim();
         if (!topic) return;
         
         const hidden = getHiddenTopics();
-        if (!hidden.some(h => h.toLowerCase() === topic.toLowerCase())) {
-          hidden.push(topic);
+        if (!hidden.some(h => (h.id || '').toLowerCase() === topic.toLowerCase())) {
+          hidden.push({ id: topic, name: topic });
           setHiddenTopics(hidden);
         }
         input.value = '';
@@ -3133,8 +3134,8 @@ Jonathan Tsai (@jontsai)
         if (!session) return;
         
         const hidden = getHiddenSessions();
-        if (!hidden.some(h => h.toLowerCase() === session.toLowerCase())) {
-          hidden.push(session);
+        if (!hidden.some(h => (h.id || '').toLowerCase() === session.toLowerCase())) {
+          hidden.push({ id: session, name: session });
           setHiddenSessions(hidden);
         }
         input.value = '';
@@ -3148,8 +3149,8 @@ Jonathan Tsai (@jontsai)
         if (!cron) return;
         
         const hidden = getHiddenCrons();
-        if (!hidden.some(h => h.toLowerCase() === cron.toLowerCase())) {
-          hidden.push(cron);
+        if (!hidden.some(h => (h.id || '').toLowerCase() === cron.toLowerCase())) {
+          hidden.push({ id: cron, name: cron });
           setHiddenCrons(hidden);
         }
         input.value = '';
@@ -3158,56 +3159,57 @@ Jonathan Tsai (@jontsai)
       }
       
       // Quick-hide from card (called by hide icon on cards)
-      function quickHideTopic(name) {
+      // Stores id for matching, name for display
+      function quickHideTopic(id, name) {
         const hidden = getHiddenTopics();
-        if (!hidden.some(h => h.toLowerCase() === name.toLowerCase())) {
-          hidden.push(name);
+        if (!hidden.some(h => (h.id || '').toLowerCase() === id.toLowerCase())) {
+          hidden.push({ id: id, name: name || id });
           setHiddenTopics(hidden);
         }
         refreshAllViews();
-        showToast(`Topic "${name}" hidden. Open Privacy Settings to unhide.`);
+        showToast(`Topic "${name || id}" hidden. Open Privacy Settings to unhide.`);
       }
       
-      function quickHideSession(label) {
+      function quickHideSession(id, name) {
         const hidden = getHiddenSessions();
-        if (!hidden.some(h => h.toLowerCase() === label.toLowerCase())) {
-          hidden.push(label);
+        if (!hidden.some(h => (h.id || '').toLowerCase() === id.toLowerCase())) {
+          hidden.push({ id: id, name: name || id });
           setHiddenSessions(hidden);
         }
         refreshAllViews();
-        showToast(`Session "${label}" hidden. Open Privacy Settings to unhide.`);
+        showToast(`Session "${name || id}" hidden. Open Privacy Settings to unhide.`);
       }
       
-      function quickHideCron(name) {
+      function quickHideCron(id, name) {
         const hidden = getHiddenCrons();
-        if (!hidden.some(h => h.toLowerCase() === name.toLowerCase())) {
-          hidden.push(name);
+        if (!hidden.some(h => (h.id || '').toLowerCase() === id.toLowerCase())) {
+          hidden.push({ id: id, name: name || id });
           setHiddenCrons(hidden);
         }
         refreshAllViews();
-        showToast(`Cron job "${name}" hidden. Open Privacy Settings to unhide.`);
+        showToast(`Cron job "${name || id}" hidden. Open Privacy Settings to unhide.`);
       }
       
-      // Remove functions
-      function removeHiddenTopic(topic) {
+      // Remove functions (by id)
+      function removeHiddenTopic(id) {
         const hidden = getHiddenTopics();
-        const filtered = hidden.filter(h => h.toLowerCase() !== topic.toLowerCase());
+        const filtered = hidden.filter(h => (h.id || '').toLowerCase() !== id.toLowerCase());
         setHiddenTopics(filtered);
         renderPrivacyLists();
         refreshAllViews();
       }
       
-      function removeHiddenSession(session) {
+      function removeHiddenSession(id) {
         const hidden = getHiddenSessions();
-        const filtered = hidden.filter(h => h.toLowerCase() !== session.toLowerCase());
+        const filtered = hidden.filter(h => (h.id || '').toLowerCase() !== id.toLowerCase());
         setHiddenSessions(filtered);
         renderPrivacyLists();
         refreshAllViews();
       }
       
-      function removeHiddenCron(cron) {
+      function removeHiddenCron(id) {
         const hidden = getHiddenCrons();
-        const filtered = hidden.filter(h => h.toLowerCase() !== cron.toLowerCase());
+        const filtered = hidden.filter(h => (h.id || '').toLowerCase() !== id.toLowerCase());
         setHiddenCrons(filtered);
         renderPrivacyLists();
         refreshAllViews();
@@ -3291,10 +3293,11 @@ Jonathan Tsai (@jontsai)
           return;
         }
         
-        container.innerHTML = hidden.map(topic => `
+        // Display name, but remove by id
+        container.innerHTML = hidden.map(item => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
-            <span>${escapeHtml(topic)}</span>
-            <button onclick="removeHiddenTopic('${escapeHtml(topic).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+            <span>${escapeHtml(item.name || item.id)}</span>
+            <button onclick="removeHiddenTopic('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
         `).join('');
       }
@@ -3313,10 +3316,11 @@ Jonathan Tsai (@jontsai)
           return;
         }
         
-        container.innerHTML = hidden.map(session => `
+        // Display name, but remove by id
+        container.innerHTML = hidden.map(item => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
-            <span>${escapeHtml(session)}</span>
-            <button onclick="removeHiddenSession('${escapeHtml(session).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+            <span>${escapeHtml(item.name || item.id)}</span>
+            <button onclick="removeHiddenSession('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
         `).join('');
       }
@@ -3335,10 +3339,11 @@ Jonathan Tsai (@jontsai)
           return;
         }
         
-        container.innerHTML = hidden.map(cron => `
+        // Display name, but remove by id
+        container.innerHTML = hidden.map(item => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
-            <span>${escapeHtml(cron)}</span>
-            <button onclick="removeHiddenCron('${escapeHtml(cron).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+            <span>${escapeHtml(item.name || item.id)}</span>
+            <button onclick="removeHiddenCron('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
         `).join('');
       }
