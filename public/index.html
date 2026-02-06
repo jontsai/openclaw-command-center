@@ -151,11 +151,11 @@
         </div>
         <div class="stat" title="Click for cost breakdown" onclick="openCostModal()" style="cursor: pointer;">
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label">API Cost (24h) 📊</div>
+          <div class="stat-label">Est. Cost (24h) 📊</div>
         </div>
         <div class="stat" title="Savings vs API pricing (you pay flat $200/mo)" id="savings-stat" style="display: none;">
           <div class="stat-value" id="est-savings" style="color: var(--green);">-</div>
-          <div class="stat-label">Savings 💰</div>
+          <div class="stat-label">Est. Savings 💰</div>
         </div>
         <div class="stat" title="Main session capacity">
           <div class="stat-value" id="main-capacity">-</div>
@@ -1370,7 +1370,7 @@ Jonathan Tsai (@jontsai)
           <div class="detail-box" id="cost-calculation"></div>
         </div>
         <div class="detail-section" style="background: rgba(63,185,80,0.1); border-radius: 8px; padding: 16px;">
-          <h3>✨ Your Savings</h3>
+          <h3>✨ Est. Savings</h3>
           <div class="detail-box" id="cost-savings"></div>
         </div>
       </div>
@@ -2759,7 +2759,7 @@ Jonathan Tsai (@jontsai)
           <div class="detail-row"><span class="detail-label">Cache Read Cost</span><span class="detail-value">$${formatCurrency(calc.cacheReadCost, 2)}</span></div>
           <div class="detail-row"><span class="detail-label">Cache Write Cost</span><span class="detail-value">$${formatCurrency(calc.cacheWriteCost, 2)}</span></div>
           <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
-            <span class="detail-label"><strong>Total API Cost</strong></span>
+            <span class="detail-label"><strong>Est. API Cost</strong></span>
             <span class="detail-value"><strong>$${formatCurrency(data.totalCost)}</strong></span>
           </div>
         `;
@@ -2770,9 +2770,9 @@ Jonathan Tsai (@jontsai)
         const monthlyProjection = Math.round(data.totalCost * 30);
         document.getElementById("cost-savings").innerHTML = savings > 0 ? `
           <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
-          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
+          <div class="detail-row"><span class="detail-label">Est. API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
           <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
-            <span class="detail-label"><strong>You Saved</strong></span>
+            <span class="detail-label"><strong>Est. Savings</strong></span>
             <span class="detail-value" style="color: var(--green);"><strong>$${formatCurrency(savings)} (${savingsPercent}%)</strong></span>
           </div>
           <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
@@ -2780,9 +2780,9 @@ Jonathan Tsai (@jontsai)
           </p>
         ` : `
           <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
-          <div class="detail-row"><span class="detail-label">API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
+          <div class="detail-row"><span class="detail-label">Est. API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
           <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-            📈 Keep going! Once your 24h API cost exceeds $${data.planCost || 200}, you'll start seeing savings.
+            📈 Keep going! Once your 24h est. cost exceeds $${data.planCost || 200}, you'll start seeing savings.
           </p>
         `;
       }
