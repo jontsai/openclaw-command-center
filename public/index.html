@@ -1349,6 +1349,49 @@ Jonathan Tsai (@jontsai)
       </div>
     </div>
 
+    <!-- Auth Fix Modal -->
+    <div id="auth-modal-overlay" class="detail-overlay hidden" onclick="closeAuthModal()"></div>
+    <div id="auth-modal" class="detail-panel hidden" style="max-width: 550px;">
+      <div class="detail-header">
+        <h2>🔑 Fix Claude Authentication</h2>
+        <button class="close-btn" onclick="closeAuthModal()">✕</button>
+      </div>
+      <div class="detail-content" id="auth-modal-content">
+        <div class="detail-section" style="background: rgba(245,158,11,0.1); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+          <p style="margin: 0; color: #f59e0b;">⚠️ Your Claude OAuth token has expired or lacks the required permissions.</p>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Step 1: Refresh Claude Token</h3>
+          <div class="detail-box">
+            <p>Open Terminal and run:</p>
+            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>claude setup-token</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px;">Follow the prompts to authenticate with your Claude account.</p>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Step 2: Update OpenClaw Agent</h3>
+          <div class="detail-box">
+            <p>Run the onboard wizard to update your agent credentials:</p>
+            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>openclaw onboard</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px;">Or manually update the main agent:</p>
+            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>openclaw agents add main</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px;">Select "Claude Code CLI" when prompted for the auth source.</p>
+          </div>
+        </div>
+        
+        <div class="detail-section">
+          <h3>Step 3: Verify</h3>
+          <div class="detail-box">
+            <p>Refresh this dashboard or run:</p>
+            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>openclaw status --usage</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px;">You should see your usage percentages instead of an auth error.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Cost Breakdown Modal -->
     <div id="cost-modal-overlay" class="detail-overlay hidden" onclick="closeCostModal()"></div>
     <div id="cost-modal" class="detail-panel hidden" style="max-width: 500px;">
@@ -2236,6 +2279,7 @@ Jonathan Tsai (@jontsai)
         if (data?.errorType === "auth" || data?.claude?.session?.error) {
           const errorMsg = "⚠️ Auth Error";
           const errorDetail = "API key lacks user:profile scope";
+          const clickableError = '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>';
           
           // Session card
           document.getElementById("claude-session-pct").innerHTML = 
@@ -2243,7 +2287,7 @@ Jonathan Tsai (@jontsai)
           document.getElementById("claude-session-bar").style.width = "0%";
           document.getElementById("claude-session-bar").className = "vital-bar-fill gray";
           document.getElementById("claude-session-remaining").textContent = "N/A";
-          document.getElementById("claude-session-reset").textContent = "Auth Error";
+          document.getElementById("claude-session-reset").innerHTML = clickableError;
           
           // Weekly card
           document.getElementById("claude-weekly-pct").innerHTML = 
@@ -2251,7 +2295,7 @@ Jonathan Tsai (@jontsai)
           document.getElementById("claude-weekly-bar").style.width = "0%";
           document.getElementById("claude-weekly-bar").className = "vital-bar-fill gray";
           document.getElementById("claude-weekly-remaining").textContent = "N/A";
-          document.getElementById("claude-weekly-reset").textContent = "Auth Error";
+          document.getElementById("claude-weekly-reset").innerHTML = clickableError;
           
           // Sonnet card
           document.getElementById("sonnet-weekly-pct").innerHTML = 
@@ -2259,7 +2303,7 @@ Jonathan Tsai (@jontsai)
           document.getElementById("sonnet-weekly-bar").style.width = "0%";
           document.getElementById("sonnet-weekly-bar").className = "vital-bar-fill gray";
           document.getElementById("sonnet-weekly-remaining").textContent = "N/A";
-          document.getElementById("sonnet-weekly-reset").textContent = "Auth Error";
+          document.getElementById("sonnet-weekly-reset").innerHTML = clickableError;
           
           // Compact cards - Claude
           const compactSessionEl = document.getElementById("claude-compact-session-pct");
@@ -2725,6 +2769,23 @@ Jonathan Tsai (@jontsai)
         setTimeout(() => {
           document.getElementById("cost-modal").classList.add("hidden");
           document.getElementById("cost-modal-overlay").classList.add("hidden");
+        }, 200);
+      }
+      
+      // Auth fix modal
+      function openAuthModal() {
+        document.getElementById("auth-modal").classList.remove("hidden");
+        document.getElementById("auth-modal").classList.add("visible");
+        document.getElementById("auth-modal-overlay").classList.remove("hidden");
+        document.getElementById("auth-modal-overlay").classList.add("visible");
+      }
+      
+      function closeAuthModal() {
+        document.getElementById("auth-modal").classList.remove("visible");
+        document.getElementById("auth-modal-overlay").classList.remove("visible");
+        setTimeout(() => {
+          document.getElementById("auth-modal").classList.add("hidden");
+          document.getElementById("auth-modal-overlay").classList.add("hidden");
         }, 200);
       }
       
