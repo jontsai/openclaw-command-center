@@ -906,9 +906,7 @@
             <div class="section-title">
               🔮 Cerebro <span class="section-count" id="cerebro-count">0 topics</span>
             </div>
-            <div class="section-actions">
-              <button class="btn-secondary" onclick="refreshCerebro()" title="Refresh">🔄</button>
-            </div>
+            <!-- SSE provides live updates -->
           </div>
 
           <div id="cerebro-content">
@@ -2851,17 +2849,6 @@ Jonathan Tsai (@jontsai)
           else lastUpdatedEl.textContent = `${Math.round(diffMins / 1440)}d ago`;
         } else {
           lastUpdatedEl.textContent = "-";
-        }
-      }
-
-      async function refreshCerebro() {
-        try {
-          const res = await fetch("/api/cerebro");
-          const data = await res.json();
-          // API returns cerebro data directly
-          renderCerebro(data);
-        } catch (e) {
-          console.error("Failed to refresh Cerebro:", e);
         }
       }
 
