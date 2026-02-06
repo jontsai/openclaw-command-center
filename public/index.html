@@ -1372,7 +1372,7 @@ Jonathan Tsai (@jontsai)
 
     <!-- Privacy Settings Modal -->
     <div id="privacy-modal-overlay" class="detail-overlay hidden" onclick="closePrivacyModal()"></div>
-    <div id="privacy-modal" class="detail-panel hidden" style="max-width: 500px;">
+    <div id="privacy-modal" class="detail-panel hidden" style="max-width: 550px;">
       <div class="detail-header">
         <h2>🔒 Privacy Settings</h2>
         <button class="close-btn" onclick="closePrivacyModal()">✕</button>
@@ -1380,24 +1380,51 @@ Jonathan Tsai (@jontsai)
       <div class="detail-content" id="privacy-modal-content">
         <div style="margin-bottom: 16px;">
           <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
-            Hide topics from display for privacy during demos/screenshots. Hidden topics are stored in your browser only.
+            Hide topics and sessions from display for privacy during demos/screenshots. Settings are stored in your browser only.
           </p>
         </div>
-        <div style="margin-bottom: 16px;">
-          <label style="font-size: 0.9rem; font-weight: 600;">Add topic to hide:</label>
-          <div style="display: flex; gap: 8px; margin-top: 8px;">
+        
+        <!-- Hidden Topics Section -->
+        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">🏷️ Hidden Topics</label>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
             <input type="text" id="privacy-add-topic" placeholder="Topic name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
             <button class="btn-primary" onclick="addHiddenTopic()">Add</button>
           </div>
-        </div>
-        <div>
-          <label style="font-size: 0.9rem; font-weight: 600;">Hidden topics:</label>
-          <div id="hidden-topics-list" style="margin-top: 8px; min-height: 40px;">
+          <div id="hidden-topics-list" style="min-height: 30px;">
             <em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>
           </div>
         </div>
-        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);">
-          <button class="btn-secondary" onclick="clearAllHiddenTopics()" style="width: 100%;">Clear All Hidden Topics</button>
+        
+        <!-- Hidden Sessions Section -->
+        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">📋 Hidden Sessions</label>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="privacy-add-session" placeholder="Session label or key..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
+            <button class="btn-primary" onclick="addHiddenSession()">Add</button>
+          </div>
+          <div id="hidden-sessions-list" style="min-height: 30px;">
+            <em style="color: var(--text-muted); font-size: 0.85rem;">No sessions hidden</em>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
+            💡 Tip: You can also click the 👁️ icon on any session card to hide it quickly.
+          </p>
+        </div>
+        
+        <!-- Hidden Cron Jobs Section -->
+        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">⏰ Hidden Cron Jobs</label>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="privacy-add-cron" placeholder="Cron job name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
+            <button class="btn-primary" onclick="addHiddenCron()">Add</button>
+          </div>
+          <div id="hidden-crons-list" style="min-height: 30px;">
+            <em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>
+          </div>
+        </div>
+        
+        <div>
+          <button class="btn-secondary" onclick="clearAllPrivacySettings()" style="width: 100%;">Clear All Privacy Settings</button>
         </div>
       </div>
     </div>
@@ -1843,7 +1870,10 @@ Jonathan Tsai (@jontsai)
         }
         // Removed: fallback to updateFilterCounts(sessions) which only counted current page
 
-        if (sessions.length === 0) {
+        // Filter out hidden sessions
+        const visibleSessions = sessions.filter(s => !isSessionHidden(s));
+        
+        if (visibleSessions.length === 0) {
           smartUpdate(sessionsEl, `
                     <div class="empty-state">
                         <div class="empty-state-icon">📡</div>
@@ -1851,7 +1881,7 @@ Jonathan Tsai (@jontsai)
                     </div>
                 `);
         } else {
-          smartUpdate(sessionsEl, sessions
+          smartUpdate(sessionsEl, visibleSessions
             .sort((a, b) => a.minutesAgo - b.minutesAgo)
             .map((s) => {
               const iconClass =
@@ -1967,6 +1997,7 @@ Jonathan Tsai (@jontsai)
                             </div>
                             ${activityHtml}
                             <span class="card-badge ${badgeClass}">${badgeText}</span>
+                            <button class="hide-btn" onclick="event.stopPropagation(); quickHideSession('${escapeHtml(s.label).replace(/'/g, "\\'")}');" title="Hide session">👁️</button>
                         </div>
                         ${topicHtml}
                         ${previewHtml}
@@ -1990,10 +2021,15 @@ Jonathan Tsai (@jontsai)
       // Render just cron jobs (for progressive loading)
       function renderCron(cron) {
         const cronEl = document.getElementById("cron-jobs");
+        cronData = cron; // Store for re-rendering after privacy changes
+        
+        // Filter out hidden crons
+        const visibleCrons = cron.filter(c => !isCronHidden(c));
+        
         $set("cron-count", "textContent", cron.length);
         $set("nav-cron-count", "textContent", cron.length);
 
-        if (cron.length === 0) {
+        if (visibleCrons.length === 0) {
           smartUpdate(cronEl, `
                     <div class="empty-state">
                         <div class="empty-state-icon">⏰</div>
@@ -2001,7 +2037,7 @@ Jonathan Tsai (@jontsai)
                     </div>
                 `);
         } else {
-          smartUpdate(cronEl, cron
+          smartUpdate(cronEl, visibleCrons
             .map((c) => {
               const humanSchedule = c.scheduleHuman
                 ? `<div class="cron-schedule-human">${escapeHtml(c.scheduleHuman)}</div>`
@@ -2994,32 +3030,67 @@ Jonathan Tsai (@jontsai)
         }, 200);
       }
       
-      // Privacy Settings
+      // Privacy Settings - Topics, Sessions, Crons
       const HIDDEN_TOPICS_KEY = 'openclawHiddenTopics';
+      const HIDDEN_SESSIONS_KEY = 'openclawHiddenSessions';
+      const HIDDEN_CRONS_KEY = 'openclawHiddenCrons';
       
-      function getHiddenTopics() {
+      // Generic localStorage helpers
+      function getHiddenItems(key) {
         try {
-          const stored = localStorage.getItem(HIDDEN_TOPICS_KEY);
+          const stored = localStorage.getItem(key);
           return stored ? JSON.parse(stored) : [];
         } catch (e) {
           return [];
         }
       }
       
-      function setHiddenTopics(topics) {
+      function setHiddenItems(key, items) {
         try {
-          localStorage.setItem(HIDDEN_TOPICS_KEY, JSON.stringify(topics));
+          localStorage.setItem(key, JSON.stringify(items));
         } catch (e) {
-          console.error('Failed to save hidden topics:', e);
+          console.error('Failed to save hidden items:', e);
         }
       }
       
-      function isTopicHidden(topicName) {
-        const hidden = getHiddenTopics();
-        const normalized = (topicName || '').toLowerCase().trim();
+      function isItemHidden(key, itemName) {
+        const hidden = getHiddenItems(key);
+        const normalized = (itemName || '').toLowerCase().trim();
         return hidden.some(h => h.toLowerCase().trim() === normalized);
       }
       
+      // Topic-specific functions
+      function getHiddenTopics() { return getHiddenItems(HIDDEN_TOPICS_KEY); }
+      function setHiddenTopics(topics) { setHiddenItems(HIDDEN_TOPICS_KEY, topics); }
+      function isTopicHidden(topicName) { return isItemHidden(HIDDEN_TOPICS_KEY, topicName); }
+      
+      // Session-specific functions  
+      function getHiddenSessions() { return getHiddenItems(HIDDEN_SESSIONS_KEY); }
+      function setHiddenSessions(sessions) { setHiddenItems(HIDDEN_SESSIONS_KEY, sessions); }
+      function isSessionHidden(session) {
+        const hidden = getHiddenSessions();
+        const label = (session.label || '').toLowerCase().trim();
+        const key = (session.sessionKey || session.key || '').toLowerCase().trim();
+        return hidden.some(h => {
+          const hLower = h.toLowerCase().trim();
+          return hLower === label || hLower === key || label.includes(hLower) || key.includes(hLower);
+        });
+      }
+      
+      // Cron-specific functions
+      function getHiddenCrons() { return getHiddenItems(HIDDEN_CRONS_KEY); }
+      function setHiddenCrons(crons) { setHiddenItems(HIDDEN_CRONS_KEY, crons); }
+      function isCronHidden(cron) {
+        const hidden = getHiddenCrons();
+        const name = (cron.name || cron.label || '').toLowerCase().trim();
+        const id = (cron.id || cron.jobId || '').toLowerCase().trim();
+        return hidden.some(h => {
+          const hLower = h.toLowerCase().trim();
+          return hLower === name || hLower === id || name.includes(hLower);
+        });
+      }
+      
+      // Add functions
       function addHiddenTopic() {
         const input = document.getElementById('privacy-add-topic');
         const topic = (input.value || '').trim();
@@ -3031,35 +3102,112 @@ Jonathan Tsai (@jontsai)
           setHiddenTopics(hidden);
         }
         input.value = '';
-        renderHiddenTopicsList();
-        
-        // Re-render Cerebro and sessions to apply filter
-        if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
-        renderSessions(sessionsData);
+        renderPrivacyLists();
+        refreshAllViews();
       }
       
+      function addHiddenSession() {
+        const input = document.getElementById('privacy-add-session');
+        const session = (input.value || '').trim();
+        if (!session) return;
+        
+        const hidden = getHiddenSessions();
+        if (!hidden.some(h => h.toLowerCase() === session.toLowerCase())) {
+          hidden.push(session);
+          setHiddenSessions(hidden);
+        }
+        input.value = '';
+        renderPrivacyLists();
+        refreshAllViews();
+      }
+      
+      function addHiddenCron() {
+        const input = document.getElementById('privacy-add-cron');
+        const cron = (input.value || '').trim();
+        if (!cron) return;
+        
+        const hidden = getHiddenCrons();
+        if (!hidden.some(h => h.toLowerCase() === cron.toLowerCase())) {
+          hidden.push(cron);
+          setHiddenCrons(hidden);
+        }
+        input.value = '';
+        renderPrivacyLists();
+        refreshAllViews();
+      }
+      
+      // Quick-hide from card (called by hide icon on cards)
+      function quickHideSession(label) {
+        const hidden = getHiddenSessions();
+        if (!hidden.some(h => h.toLowerCase() === label.toLowerCase())) {
+          hidden.push(label);
+          setHiddenSessions(hidden);
+        }
+        refreshAllViews();
+        showToast(`Session "${label}" hidden. Open Privacy Settings to unhide.`);
+      }
+      
+      function quickHideCron(name) {
+        const hidden = getHiddenCrons();
+        if (!hidden.some(h => h.toLowerCase() === name.toLowerCase())) {
+          hidden.push(name);
+          setHiddenCrons(hidden);
+        }
+        refreshAllViews();
+        showToast(`Cron job "${name}" hidden. Open Privacy Settings to unhide.`);
+      }
+      
+      // Remove functions
       function removeHiddenTopic(topic) {
         const hidden = getHiddenTopics();
         const filtered = hidden.filter(h => h.toLowerCase() !== topic.toLowerCase());
         setHiddenTopics(filtered);
-        renderHiddenTopicsList();
-        
-        // Re-render Cerebro and sessions to apply filter
-        if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
-        renderSessions(sessionsData);
+        renderPrivacyLists();
+        refreshAllViews();
       }
       
-      function clearAllHiddenTopics() {
+      function removeHiddenSession(session) {
+        const hidden = getHiddenSessions();
+        const filtered = hidden.filter(h => h.toLowerCase() !== session.toLowerCase());
+        setHiddenSessions(filtered);
+        renderPrivacyLists();
+        refreshAllViews();
+      }
+      
+      function removeHiddenCron(cron) {
+        const hidden = getHiddenCrons();
+        const filtered = hidden.filter(h => h.toLowerCase() !== cron.toLowerCase());
+        setHiddenCrons(filtered);
+        renderPrivacyLists();
+        refreshAllViews();
+      }
+      
+      // Clear all
+      function clearAllPrivacySettings() {
         setHiddenTopics([]);
-        renderHiddenTopicsList();
-        
-        // Re-render Cerebro and sessions to apply filter
+        setHiddenSessions([]);
+        setHiddenCrons([]);
+        renderPrivacyLists();
+        refreshAllViews();
+      }
+      
+      // Refresh all views after privacy change
+      function refreshAllViews() {
         if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
         renderSessions(sessionsData);
+        if (cronData && cronData.length > 0) renderCron(cronData);
+      }
+      
+      // Render all privacy lists
+      function renderPrivacyLists() {
+        renderHiddenTopicsList();
+        renderHiddenSessionsList();
+        renderHiddenCronsList();
       }
       
       function renderHiddenTopicsList() {
         const container = document.getElementById('hidden-topics-list');
+        if (!container) return;
         const hidden = getHiddenTopics();
         
         if (hidden.length === 0) {
@@ -3068,9 +3216,45 @@ Jonathan Tsai (@jontsai)
         }
         
         container.innerHTML = hidden.map(topic => `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg); border-radius: 6px; margin-bottom: 6px;">
-            <span style="font-size: 0.9rem;">${escapeHtml(topic)}</span>
-            <button onclick="removeHiddenTopic('${escapeHtml(topic).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; font-size: 1rem;" title="Remove">✕</button>
+          <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
+            <span>${escapeHtml(topic)}</span>
+            <button onclick="removeHiddenTopic('${escapeHtml(topic).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+          </div>
+        `).join('');
+      }
+      
+      function renderHiddenSessionsList() {
+        const container = document.getElementById('hidden-sessions-list');
+        if (!container) return;
+        const hidden = getHiddenSessions();
+        
+        if (hidden.length === 0) {
+          container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No sessions hidden</em>';
+          return;
+        }
+        
+        container.innerHTML = hidden.map(session => `
+          <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
+            <span>${escapeHtml(session)}</span>
+            <button onclick="removeHiddenSession('${escapeHtml(session).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+          </div>
+        `).join('');
+      }
+      
+      function renderHiddenCronsList() {
+        const container = document.getElementById('hidden-crons-list');
+        if (!container) return;
+        const hidden = getHiddenCrons();
+        
+        if (hidden.length === 0) {
+          container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>';
+          return;
+        }
+        
+        container.innerHTML = hidden.map(cron => `
+          <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
+            <span>${escapeHtml(cron)}</span>
+            <button onclick="removeHiddenCron('${escapeHtml(cron).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
         `).join('');
       }
@@ -3080,7 +3264,7 @@ Jonathan Tsai (@jontsai)
         document.getElementById("privacy-modal").classList.add("visible");
         document.getElementById("privacy-modal-overlay").classList.remove("hidden");
         document.getElementById("privacy-modal-overlay").classList.add("visible");
-        renderHiddenTopicsList();
+        renderPrivacyLists();
       }
       
       function closePrivacyModal() {
