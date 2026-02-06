@@ -1420,6 +1420,15 @@ Jonathan Tsai (@jontsai)
           </div>
         </div>
         
+        <!-- Display Options Section -->
+        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">🖥️ Display Options</label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem;">
+            <input type="checkbox" id="privacy-hide-hostname" onchange="toggleHideHostname()" style="width: 18px; height: 18px; cursor: pointer;">
+            <span>Hide system hostname</span>
+          </label>
+        </div>
+        
         <div>
           <button class="btn-secondary" onclick="clearAllPrivacySettings()" style="width: 100%;">Clear All Privacy Settings</button>
         </div>
@@ -3039,10 +3048,11 @@ Jonathan Tsai (@jontsai)
         }, 200);
       }
       
-      // Privacy Settings - Topics, Sessions, Crons
+      // Privacy Settings - Topics, Sessions, Crons, Display Options
       const HIDDEN_TOPICS_KEY = 'openclawHiddenTopics';
       const HIDDEN_SESSIONS_KEY = 'openclawHiddenSessions';
       const HIDDEN_CRONS_KEY = 'openclawHiddenCrons';
+      const HIDE_HOSTNAME_KEY = 'openclawHideHostname';
       
       // Generic localStorage helpers
       function getHiddenItems(key) {
@@ -3206,8 +3216,44 @@ Jonathan Tsai (@jontsai)
         setHiddenTopics([]);
         setHiddenSessions([]);
         setHiddenCrons([]);
+        setHideHostname(false);
         renderPrivacyLists();
+        // Update checkbox
+        const hostnameCheckbox = document.getElementById('privacy-hide-hostname');
+        if (hostnameCheckbox) hostnameCheckbox.checked = false;
         refreshAllViews();
+      }
+      
+      // Hostname privacy
+      function isHostnameHidden() {
+        try {
+          return localStorage.getItem(HIDE_HOSTNAME_KEY) === 'true';
+        } catch (e) {
+          return false;
+        }
+      }
+      
+      function setHideHostname(hide) {
+        try {
+          localStorage.setItem(HIDE_HOSTNAME_KEY, hide ? 'true' : 'false');
+        } catch (e) {}
+      }
+      
+      function toggleHideHostname() {
+        const checkbox = document.getElementById('privacy-hide-hostname');
+        setHideHostname(checkbox.checked);
+        updateHostnameDisplay();
+      }
+      
+      function updateHostnameDisplay() {
+        const hostnameEl = document.getElementById('vitals-hostname');
+        if (hostnameEl) {
+          if (isHostnameHidden()) {
+            hostnameEl.style.display = 'none';
+          } else {
+            hostnameEl.style.display = '';
+          }
+        }
       }
       
       // Refresh all views after privacy change
@@ -3215,6 +3261,7 @@ Jonathan Tsai (@jontsai)
         if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
         renderSessions(sessionsData);
         if (cronData && cronData.length > 0) renderCron(cronData);
+        updateHostnameDisplay();
       }
       
       // Render all privacy lists
@@ -3284,6 +3331,9 @@ Jonathan Tsai (@jontsai)
         document.getElementById("privacy-modal-overlay").classList.remove("hidden");
         document.getElementById("privacy-modal-overlay").classList.add("visible");
         renderPrivacyLists();
+        // Set checkbox state
+        const hostnameCheckbox = document.getElementById('privacy-hide-hostname');
+        if (hostnameCheckbox) hostnameCheckbox.checked = isHostnameHidden();
       }
       
       function closePrivacyModal() {
@@ -3906,6 +3956,9 @@ Jonathan Tsai (@jontsai)
         // Fetch data after short delay to ensure DOM is ready
         // This fixes a race condition on initial page load
         setTimeout(fetchData, 100);
+        
+        // Apply privacy settings on load
+        updateHostnameDisplay();
         
         // Set up savings window selector
         const windowSelect = document.getElementById("savings-window-select");
