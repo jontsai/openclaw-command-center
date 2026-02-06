@@ -3251,9 +3251,13 @@ Jonathan Tsai (@jontsai)
         const hostnameEl = document.getElementById('vitals-hostname');
         if (hostnameEl) {
           if (isHostnameHidden()) {
-            hostnameEl.style.display = 'none';
+            hostnameEl.style.filter = 'blur(8px)';
+            hostnameEl.style.userSelect = 'none';
+            hostnameEl.title = 'Hidden for privacy';
           } else {
-            hostnameEl.style.display = '';
+            hostnameEl.style.filter = '';
+            hostnameEl.style.userSelect = '';
+            hostnameEl.title = '';
           }
         }
       }
