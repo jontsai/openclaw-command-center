@@ -2055,6 +2055,7 @@ Jonathan Tsai (@jontsai)
                                 ${c.enabled !== false ? "✓ Enabled" : "○ Disabled"}
                             </span>
                             <div class="cron-next">${c.nextRun}</div>
+                            <button class="hide-btn" onclick="event.stopPropagation(); quickHideCron('${escapeHtml(c.name).replace(/'/g, "\\'")}');" title="Hide cron job">👁️</button>
                         </div>
                     </div>
                 `;
