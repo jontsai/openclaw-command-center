@@ -858,63 +858,12 @@
         }
       }
     </style>
+    <!-- Shared Sidebar Loader -->
+    <script src="/js/sidebar.js"></script>
   </head>
   <body>
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <span class="sidebar-logo">🦞</span>
-        <span class="sidebar-title">Command Center</span>
-        <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">◀</button>
-      </div>
-      <div class="sidebar-nav">
-        <div class="nav-section">
-          <div class="nav-section-title">Navigation</div>
-          <a href="/" class="nav-item" data-tooltip="System Vitals">
-            <span class="nav-icon">🖥️</span>
-            <span>System Vitals</span>
-          </a>
-          <a href="/#llm-section" class="nav-item" data-tooltip="LLM Fuel Gauges">
-            <span class="nav-icon">⛽</span>
-            <span>LLM Usage</span>
-          </a>
-          <a href="/#sessions-section" class="nav-item" data-tooltip="Sessions">
-            <span class="nav-icon">📡</span>
-            <span>Sessions</span>
-            <span class="nav-badge" id="nav-session-count">-</span>
-          </a>
-          <a href="/#cron-section" class="nav-item" data-tooltip="Cron Jobs">
-            <span class="nav-icon">⏰</span>
-            <span>Cron Jobs</span>
-            <span class="nav-badge" id="nav-cron-count">-</span>
-          </a>
-          <a href="/jobs.html" class="nav-item active" data-tooltip="AI Jobs Dashboard">
-            <span class="nav-icon">🤖</span>
-            <span>AI Jobs</span>
-            <span class="nav-badge" id="nav-jobs-count">—</span>
-          </a>
-          <a href="/#memory-section" class="nav-item" data-tooltip="Memory">
-            <span class="nav-icon">🧠</span>
-            <span>Memory</span>
-            <span class="nav-badge" id="nav-memory-count">-</span>
-          </a>
-          <a href="/#cerebro-section" class="nav-item" data-tooltip="Cerebro">
-            <span class="nav-icon">🔮</span>
-            <span>Cerebro</span>
-            <span class="nav-badge" id="nav-cerebro-count">-</span>
-          </a>
-          <a href="/#operators-section" class="nav-item" data-tooltip="Operators">
-            <span class="nav-icon">👥</span>
-            <span>Operators</span>
-            <span class="nav-badge" id="nav-operator-count">-</span>
-          </a>
-        </div>
-      </div>
-      <div class="sidebar-footer">
-        Auto-refresh: 30s<br />
-        <span id="sidebar-updated">—</span>
-      </div>
-    </nav>
+    <!-- Sidebar container (populated by sidebar.js) -->
+    <div id="sidebar-container"></div>
 
     <!-- Main Content -->
     <div class="main-wrapper" id="main-wrapper">
@@ -1362,13 +1311,7 @@
         setTimeout(() => toast.remove(), 4000);
       }
 
-      // Toggle sidebar
-      function toggleSidebar() {
-        const sidebar = document.getElementById("sidebar");
-        const mainWrapper = document.getElementById("main-wrapper");
-        sidebar.classList.toggle("collapsed");
-        mainWrapper.classList.toggle("sidebar-collapsed");
-      }
+      // Toggle sidebar - provided by sidebar.js
 
       // Close modal on overlay click
       document.getElementById("history-modal").addEventListener("click", function (e) {
