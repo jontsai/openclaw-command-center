@@ -1462,6 +1462,18 @@ Jonathan Tsai (@jontsai)
       </div>
     </div>
 
+    <!-- Operator Modal -->
+    <div id="operator-modal-overlay" class="detail-overlay hidden" onclick="closeOperatorModal()"></div>
+    <div id="operator-modal" class="detail-panel hidden" style="max-width: 500px;">
+      <div class="detail-header">
+        <h2>👤 <span id="operator-modal-name">User Stats</span></h2>
+        <button class="close-btn" onclick="closeOperatorModal()">✕</button>
+      </div>
+      <div class="detail-content" id="operator-modal-content">
+        <div class="loading-state">Loading user stats...</div>
+      </div>
+    </div>
+
     <script>
       // State
       // Filter state for each section
@@ -1952,12 +1964,20 @@ Jonathan Tsai (@jontsai)
                   ? Math.floor(m.minutesActive / 60) + "h " + (m.minutesActive % 60) + "m"
                   : m.minutesActive + "m";
 
-              // Format tokens for display
-              const tokensFormatted = s.tokens > 1000000 
-                ? (s.tokens / 1000000).toFixed(1) + "M" 
-                : s.tokens > 1000 
-                  ? (s.tokens / 1000).toFixed(1) + "k" 
-                  : s.tokens || 0;
+              // Operator metric (clickable to show user stats)
+              const operatorName = s.originator?.displayName || s.originator?.username || null;
+              const operatorId = s.originator?.userId || s.originator?.id || null;
+              const operatorMetricHtml = operatorName 
+                ? `<div class="metric-ring operator" title="User: ${escapeHtml(operatorName)}" onclick="event.stopPropagation(); openOperatorModal('${escapeHtml(operatorId || operatorName)}')">
+                      <span class="metric-icon">👤</span>
+                      <span class="metric-value" style="font-size: 0.7rem; max-width: 50px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(operatorName.split(' ')[0])}</span>
+                      <span class="metric-label">user</span>
+                   </div>`
+                : `<div class="metric-ring operator" title="Unknown user">
+                      <span class="metric-icon">👤</span>
+                      <span class="metric-value">—</span>
+                      <span class="metric-label">user</span>
+                   </div>`;
 
               const metricsHtml = `
                         <div class="metrics-bar">
@@ -1966,11 +1986,7 @@ Jonathan Tsai (@jontsai)
                                 <span class="metric-value">${burnRateFormatted}</span>
                                 <span class="metric-label">tok/min</span>
                             </div>
-                            <div class="metric-ring tokens" title="Total tokens this session: ${(s.tokens || 0).toLocaleString()}">
-                                <span class="metric-icon">🎫</span>
-                                <span class="metric-value">${tokensFormatted}</span>
-                                <span class="metric-label">tokens</span>
-                            </div>
+                            ${operatorMetricHtml}
                             <div class="metric-ring time" title="Time active: ${m.minutesActive} minutes">
                                 <span class="metric-icon">⏱️</span>
                                 <span class="metric-value">${timeActiveFormatted}</span>
@@ -2090,7 +2106,7 @@ Jonathan Tsai (@jontsai)
               }
 
               return `
-                    <div class="operator-card role-${roleClass}">
+                    <div class="operator-card role-${roleClass}" style="cursor: pointer;" onclick="openOperatorModal('${escapeHtml(op.id || op.username)}')">
                         <div class="operator-header">
                             <div class="operator-avatar">${avatarHtml}</div>
                             <div class="operator-info">
@@ -2842,6 +2858,119 @@ Jonathan Tsai (@jontsai)
         setTimeout(() => {
           document.getElementById("auth-modal").classList.add("hidden");
           document.getElementById("auth-modal-overlay").classList.add("hidden");
+        }, 200);
+      }
+      
+      // Operator modal
+      async function openOperatorModal(operatorId) {
+        document.getElementById("operator-modal").classList.remove("hidden");
+        document.getElementById("operator-modal").classList.add("visible");
+        document.getElementById("operator-modal-overlay").classList.remove("hidden");
+        document.getElementById("operator-modal-overlay").classList.add("visible");
+        
+        // Show loading state
+        document.getElementById("operator-modal-content").innerHTML = '<div class="loading-state">Loading user stats...</div>';
+        
+        try {
+          // Fetch operator data from API
+          const res = await fetch("/api/operators");
+          const data = await res.json();
+          
+          // Find the operator by ID or name
+          const operator = data.operators?.find(op => 
+            op.id === operatorId || 
+            op.metadata?.slackId === operatorId ||
+            op.displayName === operatorId ||
+            op.username === operatorId
+          );
+          
+          if (operator) {
+            renderOperatorModal(operator, data.sessions || []);
+          } else {
+            document.getElementById("operator-modal-content").innerHTML = `
+              <div class="detail-section">
+                <p style="color: var(--text-muted)">Operator not found: ${escapeHtml(operatorId)}</p>
+              </div>
+            `;
+          }
+        } catch (e) {
+          console.error("Failed to load operator:", e);
+          document.getElementById("operator-modal-content").innerHTML = `
+            <div class="detail-section">
+              <p style="color: var(--error)">Failed to load user data</p>
+            </div>
+          `;
+        }
+      }
+      
+      function renderOperatorModal(operator, allSessions) {
+        const displayName = operator.displayName || operator.username || "Unknown";
+        document.getElementById("operator-modal-name").textContent = displayName;
+        
+        // Calculate user stats
+        const userSessions = sessionsData.filter(s => 
+          s.originator?.userId === operator.id || 
+          s.originator?.userId === operator.metadata?.slackId ||
+          s.originator?.displayName === displayName
+        );
+        
+        const activeSessions = userSessions.filter(s => s.active).length;
+        const totalTokens = userSessions.reduce((sum, s) => sum + (s.tokens || 0), 0);
+        const tokensFormatted = totalTokens > 1000000 
+          ? (totalTokens / 1000000).toFixed(1) + "M"
+          : totalTokens > 1000
+            ? (totalTokens / 1000).toFixed(1) + "k"
+            : totalTokens;
+        
+        const initial = displayName.charAt(0).toUpperCase();
+        const roleLabel = operator.role === "owner" ? "👑 Owner" 
+                        : operator.role === "admin" ? "⭐ Admin" 
+                        : "👤 User";
+        
+        document.getElementById("operator-modal-content").innerHTML = `
+          <div class="detail-section">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">
+                ${initial}
+              </div>
+              <div>
+                <div style="font-size: 1.2rem; font-weight: 600;">${escapeHtml(displayName)}</div>
+                <div style="color: var(--text-muted); font-size: 0.85rem;">${roleLabel}</div>
+                ${operator.source ? `<div style="color: var(--text-muted); font-size: 0.75rem;">via ${operator.source}</div>` : ''}
+              </div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3>📊 Stats</h3>
+            <div class="detail-box">
+              <div class="detail-row"><span class="detail-label">Active Sessions</span><span class="detail-value">${activeSessions}</span></div>
+              <div class="detail-row"><span class="detail-label">Total Sessions</span><span class="detail-value">${userSessions.length}</span></div>
+              <div class="detail-row"><span class="detail-label">Total Tokens</span><span class="detail-value">${tokensFormatted}</span></div>
+              <div class="detail-row"><span class="detail-label">First Seen</span><span class="detail-value">${operator.firstSeen ? new Date(operator.firstSeen).toLocaleDateString() : '—'}</span></div>
+            </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3>💬 Recent Sessions</h3>
+            <div class="detail-box" style="font-size: 0.85rem;">
+              ${userSessions.slice(0, 5).map(s => `
+                <div class="detail-row" style="cursor: pointer;" onclick="closeOperatorModal(); openDetail('${escapeHtml(s.sessionKey)}', '${escapeHtml(s.label)}')">
+                  <span class="detail-label">${s.active ? '🟢' : '⚪'} ${escapeHtml(s.label?.substring(0, 30) || 'Unknown')}${(s.label?.length || 0) > 30 ? '...' : ''}</span>
+                  <span class="detail-value">${((s.tokens || 0) / 1000).toFixed(1)}k</span>
+                </div>
+              `).join('') || '<em style="color: var(--text-muted)">No sessions found</em>'}
+            </div>
+          </div>
+        `;
+      }
+      
+      function closeOperatorModal() {
+        document.getElementById("operator-modal").classList.remove("visible");
+        document.getElementById("operator-modal-overlay").classList.remove("visible");
+        setTimeout(() => {
+          document.getElementById("operator-modal").classList.add("hidden");
+          document.getElementById("operator-modal-overlay").classList.add("hidden");
         }, 200);
       }
       
