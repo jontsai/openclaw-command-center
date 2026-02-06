@@ -2825,25 +2825,25 @@ Jonathan Tsai (@jontsai)
           </div>
         `;
         
-        // Savings
-        const savings = (data.totalCost || 0) - (data.planCost || 200);
-        const savingsPercent = data.totalCost > 0 ? Math.round((savings / data.totalCost) * 100) : 0;
-        const monthlyProjection = Math.round(data.totalCost * 30);
-        document.getElementById("cost-savings").innerHTML = savings > 0 ? `
-          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
+        // Savings (compare monthly to monthly)
+        const monthlyApiCost = (data.totalCost || 0) * 30;
+        const planCost = data.planCost || 200;
+        const monthlySavings = monthlyApiCost - planCost;
+        const savingsPercent = monthlyApiCost > 0 ? Math.round((monthlySavings / monthlyApiCost) * 100) : 0;
+        document.getElementById("cost-savings").innerHTML = monthlySavings > 0 ? `
+          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Code Max'}</span><span class="detail-value">$${planCost}/month</span></div>
           <div class="detail-row"><span class="detail-label">Est. API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
+          <div class="detail-row"><span class="detail-label">Est. Monthly API Cost</span><span class="detail-value">$${Math.round(monthlyApiCost).toLocaleString()}/month</span></div>
           <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
             <span class="detail-label"><strong>Est. Savings</strong></span>
-            <span class="detail-value" style="color: var(--green);"><strong>$${formatCurrency(savings)} (${savingsPercent}%)</strong></span>
+            <span class="detail-value" style="color: var(--green);"><strong>$${Math.round(monthlySavings).toLocaleString()}/mo (${savingsPercent}%)</strong></span>
           </div>
-          <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-            💡 At this rate, your monthly API cost would be ~$${monthlyProjection.toLocaleString()}/mo vs your $${data.planCost}/mo plan.
-          </p>
         ` : `
-          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Plan'}</span><span class="detail-value">$${data.planCost || 200}/month</span></div>
+          <div class="detail-row"><span class="detail-label">${data.planName || 'Claude Code Max'}</span><span class="detail-value">$${planCost}/month</span></div>
           <div class="detail-row"><span class="detail-label">Est. API Cost (24h)</span><span class="detail-value">$${formatCurrency(data.totalCost)}</span></div>
+          <div class="detail-row"><span class="detail-label">Est. Monthly API Cost</span><span class="detail-value">$${Math.round(monthlyApiCost).toLocaleString()}/month</span></div>
           <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-            📈 Keep going! Once your 24h est. cost exceeds $${data.planCost || 200}, you'll start seeing savings.
+            📈 Keep going! Once your monthly cost exceeds $${planCost}, you'll start seeing savings.
           </p>
         `;
       }
