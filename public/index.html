@@ -1515,6 +1515,38 @@ Jonathan Tsai (@jontsai)
         return div.innerHTML;
       }
 
+      // Safe DOM utilities - defensive wrappers that won't crash on missing elements
+      function $safe(id) {
+        const el = document.getElementById(id);
+        return {
+          el,
+          exists: !!el,
+          text: (val) => { if (el) el.textContent = val; return this; },
+          html: (val) => { if (el) el.innerHTML = val; return this; },
+          style: (prop, val) => { if (el) el.style[prop] = val; return this; },
+          class: (val) => { if (el) el.className = val; return this; },
+          addClass: (val) => { if (el) el.classList.add(val); return this; },
+          removeClass: (val) => { if (el) el.classList.remove(val); return this; },
+        };
+      }
+      
+      // Batch safe DOM updates - silently skips missing elements
+      function $batch(updates) {
+        for (const [id, ops] of Object.entries(updates)) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          for (const [op, val] of Object.entries(ops)) {
+            switch (op) {
+              case 'text': el.textContent = val; break;
+              case 'html': el.innerHTML = val; break;
+              case 'class': el.className = val; break;
+              case 'width': el.style.width = val; break;
+              default: if (op.startsWith('style.')) el.style[op.slice(6)] = val; break;
+            }
+          }
+        }
+      }
+
       // Smart DOM update using morphdom - only patches what changed
       function smartUpdate(targetEl, newHtml) {
         if (typeof morphdom === 'undefined') {
@@ -1541,7 +1573,7 @@ Jonathan Tsai (@jontsai)
         document
           .getElementById("main-wrapper")
           .classList.toggle("sidebar-collapsed", sidebarCollapsed);
-        document.getElementById("sidebar-toggle-btn").textContent = sidebarCollapsed ? "▶" : "◀";
+        $set("sidebar-toggle-btn", "textContent", sidebarCollapsed ? "▶" : "◀");
       }
 
       // Navigation
@@ -1651,18 +1683,18 @@ Jonathan Tsai (@jontsai)
           else counts.idle++;
         });
 
-        document.getElementById("filter-all-count").textContent = counts.all;
-        document.getElementById("filter-live-count").textContent = counts.live;
-        document.getElementById("filter-recent-count").textContent = counts.recent;
-        document.getElementById("filter-idle-count").textContent = counts.idle;
+        $set("filter-all-count", "textContent", counts.all);
+        $set("filter-live-count", "textContent", counts.live);
+        $set("filter-recent-count", "textContent", counts.recent);
+        $set("filter-idle-count", "textContent", counts.idle);
       }
 
       // Use server-provided counts for ALL sessions (across all pages)
       function updateFilterCountsFromServer(statusCounts) {
-        document.getElementById("filter-all-count").textContent = statusCounts.all || 0;
-        document.getElementById("filter-live-count").textContent = statusCounts.live || 0;
-        document.getElementById("filter-recent-count").textContent = statusCounts.recent || 0;
-        document.getElementById("filter-idle-count").textContent = statusCounts.idle || 0;
+        $set("filter-all-count", "textContent", statusCounts.all || 0);
+        $set("filter-live-count", "textContent", statusCounts.live || 0);
+        $set("filter-recent-count", "textContent", statusCounts.recent || 0);
+        $set("filter-idle-count", "textContent", statusCounts.idle || 0);
       }
 
       // Extract links from text
@@ -1818,8 +1850,8 @@ Jonathan Tsai (@jontsai)
         
         // Update timestamp
         const now = new Date().toLocaleTimeString();
-        document.getElementById("last-updated").textContent = now;
-        document.getElementById("sidebar-updated").textContent = `Updated: ${now}`;
+        $set("last-updated", "textContent", now);
+        $set("sidebar-updated", "textContent", `Updated: ${now}`);
         
         // Render each section
         if (state.vitals) renderVitals(state.vitals);
@@ -1863,8 +1895,8 @@ Jonathan Tsai (@jontsai)
         if (subagents?.subagents) renderSubagents(subagents.subagents);
         
         const now = new Date().toLocaleTimeString();
-        document.getElementById("last-updated").textContent = now;
-        document.getElementById("sidebar-updated").textContent = `Updated: ${now}`;
+        $set("last-updated", "textContent", now);
+        $set("sidebar-updated", "textContent", `Updated: ${now}`);
       }
 
       // Render just sessions (for progressive loading)
@@ -1881,8 +1913,8 @@ Jonathan Tsai (@jontsai)
         // Always use paginationState.total if we have it (survives SSE updates)
         // Only fall back to sessions.length if we've never received pagination data
         const displayCount = paginationState.total > 0 ? paginationState.total : sessions.length;
-        document.getElementById("session-count").textContent = displayCount;
-        document.getElementById("nav-session-count").textContent = displayCount;
+        $set("session-count", "textContent", displayCount);
+        $set("nav-session-count", "textContent", displayCount);
 
         // Use server-provided statusCounts for ALL sessions, not just current page
         // If statusCounts not provided, keep previous values (don't overwrite with wrong counts)
@@ -2037,8 +2069,8 @@ Jonathan Tsai (@jontsai)
       // Render just cron jobs (for progressive loading)
       function renderCron(cron) {
         const cronEl = document.getElementById("cron-jobs");
-        document.getElementById("cron-count").textContent = cron.length;
-        document.getElementById("nav-cron-count").textContent = cron.length;
+        $set("cron-count", "textContent", cron.length);
+        $set("nav-cron-count", "textContent", cron.length);
 
         if (cron.length === 0) {
           smartUpdate(cronEl, `
@@ -2082,7 +2114,7 @@ Jonathan Tsai (@jontsai)
         const operatorsEl = document.getElementById("operators-grid");
         operatorsData = data.operators || [];
 
-        document.getElementById("nav-operator-count").textContent = operatorsData.length;
+        $set("nav-operator-count", "textContent", operatorsData.length);
 
         if (operatorsData.length === 0) {
           smartUpdate(operatorsEl, `
@@ -2197,16 +2229,16 @@ Jonathan Tsai (@jontsai)
         if (!stats) return;
         currentTokenStats = stats; // Store for window switching
         
-        document.getElementById("total-tokens").textContent = stats.total || "0";
-        document.getElementById("active-sessions").textContent = stats.activeCount || 0;
-        document.getElementById("input-tokens").textContent = stats.input || "0";
-        document.getElementById("output-tokens").textContent = stats.output || "0";
-        document.getElementById("est-cost").textContent = stats.estCost || "$0.00";
-        document.getElementById("nav-tokens").textContent = stats.total || "0";
-        document.getElementById("nav-cost").textContent = stats.estCost || "$0.00";
-        document.getElementById("nav-monthly-cost").textContent = stats.estMonthlyCost || "-";
-        document.getElementById("nav-avg-tokens").textContent = stats.avgTokensPerSession || "-";
-        document.getElementById("nav-avg-cost").textContent = stats.avgCostPerSession || "-";
+        $set("total-tokens", "textContent", stats.total || "0");
+        $set("active-sessions", "textContent", stats.activeCount || 0);
+        $set("input-tokens", "textContent", stats.input || "0");
+        $set("output-tokens", "textContent", stats.output || "0");
+        $set("est-cost", "textContent", stats.estCost || "$0.00");
+        $set("nav-tokens", "textContent", stats.total || "0");
+        $set("nav-cost", "textContent", stats.estCost || "$0.00");
+        $set("nav-monthly-cost", "textContent", stats.estMonthlyCost || "-");
+        $set("nav-avg-tokens", "textContent", stats.avgTokensPerSession || "-");
+        $set("nav-avg-cost", "textContent", stats.avgCostPerSession || "-");
         
         // Load preference and update selector
         const savedWindow = getSavingsWindowPref();
@@ -2258,18 +2290,20 @@ Jonathan Tsai (@jontsai)
         if (!vitals) return;
 
         // Hostname & uptime
-        document.getElementById("vitals-hostname").textContent = vitals.hostname || "-";
-        document.getElementById("vitals-uptime").textContent = vitals.uptime || "-";
+        $set("vitals-hostname", "textContent", vitals.hostname || "-");
+        $set("vitals-uptime", "textContent", vitals.uptime || "-");
 
         // CPU
         const cpuPercent = vitals.cpu?.usage || 0;
-        document.getElementById("cpu-percent").textContent = cpuPercent + "%";
-        document.getElementById("cpu-bar").style.width = cpuPercent + "%";
+        $set("cpu-percent", "textContent", cpuPercent + "%");
+        $set("cpu-bar", "style.width", cpuPercent + "%");
 
         // Color based on load
         const cpuBar = document.getElementById("cpu-bar");
-        cpuBar.className =
-          "vital-bar-fill " + (cpuPercent > 80 ? "red" : cpuPercent > 50 ? "yellow" : "blue");
+        if (cpuBar) {
+          cpuBar.className =
+            "vital-bar-fill " + (cpuPercent > 80 ? "red" : cpuPercent > 50 ? "yellow" : "blue");
+        }
 
         // Chip name
         const chipEl = document.getElementById("cpu-chip");
@@ -2282,18 +2316,15 @@ Jonathan Tsai (@jontsai)
         }
 
         // User/sys/idle breakdown
-        document.getElementById("cpu-user").textContent =
-          vitals.cpu?.userPercent?.toFixed(1) + "%" || "-";
-        document.getElementById("cpu-sys").textContent =
-          vitals.cpu?.sysPercent?.toFixed(1) + "%" || "-";
-        document.getElementById("cpu-idle").textContent =
-          vitals.cpu?.idlePercent?.toFixed(1) + "%" || "-";
+        $set("cpu-user", "textContent", vitals.cpu?.userPercent?.toFixed(1) + "%" || "-");
+        $set("cpu-sys", "textContent", vitals.cpu?.sysPercent?.toFixed(1) + "%" || "-");
+        $set("cpu-idle", "textContent", vitals.cpu?.idlePercent?.toFixed(1) + "%" || "-");
 
         const loadAvg = vitals.cpu?.loadAvg || [0, 0, 0];
-        document.getElementById("cpu-load-1").textContent = loadAvg[0]?.toFixed(2) || "-";
-        document.getElementById("cpu-load-5").textContent = loadAvg[1]?.toFixed(2) || "-";
-        document.getElementById("cpu-load-15").textContent = loadAvg[2]?.toFixed(2) || "-";
-        document.getElementById("cpu-cores").textContent = vitals.cpu?.cores || "-";
+        $set("cpu-load-1", "textContent", loadAvg[0]?.toFixed(2) || "-");
+        $set("cpu-load-5", "textContent", loadAvg[1]?.toFixed(2) || "-");
+        $set("cpu-load-15", "textContent", loadAvg[2]?.toFixed(2) || "-");
+        $set("cpu-cores", "textContent", vitals.cpu?.cores || "-");
 
         // Core topology (P-cores + E-cores)
         const topologyEl = document.getElementById("cpu-topology");
@@ -2305,25 +2336,28 @@ Jonathan Tsai (@jontsai)
 
         // Memory - Show "X% used" with "X of Y" summary
         const memPercent = vitals.memory?.percent || 0;
-        document.getElementById("mem-percent").innerHTML =
-          memPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>';
-        document.getElementById("mem-bar").style.width = memPercent + "%";
+        $set("mem-percent", "innerHTML", memPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set("mem-bar", "style.width", memPercent + "%");
 
         const memBar = document.getElementById("mem-bar");
-        memBar.className =
-          "vital-bar-fill " + (memPercent > 90 ? "red" : memPercent > 75 ? "yellow" : "green");
+        if (memBar) {
+          memBar.className =
+            "vital-bar-fill " + (memPercent > 90 ? "red" : memPercent > 75 ? "yellow" : "green");
+        }
 
         // Show "68.8GB of 128GB" format
         const memUsed = vitals.memory?.usedFormatted || "-";
         const memTotal = vitals.memory?.totalFormatted || "-";
-        document.getElementById("mem-summary").textContent = memUsed + " of " + memTotal;
-        document.getElementById("mem-free").textContent = vitals.memory?.freeFormatted || "-";
+        $set("mem-summary", "textContent", memUsed + " of " + memTotal);
+        $set("mem-free", "textContent", vitals.memory?.freeFormatted || "-");
 
         // Memory pressure
         const pressure = vitals.memory?.pressure || "normal";
         const pressureEl = document.getElementById("mem-pressure");
-        pressureEl.textContent = pressure.charAt(0).toUpperCase() + pressure.slice(1);
-        pressureEl.className = "pressure-indicator " + pressure;
+        if (pressureEl) {
+          pressureEl.textContent = pressure.charAt(0).toUpperCase() + pressure.slice(1);
+          pressureEl.className = "pressure-indicator " + pressure;
+        }
 
         // Memory breakdown (active, wired, compressed, cached)
         const formatMemBytes = (bytes) => {
@@ -2331,65 +2365,79 @@ Jonathan Tsai (@jontsai)
           const gb = bytes / (1024 * 1024 * 1024);
           return gb >= 1 ? gb.toFixed(1) + " GB" : (gb * 1024).toFixed(0) + " MB";
         };
-        document.getElementById("mem-active").textContent = formatMemBytes(vitals.memory?.active);
-        document.getElementById("mem-wired").textContent = formatMemBytes(vitals.memory?.wired);
-        document.getElementById("mem-compressed").textContent = formatMemBytes(
-          vitals.memory?.compressed,
-        );
-        document.getElementById("mem-cached").textContent = formatMemBytes(vitals.memory?.cached);
+        $set("mem-active", "textContent", formatMemBytes(vitals.memory?.active));
+        $set("mem-wired", "textContent", formatMemBytes(vitals.memory?.wired));
+        $set("mem-compressed", "textContent", formatMemBytes(vitals.memory?.compressed));
+        $set("mem-cached", "textContent", formatMemBytes(vitals.memory?.cached));
 
         // Disk - Show "X% used" with "X of Y" summary
         const diskPercent = vitals.disk?.percent || 0;
-        document.getElementById("disk-percent").innerHTML =
-          diskPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>';
-        document.getElementById("disk-bar").style.width = diskPercent + "%";
+        $set("disk-percent", "innerHTML", diskPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set("disk-bar", "style.width", diskPercent + "%");
 
         const diskBar = document.getElementById("disk-bar");
-        diskBar.className =
-          "vital-bar-fill " + (diskPercent > 90 ? "red" : diskPercent > 75 ? "yellow" : "green");
+        if (diskBar) {
+          diskBar.className =
+            "vital-bar-fill " + (diskPercent > 90 ? "red" : diskPercent > 75 ? "yellow" : "green");
+        }
 
         // Show "700GB of 1.8TB" format
         const diskUsed = vitals.disk?.usedFormatted || "-";
         const diskTotal = vitals.disk?.totalFormatted || "-";
-        document.getElementById("disk-summary").textContent = diskUsed + " of " + diskTotal;
-        document.getElementById("disk-free").textContent = vitals.disk?.freeFormatted || "-";
+        $set("disk-summary", "textContent", diskUsed + " of " + diskTotal);
+        $set("disk-free", "textContent", vitals.disk?.freeFormatted || "-");
 
         // Disk I/O stats
-        document.getElementById("disk-iops").textContent = vitals.disk?.iops?.toFixed(0) || "0";
-        document.getElementById("disk-throughput").textContent =
-          vitals.disk?.throughputMBps?.toFixed(2) || "0.00";
-        document.getElementById("disk-kbt").textContent =
-          vitals.disk?.kbPerTransfer?.toFixed(1) || "0.0";
+        $set("disk-iops", "textContent", vitals.disk?.iops?.toFixed(0) || "0");
+        $set("disk-throughput", "textContent", vitals.disk?.throughputMBps?.toFixed(2) || "0.00");
+        $set("disk-kbt", "textContent", vitals.disk?.kbPerTransfer?.toFixed(1) || "0.0");
 
         // Temperature
         const temp = vitals.temperature;
         const tempNote = vitals.temperatureNote;
+        const tempEl = document.getElementById("temp-value");
+        const tempStatusEl = document.getElementById("temp-status");
         if (temp !== null && temp !== undefined && temp > 0) {
-          document.getElementById("temp-value").textContent = temp;
+          if (tempEl) {
+            tempEl.textContent = temp;
+            const tempColor =
+              temp < 50
+                ? "var(--green)"
+                : temp < 70
+                  ? "var(--text)"
+                  : temp < 85
+                    ? "var(--yellow)"
+                    : "var(--red)";
+            tempEl.style.color = tempColor;
+          }
           const tempStatus =
             temp < 50 ? "Cool" : temp < 70 ? "Normal" : temp < 85 ? "Warm" : "Hot!";
-          const tempColor =
-            temp < 50
-              ? "var(--green)"
-              : temp < 70
-                ? "var(--text)"
-                : temp < 85
-                  ? "var(--yellow)"
-                  : "var(--red)";
-          document.getElementById("temp-value").style.color = tempColor;
-          document.getElementById("temp-status").textContent = tempStatus;
+          if (tempStatusEl) tempStatusEl.textContent = tempStatus;
         } else {
-          document.getElementById("temp-value").textContent = "-";
-          document.getElementById("temp-value").style.color = "var(--text-muted)";
-          if (tempNote) {
-            document.getElementById("temp-status").textContent = tempNote;
-          } else {
-            document.getElementById("temp-status").textContent = "Unavailable";
+          if (tempEl) {
+            tempEl.textContent = "-";
+            tempEl.style.color = "var(--text-muted)";
+          }
+          if (tempStatusEl) {
+            tempStatusEl.textContent = tempNote || "Unavailable";
           }
         }
       }
 
+      // Safe DOM helper - sets property only if element exists
+      function $set(id, prop, value) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (prop === 'innerHTML') el.innerHTML = value;
+        else if (prop === 'textContent') el.textContent = value;
+        else if (prop === 'className') el.className = value;
+        else if (prop.startsWith('style.')) el.style[prop.slice(6)] = value;
+        return el;
+      }
+
       function renderLlmUsage(data) {
+        // Wrap in try-catch to prevent crashes from blocking other renders
+        try {
         // Handle auth errors - show clear error state instead of 0%
         if (data?.errorType === "auth" || data?.claude?.session?.error) {
           const errorMsg = "⚠️ Auth Error";
@@ -2397,28 +2445,25 @@ Jonathan Tsai (@jontsai)
           const clickableError = '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>';
           
           // Session card
-          document.getElementById("claude-session-pct").innerHTML = 
-            '<span style="color:#f59e0b">N/A</span>';
-          document.getElementById("claude-session-bar").style.width = "0%";
-          document.getElementById("claude-session-bar").className = "vital-bar-fill gray";
-          document.getElementById("claude-session-remaining").textContent = "N/A";
-          document.getElementById("claude-session-reset").innerHTML = clickableError;
+          $set("claude-session-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
+          $set("claude-session-bar", "style.width", "0%");
+          $set("claude-session-bar", "className", "vital-bar-fill gray");
+          $set("claude-session-remaining", "textContent", "N/A");
+          $set("claude-session-reset", "innerHTML", clickableError);
           
           // Weekly card
-          document.getElementById("claude-weekly-pct").innerHTML = 
-            '<span style="color:#f59e0b">N/A</span>';
-          document.getElementById("claude-weekly-bar").style.width = "0%";
-          document.getElementById("claude-weekly-bar").className = "vital-bar-fill gray";
-          document.getElementById("claude-weekly-remaining").textContent = "N/A";
-          document.getElementById("claude-weekly-reset").innerHTML = clickableError;
+          $set("claude-weekly-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
+          $set("claude-weekly-bar", "style.width", "0%");
+          $set("claude-weekly-bar", "className", "vital-bar-fill gray");
+          $set("claude-weekly-remaining", "textContent", "N/A");
+          $set("claude-weekly-reset", "innerHTML", clickableError);
           
           // Sonnet card
-          document.getElementById("sonnet-weekly-pct").innerHTML = 
-            '<span style="color:#f59e0b">N/A</span>';
-          document.getElementById("sonnet-weekly-bar").style.width = "0%";
-          document.getElementById("sonnet-weekly-bar").className = "vital-bar-fill gray";
-          document.getElementById("sonnet-weekly-remaining").textContent = "N/A";
-          document.getElementById("sonnet-weekly-reset").innerHTML = clickableError;
+          $set("sonnet-weekly-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
+          $set("sonnet-weekly-bar", "style.width", "0%");
+          $set("sonnet-weekly-bar", "className", "vital-bar-fill gray");
+          $set("sonnet-weekly-remaining", "textContent", "N/A");
+          $set("sonnet-weekly-reset", "innerHTML", clickableError);
           
           // Compact cards - Claude
           const compactSessionEl = document.getElementById("claude-compact-session-pct");
@@ -2451,30 +2496,27 @@ Jonathan Tsai (@jontsai)
             codexDayBar.style.width = "0%";
             codexDayBar.className = "quota-bar-fill low";
           }
-          document.getElementById("codex-tasks").textContent = "0 total";
-          
-          document.getElementById("llm-sync-time").textContent = errorMsg;
+          $set("codex-tasks", "textContent", "0 total");
+          $set("llm-sync-time", "textContent", errorMsg);
           
           // Still render routing data if available
           if (data.routing) {
             const ct = data.routing.claudeTasks || 0;
             const cx = data.routing.codexTasks || 0;
             const total = data.routing.total || 0;
-            document.getElementById("llm-routing-summary").textContent =
-              total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet";
+            $set("llm-routing-summary", "textContent",
+              total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet");
             
             // Task routing counts
-            document.getElementById("codex-tasks").textContent = total + " total";
-            document.getElementById("claude-task-count").textContent = ct;
-            document.getElementById("codex-task-count").textContent = cx;
+            $set("codex-tasks", "textContent", total + " total");
+            $set("claude-task-count", "textContent", ct);
+            $set("codex-task-count", "textContent", cx);
           }
           return;
         }
         
         if (!data || data.error) {
-          document.getElementById("llm-sync-time").textContent = data?.needsSync
-            ? "Needs sync"
-            : "Error";
+          $set("llm-sync-time", "textContent", data?.needsSync ? "Needs sync" : "Error");
           return;
         }
 
@@ -2482,10 +2524,9 @@ Jonathan Tsai (@jontsai)
         if (data.claude?.lastSynced) {
           const synced = new Date(data.claude.lastSynced);
           const ago = Math.round((Date.now() - synced) / 60000);
-          document.getElementById("llm-sync-time").textContent =
-            ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`;
+          $set("llm-sync-time", "textContent", ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`);
         } else if (data.source === "live") {
-          document.getElementById("llm-sync-time").textContent = "Live";
+          $set("llm-sync-time", "textContent", "Live");
         }
 
         // Routing summary - show task counts clearly
@@ -2493,38 +2534,38 @@ Jonathan Tsai (@jontsai)
           const ct = data.routing.claudeTasks || 0;
           const cx = data.routing.codexTasks || 0;
           const total = data.routing.total || 0;
-          document.getElementById("llm-routing-summary").textContent =
-            total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet";
+          $set("llm-routing-summary", "textContent",
+            total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet");
         }
 
         // Claude Session - Show USED as primary (bar fills with consumption)
         const sessionRemaining = data.claude?.session?.remainingPct || 0;
         const sessionUsed = data.claude?.session?.usedPct || 0;
-        document.getElementById("claude-session-pct").innerHTML =
-          sessionUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>';
-        document.getElementById("claude-session-bar").style.width = sessionUsed + "%";
-        document.getElementById("claude-session-remaining").textContent = sessionRemaining + "%";
-        document.getElementById("claude-session-reset").textContent =
-          data.claude?.session?.resetsIn || "-";
+        $set("claude-session-pct", "innerHTML", sessionUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set("claude-session-bar", "style.width", sessionUsed + "%");
+        $set("claude-session-remaining", "textContent", sessionRemaining + "%");
+        $set("claude-session-reset", "textContent", data.claude?.session?.resetsIn || "-");
 
         // Color based on used - red when nearly depleted (high usage)
         const sessionBar = document.getElementById("claude-session-bar");
-        sessionBar.className =
-          "vital-bar-fill " + (sessionUsed > 80 ? "red" : sessionUsed > 50 ? "yellow" : "green");
+        if (sessionBar) {
+          sessionBar.className =
+            "vital-bar-fill " + (sessionUsed > 80 ? "red" : sessionUsed > 50 ? "yellow" : "green");
+        }
 
         // Claude Weekly - Show USED as primary
         const weeklyRemaining = data.claude?.weekly?.remainingPct || 0;
         const weeklyUsed = data.claude?.weekly?.usedPct || 0;
-        document.getElementById("claude-weekly-pct").innerHTML =
-          weeklyUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>';
-        document.getElementById("claude-weekly-bar").style.width = weeklyUsed + "%";
-        document.getElementById("claude-weekly-remaining").textContent = weeklyRemaining + "%";
-        document.getElementById("claude-weekly-reset").textContent =
-          data.claude?.weekly?.resets || "-";
+        $set("claude-weekly-pct", "innerHTML", weeklyUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set("claude-weekly-bar", "style.width", weeklyUsed + "%");
+        $set("claude-weekly-remaining", "textContent", weeklyRemaining + "%");
+        $set("claude-weekly-reset", "textContent", data.claude?.weekly?.resets || "-");
 
         const weeklyBar = document.getElementById("claude-weekly-bar");
-        weeklyBar.className =
-          "vital-bar-fill " + (weeklyUsed > 80 ? "red" : weeklyUsed > 50 ? "yellow" : "green");
+        if (weeklyBar) {
+          weeklyBar.className =
+            "vital-bar-fill " + (weeklyUsed > 80 ? "red" : weeklyUsed > 50 ? "yellow" : "green");
+        }
 
         // Also update the compact quota card (uses different element IDs)
         const compactSessionEl = document.getElementById("claude-compact-session-pct");
@@ -2548,38 +2589,43 @@ Jonathan Tsai (@jontsai)
         // Sonnet Weekly - Show USED as primary
         const sonnetRemaining = data.claude?.sonnet?.remainingPct || 0;
         const sonnetUsed = data.claude?.sonnet?.usedPct || 0;
-        document.getElementById("sonnet-weekly-pct").innerHTML =
-          sonnetUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>';
-        document.getElementById("sonnet-weekly-bar").style.width = sonnetUsed + "%";
-        document.getElementById("sonnet-weekly-remaining").textContent = sonnetRemaining + "%";
-        document.getElementById("sonnet-weekly-reset").textContent =
-          data.claude?.sonnet?.resets || "-";
+        $set("sonnet-weekly-pct", "innerHTML", sonnetUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set("sonnet-weekly-bar", "style.width", sonnetUsed + "%");
+        $set("sonnet-weekly-remaining", "textContent", sonnetRemaining + "%");
+        $set("sonnet-weekly-reset", "textContent", data.claude?.sonnet?.resets || "-");
 
         const sonnetBar = document.getElementById("sonnet-weekly-bar");
-        sonnetBar.className =
-          "vital-bar-fill " + (sonnetUsed > 80 ? "red" : sonnetUsed > 50 ? "yellow" : "green");
+        if (sonnetBar) {
+          sonnetBar.className =
+            "vital-bar-fill " + (sonnetUsed > 80 ? "red" : sonnetUsed > 50 ? "yellow" : "green");
+        }
 
         // Task Routing
         const totalTasks = data.routing?.total || 0;
         const claudeTasks = data.routing?.claudeTasks || 0;
         const codexTasks = data.routing?.codexTasks || 0;
-        document.getElementById("codex-tasks").textContent = totalTasks + " total";
-        document.getElementById("claude-task-count").textContent = claudeTasks;
-        document.getElementById("codex-task-count").textContent = codexTasks;
+        $set("codex-tasks", "textContent", totalTasks + " total");
+        $set("claude-task-count", "textContent", claudeTasks);
+        $set("codex-task-count", "textContent", codexTasks);
 
         // Codex floor status - shows if we're meeting the 20% minimum
         const floorStatus = document.getElementById("codex-floor-status");
         const codexPct = data.routing?.codexPct || 0;
         const codexFloor = data.routing?.codexFloor || 20;
-        if (totalTasks === 0) {
-          floorStatus.className = "pressure-indicator";
-          floorStatus.textContent = `Codex ≥20%: No tasks yet`;
-        } else if (codexPct >= codexFloor) {
-          floorStatus.className = "pressure-indicator normal";
-          floorStatus.textContent = `Codex ≥20%: ✓ ${codexPct}%`;
-        } else {
-          floorStatus.className = "pressure-indicator warning";
-          floorStatus.textContent = `Codex ≥20%: ${codexPct}% (need more)`;
+        if (floorStatus) {
+          if (totalTasks === 0) {
+            floorStatus.className = "pressure-indicator";
+            floorStatus.textContent = `Codex ≥20%: No tasks yet`;
+          } else if (codexPct >= codexFloor) {
+            floorStatus.className = "pressure-indicator normal";
+            floorStatus.textContent = `Codex ≥20%: ✓ ${codexPct}%`;
+          } else {
+            floorStatus.className = "pressure-indicator warning";
+            floorStatus.textContent = `Codex ≥20%: ${codexPct}% (need more)`;
+          }
+        }
+        } catch (e) {
+          console.error("[renderLlmUsage] Error:", e.message);
         }
       }
 
@@ -2600,7 +2646,7 @@ Jonathan Tsai (@jontsai)
         const byModel = data.by_model || {};
 
         // Total tasks
-        document.getElementById("total-routed-tasks").textContent = total + " (24h)";
+        $set("total-routed-tasks", "textContent", total + " (24h)");
 
         // Count by model family
         let claudeCount = 0,
@@ -2620,20 +2666,22 @@ Jonathan Tsai (@jontsai)
           }
         }
 
-        document.getElementById("claude-task-count").textContent = claudeCount;
-        document.getElementById("codex-task-count").textContent = codexCount;
-        document.getElementById("llama-task-count").textContent = llamaCount;
-        document.getElementById("qwen-task-count").textContent = qwenCount;
+        $set("claude-task-count", "textContent", claudeCount);
+        $set("codex-task-count", "textContent", codexCount);
+        $set("llama-task-count", "textContent", llamaCount);
+        $set("qwen-task-count", "textContent", qwenCount);
 
         // Latency
         const avgLatency = data.avg_latency_ms || 0;
         const latencyEl = document.getElementById("routing-latency");
-        if (avgLatency > 0) {
-          const latencySec = (avgLatency / 1000).toFixed(1);
-          latencyEl.textContent = `Avg latency: ${latencySec}s`;
-          latencyEl.className = "pressure-indicator " + (avgLatency > 30000 ? "warning" : "normal");
-        } else {
-          latencyEl.textContent = "Avg latency: -";
+        if (latencyEl) {
+          if (avgLatency > 0) {
+            const latencySec = (avgLatency / 1000).toFixed(1);
+            latencyEl.textContent = `Avg latency: ${latencySec}s`;
+            latencyEl.className = "pressure-indicator " + (avgLatency > 30000 ? "warning" : "normal");
+          } else {
+            latencyEl.textContent = "Avg latency: -";
+          }
         }
       }
 
@@ -2657,16 +2705,16 @@ Jonathan Tsai (@jontsai)
         if (data.tokenStats) {
           renderTokenStats(data.tokenStats);
           // Also update the detailed stats
-          document.getElementById("total-tokens").textContent = data.tokenStats.total;
-          document.getElementById("input-tokens").textContent = data.tokenStats.input;
-          document.getElementById("output-tokens").textContent = data.tokenStats.output;
-          document.getElementById("active-sessions").textContent = data.tokenStats.activeCount;
-          document.getElementById("est-cost").textContent = data.tokenStats.estCost;
-          document.getElementById("nav-tokens").textContent = data.tokenStats.total;
-          document.getElementById("nav-cost").textContent = data.tokenStats.estCost;
-          document.getElementById("nav-monthly-cost").textContent = data.tokenStats.estMonthlyCost || "-";
-          document.getElementById("nav-avg-tokens").textContent = data.tokenStats.avgTokensPerSession || "-";
-          document.getElementById("nav-avg-cost").textContent = data.tokenStats.avgCostPerSession || "-";
+          $set("total-tokens", "textContent", data.tokenStats.total);
+          $set("input-tokens", "textContent", data.tokenStats.input);
+          $set("output-tokens", "textContent", data.tokenStats.output);
+          $set("active-sessions", "textContent", data.tokenStats.activeCount);
+          $set("est-cost", "textContent", data.tokenStats.estCost);
+          $set("nav-tokens", "textContent", data.tokenStats.total);
+          $set("nav-cost", "textContent", data.tokenStats.estCost);
+          $set("nav-monthly-cost", "textContent", data.tokenStats.estMonthlyCost || "-");
+          $set("nav-avg-tokens", "textContent", data.tokenStats.avgTokensPerSession || "-");
+          $set("nav-avg-cost", "textContent", data.tokenStats.avgCostPerSession || "-");
           
           // Show savings if positive
           const savingsStat = document.getElementById("savings-stat");
@@ -2694,14 +2742,14 @@ Jonathan Tsai (@jontsai)
       }
 
       function renderMemory(memory) {
-        document.getElementById("memory-count").textContent = `${memory.totalFiles} files`;
-        document.getElementById("nav-memory-count").textContent = memory.totalFiles;
+        $set("memory-count", "textContent", `${memory.totalFiles} files`);
+        $set("nav-memory-count", "textContent", memory.totalFiles);
 
-        document.getElementById("memory-md-size").textContent = memory.memoryMdSizeFormatted || "-";
-        document.getElementById("memory-md-lines").textContent = memory.memoryMdLines || "-";
+        $set("memory-md-size", "textContent", memory.memoryMdSizeFormatted || "-");
+        $set("memory-md-lines", "textContent", memory.memoryMdLines || "-");
 
-        document.getElementById("memory-total-files").textContent = memory.totalFiles || "-";
-        document.getElementById("memory-total-size").textContent = memory.totalSizeFormatted || "-";
+        $set("memory-total-files", "textContent", memory.totalFiles || "-");
+        $set("memory-total-size", "textContent", memory.totalSizeFormatted || "-");
 
         // Recent files
         const recentEl = document.getElementById("memory-recent-files");
@@ -2729,35 +2777,35 @@ Jonathan Tsai (@jontsai)
 
         if (!cerebro || !cerebro.initialized) {
           // Show not initialized state with dynamic path
-          notInitEl.style.display = "block";
-          initEl.style.display = "none";
-          document.getElementById("cerebro-count").textContent = "not initialized";
-          document.getElementById("nav-cerebro-count").textContent = "-";
+          if (notInitEl) notInitEl.style.display = "block";
+          if (initEl) initEl.style.display = "none";
+          $set("cerebro-count", "textContent", "not initialized");
+          $set("nav-cerebro-count", "textContent", "-");
           
           // Update init commands with actual configured path
           if (cerebro && cerebro.cerebroPath) {
             const basePath = cerebro.cerebroPath.replace(/^\/Users\/[^/]+/, '~');
-            document.getElementById("cerebro-init-topics-cmd").textContent = `mkdir -p ${basePath}/topics`;
-            document.getElementById("cerebro-init-orphans-cmd").textContent = `mkdir -p ${basePath}/orphans`;
+            $set("cerebro-init-topics-cmd", "textContent", `mkdir -p ${basePath}/topics`);
+            $set("cerebro-init-orphans-cmd", "textContent", `mkdir -p ${basePath}/orphans`);
           }
           return;
         }
 
         // Show initialized state
-        notInitEl.style.display = "none";
-        initEl.style.display = "block";
+        if (notInitEl) notInitEl.style.display = "none";
+        if (initEl) initEl.style.display = "block";
 
         // Update counts
-        document.getElementById("cerebro-count").textContent = `${cerebro.topics.total} topics`;
-        document.getElementById("nav-cerebro-count").textContent = cerebro.topics.total;
+        $set("cerebro-count", "textContent", `${cerebro.topics.total} topics`);
+        $set("nav-cerebro-count", "textContent", cerebro.topics.total);
 
-        document.getElementById("cerebro-active").textContent = cerebro.topics.active || 0;
-        document.getElementById("cerebro-resolved").textContent = cerebro.topics.resolved || 0;
-        document.getElementById("cerebro-parked").textContent = cerebro.topics.parked || 0;
-        document.getElementById("cerebro-total-topics").textContent = cerebro.topics.total || 0;
+        $set("cerebro-active", "textContent", cerebro.topics.active || 0);
+        $set("cerebro-resolved", "textContent", cerebro.topics.resolved || 0);
+        $set("cerebro-parked", "textContent", cerebro.topics.parked || 0);
+        $set("cerebro-total-topics", "textContent", cerebro.topics.total || 0);
 
-        document.getElementById("cerebro-threads").textContent = cerebro.threads || 0;
-        document.getElementById("cerebro-orphans").textContent = cerebro.orphans || 0;
+        $set("cerebro-threads", "textContent", cerebro.threads || 0);
+        $set("cerebro-orphans", "textContent", cerebro.orphans || 0);
 
         // Recent topics with action buttons
         const recentEl = document.getElementById("cerebro-recent-topics");
