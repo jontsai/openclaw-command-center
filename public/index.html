@@ -661,6 +661,30 @@
               >
                 📱 Telegram
               </button>
+              <button
+                class="filter-btn"
+                data-filter="discord"
+                data-group="session-channel"
+                onclick="setSessionFilter('channel', 'discord')"
+              >
+                🎮 Discord
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="signal"
+                data-group="session-channel"
+                onclick="setSessionFilter('channel', 'signal')"
+              >
+                🔒 Signal
+              </button>
+              <button
+                class="filter-btn"
+                data-filter="whatsapp"
+                data-group="session-channel"
+                onclick="setSessionFilter('channel', 'whatsapp')"
+              >
+                📲 WhatsApp
+              </button>
             </div>
             <div class="filter-group">
               <span class="filter-label">Kind:</span>
@@ -1949,7 +1973,7 @@ Jonathan Tsai (@jontsai)
                     `;
 
               return `
-                    <div class="session-card ${cardClass}" data-status="${status}" data-channel="${s.channel}" data-kind="${s.kind}" onclick="openDetail('${escapeHtml(s.sessionKey)}', '${escapeHtml(s.label)}')">
+                    <div class="session-card ${cardClass}" data-status="${status}" data-channel="${s.channel}" data-kind="${s.sessionType || s.kind}" onclick="openDetail('${escapeHtml(s.sessionKey)}', '${escapeHtml(s.label)}')">
                         <div class="card-header">
                             <div class="card-icon ${iconClass}">${icon}</div>
                             <div class="card-title-area">
