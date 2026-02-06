@@ -171,11 +171,11 @@
         <div class="stat" title="Click for cost breakdown" id="savings-stat" style="display: none; cursor: pointer;">
           <div class="stat-value" id="est-savings" style="color: var(--green);" onclick="openCostModal()">-</div>
           <div class="stat-label" style="display: flex; align-items: center; gap: 4px;">
-            <span onclick="openCostModal()">Est. Savings</span>
+            <span onclick="openCostModal()">Est. Monthly Savings</span>
             <select id="savings-window-select" style="font-size: 0.7rem; padding: 1px 2px; background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 3px; cursor: pointer;" onclick="event.stopPropagation()">
               <option value="24h">24h</option>
-              <option value="3da">3da</option>
-              <option value="7da">7da</option>
+              <option value="3dma">3dma</option>
+              <option value="7dma" selected>7dma</option>
             </select>
             💰
           </div>
@@ -2158,9 +2158,9 @@ Jonathan Tsai (@jontsai)
       // Store current token stats for window switching
       let currentTokenStats = null;
       
-      // Get saved savings window preference
+      // Get saved savings window preference (default to 7dma for stability)
       function getSavingsWindowPref() {
-        return localStorage.getItem('savingsWindow') || '24h';
+        return localStorage.getItem('savingsWindow') || '7dma';
       }
       
       // Save savings window preference
@@ -3063,7 +3063,7 @@ Jonathan Tsai (@jontsai)
         
         // Build savings rows for each window
         const windowOrder = ['24h', '3d', '7d'];
-        const windowLabels = { '24h': '24h', '3d': '3-day avg', '7d': '7-day avg' };
+        const windowLabels = { '24h': '24h', '3d': '3dma', '7d': '7dma' };
         
         let savingsHtml = `
           <div class="detail-row"><span class="detail-label">${planName}</span><span class="detail-value">$${planCost}/month</span></div>
