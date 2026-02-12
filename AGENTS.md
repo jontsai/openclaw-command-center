@@ -4,6 +4,19 @@
 
 Welcome, AI agent. This document defines how you should interact with this codebase.
 
+## ⚠️ CRITICAL: Pull Request Workflow
+
+**All changes to this repository MUST go through pull requests.**
+
+This is a public open source project. Even maintainers (including AI agents working on behalf of maintainers) must:
+
+1. Create a feature branch (`git checkout -b type/description`)
+2. Make changes and commit
+3. Push branch and open a PR
+4. Get approval before merging
+
+**Never push directly to `main`.** This applies to everyone, including the repo owner.
+
 ## 🎯 Mission
 
 OpenClaw Command Center is the central dashboard for AI assistant management. Your mission is to help build, maintain, and improve this system while maintaining the Starcraft/Zerg thematic elements that make it unique.
@@ -70,9 +83,10 @@ Check with a human before:
 
 ## 🚫 Never
 
+- **Push directly to `main` branch** — ALL changes require PRs
 - Commit secrets, API keys, or credentials
+- Commit user-specific data files (see `public/data/AGENTS.md`)
 - Delete files without confirmation
-- Push directly to `main` branch
 - Expose internal endpoints publicly
 
 ## 🛠️ Development Workflow
@@ -165,6 +179,26 @@ clawhub update command-center
 ```
 
 The installed version is tracked in `.clawhub/origin.json` within the skill directory.
+
+### Who Can Publish?
+
+Only maintainers with ClawHub credentials for `jontsai/command-center` can publish. Currently:
+- @jontsai (owner)
+
+Contributors: Submit PRs. After merge, a maintainer will handle the ClawHub publish.
+
+### Release Checklist
+
+Before publishing a new version:
+
+1. [ ] All PRs for the release are merged to `main`
+2. [ ] Version bumped in both `package.json` and `SKILL.md` frontmatter
+3. [ ] CHANGELOG updated (if maintained)
+4. [ ] Tests pass: `npm test`
+5. [ ] Lint passes: `npm run lint`
+6. [ ] Git tag created: `git tag -a v<version> -m "v<version>"`
+7. [ ] Tag pushed: `git push origin --tags`
+8. [ ] Published to ClawHub with changelog
 
 ## 🎨 Thematic Guidelines
 

@@ -1,6 +1,6 @@
 ---
 name: command-center
-version: 1.0.1
+version: 1.0.4
 description: Mission control dashboard for OpenClaw - real-time session monitoring, LLM usage tracking, cost intelligence, and system vitals. View all your AI agents in one place.
 metadata:
   openclaw:
