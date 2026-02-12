@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook for openclaw-command-center
+# Validates rules from AGENTS.md and CONTRIBUTING.md before allowing commits
+#
+# Install: cp scripts/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Or: make install-hooks
+#
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+CHECKS_DIR="$SCRIPT_DIR/checks"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+echo "🔍 Running pre-commit checks..."
+echo ""
+
+FAILED=0
+
+# Run all check scripts in checks/ directory
+for check in "$CHECKS_DIR"/*.sh; do
+    if [[ -x "$check" ]]; then
+        check_name=$(basename "$check" .sh)
+        if "$check" "$REPO_ROOT"; then
+            echo -e "${GREEN}✓${NC} $check_name"
+        else
+            echo -e "${RED}✗${NC} $check_name"
+            FAILED=1
+        fi
+    fi
+done
+
+echo ""
+
+if [[ $FAILED -eq 1 ]]; then
+    echo -e "${RED}Pre-commit checks failed.${NC} Fix the issues above and try again."
+    echo ""
+    echo "To bypass (not recommended): git commit --no-verify"
+    exit 1
+else
+    echo -e "${GREEN}All pre-commit checks passed!${NC}"
+    exit 0
+fi

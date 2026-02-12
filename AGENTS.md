@@ -91,6 +91,19 @@ Check with a human before:
 
 ## 🛠️ Development Workflow
 
+### 0. First-Time Setup
+
+```bash
+# Install pre-commit hooks (required for all contributors)
+make install-hooks
+
+# Or manually:
+cp scripts/pre-commit .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+```
+
+The pre-commit hook enforces rules from this file automatically.
+
 ### 1. Feature Development
 
 ```bash
@@ -100,6 +113,7 @@ git checkout -b feat/your-feature-name
 # Make changes, then test locally
 npm test
 npm run lint
+make check  # Run pre-commit checks manually
 
 # Commit with descriptive message
 git commit -m "feat: add overlord status indicator"
@@ -135,8 +149,20 @@ This project is distributed as a ClawHub skill. After changes are merged to `mai
 
 Two files control the skill identity:
 
-- **`SKILL.md`** — Frontmatter (`name`, `description`) used by ClawHub for discovery and search
-- **`package.json`** — `version` field is the source of truth for the published version
+- **`SKILL.md`** — Frontmatter (`name`, `version`, `description`) used by ClawHub for discovery and search
+- **`package.json`** — `version` field for npm compatibility
+
+⚠️ **CRITICAL: Version Sync Required**
+
+Both `package.json` and `SKILL.md` **MUST have the same version number**. This is enforced by pre-commit hooks.
+
+```bash
+# If you change version in one file, change it in both:
+# package.json:  "version": "1.0.4"
+# SKILL.md:      version: 1.0.4
+```
+
+The pre-commit hook will block commits if versions are out of sync.
 
 ### Publishing Updates
 

@@ -58,7 +58,15 @@ This project adheres to our [Code of Conduct](./CODE_OF_CONDUCT.md). By particip
    cp config/dashboard.example.json config/dashboard.json
    ```
 
-6. **Start development server**
+6. **Install pre-commit hooks**
+
+   ```bash
+   make install-hooks
+   ```
+
+   This enforces project rules automatically on each commit.
+
+7. **Start development server**
    ```bash
    npm run dev
    ```
@@ -234,6 +242,12 @@ Follow [semver](https://semver.org/):
 | Bug fixes, minor tweaks       | `patch` | `0.1.0 → 0.1.1` |
 | New features, backward compat | `minor` | `0.1.0 → 0.2.0` |
 | Breaking changes              | `major` | `0.1.0 → 1.0.0` |
+
+⚠️ **Important:** When bumping version, update **both** files:
+- `package.json` — `"version": "X.Y.Z"`
+- `SKILL.md` — `version: X.Y.Z` (in frontmatter)
+
+The pre-commit hook will block commits if these versions don't match.
 
 ### Verifying a Publish
 

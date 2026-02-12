@@ -10,7 +10,7 @@ DASHBOARD_DIR := $(CURDIR)
 PORT := 3333
 
 .DEFAULT_GOAL := help
-.PHONY: help ensure start stop restart status logs attach clean release
+.PHONY: help ensure start stop restart status logs attach clean release install-hooks check
 
 # Include local overrides if they exist (not tracked in git)
 -include Makefile.local
@@ -116,3 +116,13 @@ ifndef V
 else
 	@./scripts/release.sh $(V)
 endif
+
+install-hooks: ## Install git pre-commit hooks
+	@echo "Installing pre-commit hook..."
+	@cp scripts/pre-commit .git/hooks/pre-commit
+	@chmod +x .git/hooks/pre-commit
+	@echo "✅ Pre-commit hook installed."
+	@echo "Run 'make check' to test checks manually."
+
+check: ## Run pre-commit checks manually
+	@./scripts/pre-commit
