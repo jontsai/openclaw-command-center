@@ -46,11 +46,11 @@ The dashboard auto-detects your OpenClaw workspace. Set `OPENCLAW_WORKSPACE` to 
 
 ### Authentication
 
-| Mode | Use Case |
-|------|----------|
-| `none` | Local development |
-| `token` | Remote access |
-| `tailscale` | Team VPN |
+| Mode         | Use Case          |
+| ------------ | ----------------- |
+| `none`       | Local development |
+| `token`      | Remote access     |
+| `tailscale`  | Team VPN          |
 | `cloudflare` | Public deployment |
 
 ```bash
@@ -59,11 +59,11 @@ DASHBOARD_AUTH_MODE=tailscale node lib/server.js
 
 ## API
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/state` | All dashboard data (unified) |
-| `GET /api/events` | SSE stream for live updates |
-| `GET /api/health` | Health check |
+| Endpoint          | Description                  |
+| ----------------- | ---------------------------- |
+| `GET /api/state`  | All dashboard data (unified) |
+| `GET /api/events` | SSE stream for live updates  |
+| `GET /api/health` | Health check                 |
 
 ## Links
 

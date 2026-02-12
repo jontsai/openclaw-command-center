@@ -9,27 +9,32 @@ OpenClaw Command Center is a real-time dashboard for monitoring and managing AI 
 ## Core Architecture Principles
 
 ### 1. **DRY (Don't Repeat Yourself)**
+
 - Shared components extracted to reusable partials
 - Single source of truth for sidebar, styling, and common logic
 - Centralized configuration management
 
 ### 2. **Real-Time First**
+
 - Server-Sent Events (SSE) for live updates
 - No polling needed for connected clients
 - Graceful degradation to polling when SSE unavailable
 
 ### 3. **Zero Build Step**
+
 - Plain HTML, CSS, and JavaScript
 - No compilation, bundling, or transpilation required
 - Works directly from static file serving
 - Dynamic loading via fetch() for shared partials
 
 ### 4. **Progressive Enhancement**
+
 - Core functionality works without JavaScript
 - Enhanced UX with JS (smooth scrolling, live updates, etc.)
 - Mobile-responsive design
 
 ### 5. **Thematic Consistency**
+
 - Starcraft/Zerg theme throughout
 - Dark mode by default (space aesthetic)
 - Consistent naming conventions
@@ -83,20 +88,23 @@ OpenClaw Command Center is a real-time dashboard for monitoring and managing AI 
 ## Frontend Architecture
 
 ### Pages
-| Page | Purpose | Key Sections |
-|------|---------|--------------|
-| `index.html` | Main dashboard | Vitals, LLM Usage, Sessions, Cron Jobs, Memory, Cerebro, Operators |
-| `jobs.html` | AI Jobs management | Job cards, run/pause/history controls |
+
+| Page         | Purpose            | Key Sections                                                       |
+| ------------ | ------------------ | ------------------------------------------------------------------ |
+| `index.html` | Main dashboard     | Vitals, LLM Usage, Sessions, Cron Jobs, Memory, Cerebro, Operators |
+| `jobs.html`  | AI Jobs management | Job cards, run/pause/history controls                              |
 
 ### Shared Components
-| Component | Location | Purpose |
-|-----------|----------|---------|
-| Sidebar | `/partials/sidebar.html` | Navigation + live stats badges |
-| Sidebar JS | `/js/sidebar.js` | Partial loading, SSE connection, navigation |
-| Styles | `/css/dashboard.css` | Shared visual theme |
-| morphdom | `/js/lib/morphdom.min.js` | Efficient DOM diffing |
+
+| Component  | Location                  | Purpose                                     |
+| ---------- | ------------------------- | ------------------------------------------- |
+| Sidebar    | `/partials/sidebar.html`  | Navigation + live stats badges              |
+| Sidebar JS | `/js/sidebar.js`          | Partial loading, SSE connection, navigation |
+| Styles     | `/css/dashboard.css`      | Shared visual theme                         |
+| morphdom   | `/js/lib/morphdom.min.js` | Efficient DOM diffing                       |
 
 ### State Management
+
 - **SSE-based**: Real-time state pushed from server
 - **Local state**: Per-component state in JavaScript closures
 - **Persistence**: `localStorage` for preferences (sidebar collapsed, etc.)
@@ -104,60 +112,69 @@ OpenClaw Command Center is a real-time dashboard for monitoring and managing AI 
 ## Backend Architecture
 
 ### Server (`lib/server.js`)
+
 - Express.js HTTP server
 - Static file serving from `/public`
 - API routes under `/api/*`
 - SSE endpoint at `/api/events`
 
 ### Data Sources
-| Source | Integration | Purpose |
-|--------|-------------|---------|
-| OpenClaw Gateway | REST API | Sessions, token stats, system vitals |
-| Jobs Scheduler | REST API | AI job definitions and run history |
-| Linear | GraphQL API | Issue tracking integration |
+
+| Source           | Integration | Purpose                              |
+| ---------------- | ----------- | ------------------------------------ |
+| OpenClaw Gateway | REST API    | Sessions, token stats, system vitals |
+| Jobs Scheduler   | REST API    | AI job definitions and run history   |
+| Linear           | GraphQL API | Issue tracking integration           |
 
 ### Configuration (`lib/config.js`)
+
 - Auto-detects OpenClaw installation paths
 - Supports multiple config file locations
 - Environment variable overrides
 
 ## API Endpoints
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/events` | GET (SSE) | Real-time state updates |
-| `/api/state` | GET | Full current state snapshot |
-| `/api/sessions` | GET | Session list and details |
-| `/api/jobs` | GET | AI job definitions |
-| `/api/jobs/:id/run` | POST | Trigger job execution |
-| `/api/jobs/:id/pause` | POST | Pause job |
-| `/api/jobs/:id/resume` | POST | Resume job |
-| `/api/jobs/:id/history` | GET | Job run history |
+| Endpoint                | Method    | Description                 |
+| ----------------------- | --------- | --------------------------- |
+| `/api/events`           | GET (SSE) | Real-time state updates     |
+| `/api/state`            | GET       | Full current state snapshot |
+| `/api/sessions`         | GET       | Session list and details    |
+| `/api/jobs`             | GET       | AI job definitions          |
+| `/api/jobs/:id/run`     | POST      | Trigger job execution       |
+| `/api/jobs/:id/pause`   | POST      | Pause job                   |
+| `/api/jobs/:id/resume`  | POST      | Resume job                  |
+| `/api/jobs/:id/history` | GET       | Job run history             |
 
 ## Design Decisions
 
 ### ADR-001: Shared Sidebar via Fetch
+
 **Decision**: Load sidebar HTML via `fetch()` rather than server-side includes or build step.
 
 **Rationale**:
+
 - Keeps zero-build-step architecture
 - Works with any static file server
 - Enables dynamic loading and hot updates
 - Single source of truth for sidebar content
 
 ### ADR-002: SSE for Real-Time Updates
+
 **Decision**: Use Server-Sent Events instead of WebSockets.
 
 **Rationale**:
+
 - Simpler protocol (HTTP-based)
 - Automatic reconnection
 - Better proxy/firewall compatibility
 - Sufficient for server→client push (no bidirectional needed)
 
 ### ADR-003: Morphdom for DOM Updates
+
 **Decision**: Use morphdom for efficient DOM patching.
 
 **Rationale**:
+
 - Virtual DOM-like efficiency without framework overhead
 - Preserves focus, scroll position, form state
 - Small footprint (~4KB)

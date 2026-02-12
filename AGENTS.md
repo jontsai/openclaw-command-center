@@ -26,6 +26,7 @@ OpenClaw Command Center is the central dashboard for AI assistant management. Yo
 **Read First**: [`docs/architecture/OVERVIEW.md`](docs/architecture/OVERVIEW.md)
 
 Key architectural principles:
+
 1. **DRY** — Don't Repeat Yourself. Extract shared code to partials/modules.
 2. **Zero Build Step** — Plain HTML/CSS/JS, no compilation needed.
 3. **Real-Time First** — SSE for live updates, polling as fallback.
@@ -209,6 +210,7 @@ The installed version is tracked in `.clawhub/origin.json` within the skill dire
 ### Who Can Publish?
 
 Only maintainers with ClawHub credentials for `jontsai/command-center` can publish. Currently:
+
 - @jontsai (owner)
 
 Contributors: Submit PRs. After merge, a maintainer will handle the ClawHub publish.
@@ -294,31 +296,37 @@ When handing off to another AI or ending a session:
 ## 📖 Lessons Learned
 
 ### DRY is Non-Negotiable
+
 **Problem**: Sidebar was duplicated across `index.html` and `jobs.html`, causing inconsistencies.
 **Solution**: Extract to `/partials/sidebar.html` + `/js/sidebar.js` for loading.
 **Lesson**: When you see similar code in multiple places, stop and extract it. The cost of extraction is always lower than maintaining duplicates.
 
 ### Naming Consistency Matters
+
 **Problem**: "Scheduled Jobs" vs "Cron Jobs" vs "Jobs" caused confusion.
 **Solution**: Established naming convention: "Cron Jobs" for OpenClaw scheduled tasks, "AI Jobs" for advanced agent jobs.
 **Lesson**: Agree on terminology early. Document it. Enforce it.
 
 ### Zero-Build Architecture Has Trade-offs
+
 **Context**: No build step keeps things simple but limits some patterns.
 **Solution**: Use `fetch()` to load partials dynamically, `<script>` for shared JS.
 **Lesson**: This works well for dashboards. Evaluate trade-offs for your use case.
 
 ### SSE Connection Per Component = Wasteful
+
 **Problem**: Multiple components each opening SSE connections.
 **Solution**: Single SSE connection in `sidebar.js`, shared state management.
 **Lesson**: Centralize real-time connections. Components subscribe to state, not sources.
 
 ### Test After Every Significant Change
+
 **Problem**: Easy to break things when refactoring HTML structure.
 **Solution**: `make restart` + browser check after each change.
 **Lesson**: Keep feedback loops tight. Visual changes need visual verification.
 
 ### Document Architectural Decisions
+
 **Problem**: Future agents (or humans) don't know why things are the way they are.
 **Solution**: Create `docs/architecture/OVERVIEW.md` and ADRs.
 **Lesson**: Write down the "why", not just the "what".

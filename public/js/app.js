@@ -1,6 +1,6 @@
 /**
  * OpenClaw Command Center - Main Application
- * 
+ *
  * Uses morphdom for efficient DOM updates (only patches what changed).
  */
 
@@ -36,44 +36,44 @@ let reconnectAttempts = 0;
 const MAX_RECONNECT_DELAY = 30000;
 
 function connectSSE() {
-  if (typeof EventSource === 'undefined') {
-    console.warn('[SSE] Not supported, falling back to polling');
+  if (typeof EventSource === "undefined") {
+    console.warn("[SSE] Not supported, falling back to polling");
     startPolling();
     return;
   }
 
-  updateConnectionStatus('connecting');
+  updateConnectionStatus("connecting");
 
-  eventSource = new EventSource('/api/events');
+  eventSource = new EventSource("/api/events");
 
   eventSource.onopen = () => {
-    console.log('[SSE] Connected');
+    console.log("[SSE] Connected");
     state.connected = true;
     reconnectAttempts = 0;
-    updateConnectionStatus('connected');
+    updateConnectionStatus("connected");
   };
 
-  eventSource.addEventListener('connected', (e) => {
+  eventSource.addEventListener("connected", (e) => {
     const data = JSON.parse(e.data);
-    console.log('[SSE] Server greeting:', data.message);
+    console.log("[SSE] Server greeting:", data.message);
   });
 
-  eventSource.addEventListener('update', (e) => {
+  eventSource.addEventListener("update", (e) => {
     const data = JSON.parse(e.data);
     handleStateUpdate(data);
   });
 
-  eventSource.addEventListener('heartbeat', (e) => {
+  eventSource.addEventListener("heartbeat", (e) => {
     const data = JSON.parse(e.data);
     state.lastUpdated = new Date();
     updateTimestamp();
   });
 
   eventSource.onerror = () => {
-    console.error('[SSE] Connection error');
+    console.error("[SSE] Connection error");
     state.connected = false;
     eventSource.close();
-    updateConnectionStatus('disconnected');
+    updateConnectionStatus("disconnected");
 
     // Exponential backoff
     reconnectAttempts++;
@@ -100,7 +100,7 @@ function handleStateUpdate(data) {
   if (data.memory) state.memory = data.memory;
   if (data.cerebro) state.cerebro = data.cerebro;
   if (data.subagents) state.subagents = data.subagents;
-  
+
   state.lastUpdated = new Date();
 
   // Re-render affected components using morphdom
@@ -130,11 +130,11 @@ function patchElement(containerId, newHtml) {
   if (!container) return;
 
   // Create a temporary element with the new content
-  const temp = document.createElement('div');
+  const temp = document.createElement("div");
   temp.innerHTML = newHtml;
 
   // Use morphdom to efficiently patch only what changed
-  if (typeof morphdom !== 'undefined') {
+  if (typeof morphdom !== "undefined") {
     // Patch each child
     while (container.firstChild && temp.firstChild) {
       morphdom(container.firstChild, temp.firstChild);
@@ -161,47 +161,47 @@ function patchElement(containerId, newHtml) {
 function renderVitals() {
   if (!state.vitals) return;
   const v = state.vitals;
-  
+
   // Update individual elements (simpler than full morphdom for now)
-  setText('vitals-hostname', v.hostname || '-');
-  setText('vitals-uptime', v.uptime || '-');
-  
+  setText("vitals-hostname", v.hostname || "-");
+  setText("vitals-uptime", v.uptime || "-");
+
   if (v.cpu) {
     const cpuPct = v.cpu.usage || 0;
-    setText('cpu-percent', cpuPct + '%');
-    setWidth('cpu-bar', cpuPct + '%');
-    setText('cpu-user', (v.cpu.userPercent?.toFixed(1) || '-') + '%');
-    setText('cpu-sys', (v.cpu.sysPercent?.toFixed(1) || '-') + '%');
-    setText('cpu-idle', (v.cpu.idlePercent?.toFixed(1) || '-') + '%');
-    setText('cpu-chip', v.cpu.chip || v.cpu.brand || '');
+    setText("cpu-percent", cpuPct + "%");
+    setWidth("cpu-bar", cpuPct + "%");
+    setText("cpu-user", (v.cpu.userPercent?.toFixed(1) || "-") + "%");
+    setText("cpu-sys", (v.cpu.sysPercent?.toFixed(1) || "-") + "%");
+    setText("cpu-idle", (v.cpu.idlePercent?.toFixed(1) || "-") + "%");
+    setText("cpu-chip", v.cpu.chip || v.cpu.brand || "");
   }
-  
+
   if (v.memory) {
     const memPct = v.memory.percent || 0;
-    setText('mem-percent', memPct + '% used');
-    setWidth('mem-bar', memPct + '%');
-    setText('mem-summary', `${v.memory.usedFormatted || '-'} of ${v.memory.totalFormatted || '-'}`);
+    setText("mem-percent", memPct + "% used");
+    setWidth("mem-bar", memPct + "%");
+    setText("mem-summary", `${v.memory.usedFormatted || "-"} of ${v.memory.totalFormatted || "-"}`);
   }
-  
+
   if (v.disk) {
     const diskPct = v.disk.percent || 0;
-    setText('disk-percent', diskPct + '% used');
-    setWidth('disk-bar', diskPct + '%');
-    setText('disk-summary', `${v.disk.usedFormatted || '-'} of ${v.disk.totalFormatted || '-'}`);
+    setText("disk-percent", diskPct + "% used");
+    setWidth("disk-bar", diskPct + "%");
+    setText("disk-summary", `${v.disk.usedFormatted || "-"} of ${v.disk.totalFormatted || "-"}`);
   }
 }
 
 function renderTokenStats() {
   if (!state.tokenStats) return;
   const t = state.tokenStats;
-  
-  setText('stat-total-tokens', t.total || '-');
-  setText('stat-input', t.input || '-');
-  setText('stat-output', t.output || '-');
-  setText('stat-active', t.activeCount || '0');
-  setText('stat-cost', t.estCost || '-');
-  setText('stat-main', `${t.activeMainCount || 0}/${t.mainLimit || 12}`);
-  setText('stat-subagents', `${t.activeSubagentCount || 0}/${t.subagentLimit || 24}`);
+
+  setText("stat-total-tokens", t.total || "-");
+  setText("stat-input", t.input || "-");
+  setText("stat-output", t.output || "-");
+  setText("stat-active", t.activeCount || "0");
+  setText("stat-cost", t.estCost || "-");
+  setText("stat-main", `${t.activeMainCount || 0}/${t.mainLimit || 12}`);
+  setText("stat-subagents", `${t.activeSubagentCount || 0}/${t.subagentLimit || 24}`);
 }
 
 function renderLlmUsage() {
@@ -249,18 +249,22 @@ function setWidth(id, width) {
 function updateTimestamp() {
   const now = state.lastUpdated || new Date();
   const timeStr = now.toLocaleTimeString();
-  const indicator = state.connected ? ' ⚡' : '';
-  setText('last-updated', timeStr + indicator);
-  setText('sidebar-updated', state.connected ? `Live: ${timeStr}` : `Updated: ${timeStr}`);
+  const indicator = state.connected ? " ⚡" : "";
+  setText("last-updated", timeStr + indicator);
+  setText("sidebar-updated", state.connected ? `Live: ${timeStr}` : `Updated: ${timeStr}`);
 }
 
 function updateConnectionStatus(status) {
-  const el = document.getElementById('connection-status');
+  const el = document.getElementById("connection-status");
   if (!el) return;
-  
-  el.className = 'connection-status ' + status;
-  el.textContent = status === 'connected' ? '🟢 Live' : 
-                   status === 'connecting' ? '🟡 Connecting...' : '🔴 Disconnected';
+
+  el.className = "connection-status " + status;
+  el.textContent =
+    status === "connected"
+      ? "🟢 Live"
+      : status === "connecting"
+        ? "🟡 Connecting..."
+        : "🔴 Disconnected";
 }
 
 // ============================================================================
@@ -277,11 +281,11 @@ function startPolling() {
 
 async function fetchState() {
   try {
-    const response = await fetch('/api/state');
+    const response = await fetch("/api/state");
     const data = await response.json();
     handleStateUpdate(data);
   } catch (e) {
-    console.error('[Polling] Failed:', e);
+    console.error("[Polling] Failed:", e);
   }
 }
 
@@ -290,16 +294,16 @@ async function fetchState() {
 // ============================================================================
 
 function init() {
-  console.log('[App] Initializing OpenClaw Command Center');
+  console.log("[App] Initializing OpenClaw Command Center");
   connectSSE();
-  
+
   // Initial fetch to populate immediately
   setTimeout(fetchState, 100);
 }
 
 // Start when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", init);
 } else {
   setTimeout(init, 0);
 }

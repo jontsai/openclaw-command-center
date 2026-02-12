@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenClaw Command Center</title>
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="css/dashboard.css" />
     <script src="js/lib/morphdom.min.js"></script>
     <!-- Shared Sidebar Loader -->
     <script src="js/sidebar.js"></script>
@@ -51,15 +51,44 @@
           <div class="stat-value" id="active-sessions">-</div>
           <div class="stat-label">Active (15m)</div>
         </div>
-        <div class="stat" title="Click for cost breakdown" onclick="openCostModal()" style="cursor: pointer;">
+        <div
+          class="stat"
+          title="Click for cost breakdown"
+          onclick="openCostModal()"
+          style="cursor: pointer"
+        >
           <div class="stat-value" id="est-cost">-</div>
           <div class="stat-label">Est. Cost (24h) 📊</div>
         </div>
-        <div class="stat" title="Click for cost breakdown" id="savings-stat" style="display: none; cursor: pointer;">
-          <div class="stat-value" id="est-savings" style="color: var(--green);" onclick="openCostModal()">-</div>
-          <div class="stat-label" style="display: flex; align-items: center; gap: 4px;">
+        <div
+          class="stat"
+          title="Click for cost breakdown"
+          id="savings-stat"
+          style="display: none; cursor: pointer"
+        >
+          <div
+            class="stat-value"
+            id="est-savings"
+            style="color: var(--green)"
+            onclick="openCostModal()"
+          >
+            -
+          </div>
+          <div class="stat-label" style="display: flex; align-items: center; gap: 4px">
             <span onclick="openCostModal()">Est. Monthly Savings</span>
-            <select id="savings-window-select" style="font-size: 0.7rem; padding: 1px 2px; background: var(--card-bg); color: var(--text); border: 1px solid var(--border); border-radius: 3px; cursor: pointer;" onclick="event.stopPropagation()">
+            <select
+              id="savings-window-select"
+              style="
+                font-size: 0.7rem;
+                padding: 1px 2px;
+                background: var(--card-bg);
+                color: var(--text);
+                border: 1px solid var(--border);
+                border-radius: 3px;
+                cursor: pointer;
+              "
+              onclick="event.stopPropagation()"
+            >
               <option value="24h">24h</option>
               <option value="3dma">3dma</option>
               <option value="7dma" selected>7dma</option>
@@ -1172,7 +1201,7 @@
                   target="_blank"
                   style="color: var(--accent); text-decoration: none; font-size: 1rem"
                 >
-Jonathan Tsai (@jontsai)
+                  Jonathan Tsai (@jontsai)
                 </a>
               </div>
 
@@ -1291,42 +1320,92 @@ Jonathan Tsai (@jontsai)
 
     <!-- Auth Fix Modal -->
     <div id="auth-modal-overlay" class="detail-overlay hidden" onclick="closeAuthModal()"></div>
-    <div id="auth-modal" class="detail-panel hidden" style="max-width: 550px;">
+    <div id="auth-modal" class="detail-panel hidden" style="max-width: 550px">
       <div class="detail-header">
         <h2>🔑 Fix Claude Authentication</h2>
         <button class="close-btn" onclick="closeAuthModal()">✕</button>
       </div>
       <div class="detail-content" id="auth-modal-content">
-        <div class="detail-section" style="background: rgba(245,158,11,0.1); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-          <p style="margin: 0; color: #f59e0b;">⚠️ Your Claude OAuth token has expired or lacks the required permissions.</p>
+        <div
+          class="detail-section"
+          style="
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+          "
+        >
+          <p style="margin: 0; color: #f59e0b">
+            ⚠️ Your Claude OAuth token has expired or lacks the required permissions.
+          </p>
         </div>
-        
+
         <div class="detail-section">
           <h3>Step 1: Refresh Claude Token</h3>
           <div class="detail-box">
             <p>Open Terminal and run:</p>
-            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>claude setup-token</code></pre>
-            <p style="color: #888; font-size: 12px; margin-top: 8px;">Follow the prompts to authenticate with your Claude account.</p>
+            <pre
+              style="
+                background: #1e1e2e;
+                padding: 12px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-size: 13px;
+              "
+            ><code>claude setup-token</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px">
+              Follow the prompts to authenticate with your Claude account.
+            </p>
           </div>
         </div>
-        
+
         <div class="detail-section">
           <h3>Step 2: Update OpenClaw Agent</h3>
           <div class="detail-box">
             <p>Run the onboard wizard to update your agent credentials:</p>
-            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>openclaw onboard</code></pre>
-            <p style="color: #888; font-size: 12px; margin-top: 8px;">Or manually update the main agent:</p>
-            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>openclaw agents add main</code></pre>
-            <p style="color: #888; font-size: 12px; margin-top: 8px;">Select "Claude Code CLI" when prompted for the auth source.</p>
+            <pre
+              style="
+                background: #1e1e2e;
+                padding: 12px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-size: 13px;
+              "
+            ><code>openclaw onboard</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px">
+              Or manually update the main agent:
+            </p>
+            <pre
+              style="
+                background: #1e1e2e;
+                padding: 12px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-size: 13px;
+              "
+            ><code>openclaw agents add main</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px">
+              Select "Claude Code CLI" when prompted for the auth source.
+            </p>
           </div>
         </div>
-        
+
         <div class="detail-section">
           <h3>Step 3: Verify</h3>
           <div class="detail-box">
             <p>Refresh this dashboard or run:</p>
-            <pre style="background: #1e1e2e; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 13px;"><code>openclaw status --usage</code></pre>
-            <p style="color: #888; font-size: 12px; margin-top: 8px;">You should see your usage percentages instead of an auth error.</p>
+            <pre
+              style="
+                background: #1e1e2e;
+                padding: 12px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-size: 13px;
+              "
+            ><code>openclaw status --usage</code></pre>
+            <p style="color: #888; font-size: 12px; margin-top: 8px">
+              You should see your usage percentages instead of an auth error.
+            </p>
           </div>
         </div>
       </div>
@@ -1334,7 +1413,7 @@ Jonathan Tsai (@jontsai)
 
     <!-- Cost Breakdown Modal -->
     <div id="cost-modal-overlay" class="detail-overlay hidden" onclick="closeCostModal()"></div>
-    <div id="cost-modal" class="detail-panel hidden" style="max-width: 500px;">
+    <div id="cost-modal" class="detail-panel hidden" style="max-width: 500px">
       <div class="detail-header">
         <h2>💰 Cost Breakdown (24h)</h2>
         <button class="close-btn" onclick="closeCostModal()">✕</button>
@@ -1352,20 +1431,27 @@ Jonathan Tsai (@jontsai)
           <h3>🧮 Calculation</h3>
           <div class="detail-box" id="cost-calculation"></div>
         </div>
-        <div class="detail-section" style="background: rgba(63,185,80,0.1); border-radius: 8px; padding: 16px;">
+        <div
+          class="detail-section"
+          style="background: rgba(63, 185, 80, 0.1); border-radius: 8px; padding: 16px"
+        >
           <h3>✨ Est. Savings</h3>
           <div class="detail-box" id="cost-savings"></div>
         </div>
         <div class="detail-section">
           <h3>🔥 Top Sessions by Tokens (24h)</h3>
-          <div class="detail-box" id="cost-top-sessions" style="font-size: 0.85rem;"></div>
+          <div class="detail-box" id="cost-top-sessions" style="font-size: 0.85rem"></div>
         </div>
       </div>
     </div>
 
     <!-- Operator Modal -->
-    <div id="operator-modal-overlay" class="detail-overlay hidden" onclick="closeOperatorModal()"></div>
-    <div id="operator-modal" class="detail-panel hidden" style="max-width: 500px;">
+    <div
+      id="operator-modal-overlay"
+      class="detail-overlay hidden"
+      onclick="closeOperatorModal()"
+    ></div>
+    <div id="operator-modal" class="detail-panel hidden" style="max-width: 500px">
       <div class="detail-header">
         <h2>👤 <span id="operator-modal-name">User Stats</span></h2>
         <button class="close-btn" onclick="closeOperatorModal()">✕</button>
@@ -1376,69 +1462,153 @@ Jonathan Tsai (@jontsai)
     </div>
 
     <!-- Privacy Settings Modal -->
-    <div id="privacy-modal-overlay" class="detail-overlay hidden" onclick="closePrivacyModal()"></div>
-    <div id="privacy-modal" class="detail-panel hidden" style="max-width: 550px;">
+    <div
+      id="privacy-modal-overlay"
+      class="detail-overlay hidden"
+      onclick="closePrivacyModal()"
+    ></div>
+    <div id="privacy-modal" class="detail-panel hidden" style="max-width: 550px">
       <div class="detail-header">
         <h2>🔒 Privacy Settings</h2>
         <button class="close-btn" onclick="closePrivacyModal()">✕</button>
       </div>
       <div class="detail-content" id="privacy-modal-content">
-        <div style="margin-bottom: 16px;">
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
-            Hide topics and sessions from display for privacy during demos/screenshots. Settings are stored in your browser only.
+        <div style="margin-bottom: 16px">
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px">
+            Hide topics and sessions from display for privacy during demos/screenshots. Settings are
+            stored in your browser only.
           </p>
         </div>
-        
+
         <!-- Hidden Topics Section -->
-        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">🏷️ Hidden Topics <span id="privacy-topics-count" style="color: var(--text-muted); font-weight: normal;">(0)</span></label>
-          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input type="text" id="privacy-add-topic" placeholder="Topic name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
+        <div
+          style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border)"
+        >
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px"
+            >🏷️ Hidden Topics
+            <span id="privacy-topics-count" style="color: var(--text-muted); font-weight: normal"
+              >(0)</span
+            ></label
+          >
+          <div style="display: flex; gap: 8px; margin-bottom: 12px">
+            <input
+              type="text"
+              id="privacy-add-topic"
+              placeholder="Topic name..."
+              style="
+                flex: 1;
+                padding: 8px 12px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                color: var(--text);
+                font-size: 0.9rem;
+              "
+            />
             <button class="btn-primary" onclick="addHiddenTopic()">Add</button>
           </div>
-          <div id="hidden-topics-list" style="min-height: 30px;">
-            <em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>
+          <div id="hidden-topics-list" style="min-height: 30px">
+            <em style="color: var(--text-muted); font-size: 0.85rem">No topics hidden</em>
           </div>
         </div>
-        
+
         <!-- Hidden Sessions Section -->
-        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">📋 Hidden Sessions <span id="privacy-sessions-count" style="color: var(--text-muted); font-weight: normal;">(0)</span></label>
-          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input type="text" id="privacy-add-session" placeholder="Session label or key..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
+        <div
+          style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border)"
+        >
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px"
+            >📋 Hidden Sessions
+            <span id="privacy-sessions-count" style="color: var(--text-muted); font-weight: normal"
+              >(0)</span
+            ></label
+          >
+          <div style="display: flex; gap: 8px; margin-bottom: 12px">
+            <input
+              type="text"
+              id="privacy-add-session"
+              placeholder="Session label or key..."
+              style="
+                flex: 1;
+                padding: 8px 12px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                color: var(--text);
+                font-size: 0.9rem;
+              "
+            />
             <button class="btn-primary" onclick="addHiddenSession()">Add</button>
           </div>
-          <div id="hidden-sessions-list" style="min-height: 30px;">
-            <em style="color: var(--text-muted); font-size: 0.85rem;">No sessions hidden</em>
+          <div id="hidden-sessions-list" style="min-height: 30px">
+            <em style="color: var(--text-muted); font-size: 0.85rem">No sessions hidden</em>
           </div>
-          <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
+          <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 8px">
             💡 Tip: You can also click the 👁️ icon on any session card to hide it quickly.
           </p>
         </div>
-        
+
         <!-- Hidden Cron Jobs Section -->
-        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">⏰ Hidden Cron Jobs <span id="privacy-crons-count" style="color: var(--text-muted); font-weight: normal;">(0)</span></label>
-          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-            <input type="text" id="privacy-add-cron" placeholder="Cron job name..." style="flex: 1; padding: 8px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.9rem;">
+        <div
+          style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border)"
+        >
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px"
+            >⏰ Hidden Cron Jobs
+            <span id="privacy-crons-count" style="color: var(--text-muted); font-weight: normal"
+              >(0)</span
+            ></label
+          >
+          <div style="display: flex; gap: 8px; margin-bottom: 12px">
+            <input
+              type="text"
+              id="privacy-add-cron"
+              placeholder="Cron job name..."
+              style="
+                flex: 1;
+                padding: 8px 12px;
+                background: var(--bg);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                color: var(--text);
+                font-size: 0.9rem;
+              "
+            />
             <button class="btn-primary" onclick="addHiddenCron()">Add</button>
           </div>
-          <div id="hidden-crons-list" style="min-height: 30px;">
-            <em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>
+          <div id="hidden-crons-list" style="min-height: 30px">
+            <em style="color: var(--text-muted); font-size: 0.85rem">No cron jobs hidden</em>
           </div>
         </div>
-        
+
         <!-- Display Options Section -->
-        <div style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);">
-          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px;">🖥️ Display Options</label>
-          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem;">
-            <input type="checkbox" id="privacy-hide-hostname" onchange="toggleHideHostname()" style="width: 18px; height: 18px; cursor: pointer;">
+        <div
+          style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border)"
+        >
+          <label style="font-size: 0.95rem; font-weight: 600; display: block; margin-bottom: 12px"
+            >🖥️ Display Options</label
+          >
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              cursor: pointer;
+              font-size: 0.9rem;
+            "
+          >
+            <input
+              type="checkbox"
+              id="privacy-hide-hostname"
+              onchange="toggleHideHostname()"
+              style="width: 18px; height: 18px; cursor: pointer"
+            />
             <span>Hide system hostname</span>
           </label>
         </div>
-        
+
         <div>
-          <button class="btn-secondary" onclick="clearAllPrivacySettings()" style="width: 100%;">Clear All Privacy Settings</button>
+          <button class="btn-secondary" onclick="clearAllPrivacySettings()" style="width: 100%">
+            Clear All Privacy Settings
+          </button>
         </div>
       </div>
     </div>
@@ -1482,15 +1652,33 @@ Jonathan Tsai (@jontsai)
         return {
           el,
           exists: !!el,
-          text: (val) => { if (el) el.textContent = val; return this; },
-          html: (val) => { if (el) el.innerHTML = val; return this; },
-          style: (prop, val) => { if (el) el.style[prop] = val; return this; },
-          class: (val) => { if (el) el.className = val; return this; },
-          addClass: (val) => { if (el) el.classList.add(val); return this; },
-          removeClass: (val) => { if (el) el.classList.remove(val); return this; },
+          text: (val) => {
+            if (el) el.textContent = val;
+            return this;
+          },
+          html: (val) => {
+            if (el) el.innerHTML = val;
+            return this;
+          },
+          style: (prop, val) => {
+            if (el) el.style[prop] = val;
+            return this;
+          },
+          class: (val) => {
+            if (el) el.className = val;
+            return this;
+          },
+          addClass: (val) => {
+            if (el) el.classList.add(val);
+            return this;
+          },
+          removeClass: (val) => {
+            if (el) el.classList.remove(val);
+            return this;
+          },
         };
       }
-      
+
       // Batch safe DOM updates - silently skips missing elements
       function $batch(updates) {
         for (const [id, ops] of Object.entries(updates)) {
@@ -1498,11 +1686,21 @@ Jonathan Tsai (@jontsai)
           if (!el) continue;
           for (const [op, val] of Object.entries(ops)) {
             switch (op) {
-              case 'text': el.textContent = val; break;
-              case 'html': el.innerHTML = val; break;
-              case 'class': el.className = val; break;
-              case 'width': el.style.width = val; break;
-              default: if (op.startsWith('style.')) el.style[op.slice(6)] = val; break;
+              case "text":
+                el.textContent = val;
+                break;
+              case "html":
+                el.innerHTML = val;
+                break;
+              case "class":
+                el.className = val;
+                break;
+              case "width":
+                el.style.width = val;
+                break;
+              default:
+                if (op.startsWith("style.")) el.style[op.slice(6)] = val;
+                break;
             }
           }
         }
@@ -1510,13 +1708,13 @@ Jonathan Tsai (@jontsai)
 
       // Smart DOM update using morphdom - only patches what changed
       function smartUpdate(targetEl, newHtml) {
-        if (typeof morphdom === 'undefined') {
+        if (typeof morphdom === "undefined") {
           // Fallback if morphdom not loaded
           targetEl.innerHTML = newHtml;
           return;
         }
         // Create a temporary container with the new content
-        const temp = document.createElement('div');
+        const temp = document.createElement("div");
         temp.innerHTML = newHtml;
         // If target has single child and temp has single child, morph directly
         if (targetEl.children.length === 1 && temp.children.length === 1) {
@@ -1779,15 +1977,18 @@ Jonathan Tsai (@jontsai)
           if (total > 1) pages.push(total);
         }
 
-        smartUpdate(pagesEl, pages
-          .map((p) => {
-            if (p === "...") {
-              return '<span class="pagination-ellipsis">...</span>';
-            }
-            const activeClass = p === current ? "active" : "";
-            return `<button class="pagination-page ${activeClass}" onclick="goToPage(${p})">${p}</button>`;
-          })
-          .join(""));
+        smartUpdate(
+          pagesEl,
+          pages
+            .map((p) => {
+              if (p === "...") {
+                return '<span class="pagination-ellipsis">...</span>';
+              }
+              const activeClass = p === current ? "active" : "";
+              return `<button class="pagination-page ${activeClass}" onclick="goToPage(${p})">${p}</button>`;
+            })
+            .join(""),
+        );
       }
 
       // Fetch and render data (progressive loading)
@@ -1804,16 +2005,16 @@ Jonathan Tsai (@jontsai)
           fetchDataLegacy();
         }
       }
-      
+
       // Render all widgets from unified state
       function renderFullState(state) {
         if (!state) return;
-        
+
         // Update timestamp
         const now = new Date().toLocaleTimeString();
         $set("last-updated", "textContent", now);
         $set("sidebar-updated", "textContent", `Updated: ${now}`);
-        
+
         // Render each section
         if (state.vitals) renderVitals(state.vitals);
         if (state.sessions) renderSessions(state.sessions, state.pagination, state.statusCounts);
@@ -1826,27 +2027,45 @@ Jonathan Tsai (@jontsai)
         if (state.cerebro) renderCerebro(state.cerebro);
         if (state.subagents) renderSubagents(state.subagents);
       }
-      
+
       // Legacy fallback - multiple API calls (used if /api/state fails)
       async function fetchDataLegacy() {
         console.log("[Legacy] Falling back to individual API calls");
-        
+
         // Fire off all requests in parallel
         const promises = [
-          fetch("/api/vitals").then(r => r.json()).catch(() => null),
-          fetch("/api/sessions").then(r => r.json()).catch(() => null),
-          fetch("/api/operators").then(r => r.json()).catch(() => null),
-          fetch("/api/llm-usage").then(r => r.json()).catch(() => null),
-          fetch("/api/cron").then(r => r.json()).catch(() => null),
-          fetch("/api/memory").then(r => r.json()).catch(() => null),
-          fetch("/api/cerebro").then(r => r.json()).catch(() => null),
-          fetch("/api/subagents").then(r => r.json()).catch(() => null),
+          fetch("/api/vitals")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/sessions")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/operators")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/llm-usage")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/cron")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/memory")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/cerebro")
+            .then((r) => r.json())
+            .catch(() => null),
+          fetch("/api/subagents")
+            .then((r) => r.json())
+            .catch(() => null),
         ];
-        
-        const [vitals, sessions, operators, llm, cron, memory, cerebro, subagents] = await Promise.all(promises);
-        
+
+        const [vitals, sessions, operators, llm, cron, memory, cerebro, subagents] =
+          await Promise.all(promises);
+
         if (vitals?.vitals) renderVitals(vitals.vitals);
-        if (sessions?.sessions) renderSessions(sessions.sessions, sessions.pagination, sessions.statusCounts);
+        if (sessions?.sessions)
+          renderSessions(sessions.sessions, sessions.pagination, sessions.statusCounts);
         if (sessions?.tokenStats) renderTokenStats(sessions.tokenStats);
         if (operators) renderOperators(operators);
         if (llm) renderLlmUsage(llm);
@@ -1854,7 +2073,7 @@ Jonathan Tsai (@jontsai)
         if (memory?.memory) renderMemory(memory.memory);
         if (cerebro) renderCerebro(cerebro);
         if (subagents?.subagents) renderSubagents(subagents.subagents);
-        
+
         const now = new Date().toLocaleTimeString();
         $set("last-updated", "textContent", now);
         $set("sidebar-updated", "textContent", `Updated: ${now}`);
@@ -1874,15 +2093,16 @@ Jonathan Tsai (@jontsai)
         // Always use paginationState.total if we have it (survives SSE updates)
         // Only fall back to sessions.length if we've never received pagination data
         const displayCount = paginationState.total > 0 ? paginationState.total : sessions.length;
-        
+
         // Filter out hidden sessions
-        const visibleSessions = sessions.filter(s => !isSessionHidden(s));
+        const visibleSessions = sessions.filter((s) => !isSessionHidden(s));
         const hiddenSessionsCount = sessions.length - visibleSessions.length;
-        
+
         // Show hidden count breakdown if any hidden
-        const sessionCountText = hiddenSessionsCount > 0
-          ? `${displayCount} (${hiddenSessionsCount} hidden)`
-          : displayCount;
+        const sessionCountText =
+          hiddenSessionsCount > 0
+            ? `${displayCount} (${hiddenSessionsCount} hidden)`
+            : displayCount;
         $set("session-count", "textContent", sessionCountText);
         $set("nav-session-count", "textContent", displayCount);
 
@@ -1892,105 +2112,116 @@ Jonathan Tsai (@jontsai)
           updateFilterCountsFromServer(statusCounts);
         }
         // Removed: fallback to updateFilterCounts(sessions) which only counted current page
-        
+
         if (visibleSessions.length === 0) {
-          smartUpdate(sessionsEl, `
+          smartUpdate(
+            sessionsEl,
+            `
                     <div class="empty-state">
                         <div class="empty-state-icon">📡</div>
                         <div class="empty-state-text">No active sessions</div>
                     </div>
-                `);
+                `,
+          );
         } else {
-          smartUpdate(sessionsEl, visibleSessions
-            .sort((a, b) => a.minutesAgo - b.minutesAgo)
-            .map((s) => {
-              const iconClass =
-                s.channel === "slack" ? "slack" : s.channel === "telegram" ? "telegram" : "main";
-              const icon = s.channel === "slack" ? "💬" : s.channel === "telegram" ? "📱" : "🏠";
-              const badgeClass = s.active
-                ? "badge-live"
-                : s.recentlyActive
-                  ? "badge-recent"
-                  : "badge-idle";
-              const badgeText = s.active ? "● Live" : formatTimeAgo(s.minutesAgo);
-              const tokenClass = s.tokens > 100000 ? "high" : s.tokens > 50000 ? "med" : "";
-              const model = s.model?.replace("claude-", "")?.replace("anthropic/", "") || "";
-              const cardClass = s.active ? "active" : s.recentlyActive ? "recent-active" : "";
-              const status = s.active ? "live" : s.recentlyActive ? "recent" : "idle";
+          smartUpdate(
+            sessionsEl,
+            visibleSessions
+              .sort((a, b) => a.minutesAgo - b.minutesAgo)
+              .map((s) => {
+                const iconClass =
+                  s.channel === "slack" ? "slack" : s.channel === "telegram" ? "telegram" : "main";
+                const icon = s.channel === "slack" ? "💬" : s.channel === "telegram" ? "📱" : "🏠";
+                const badgeClass = s.active
+                  ? "badge-live"
+                  : s.recentlyActive
+                    ? "badge-recent"
+                    : "badge-idle";
+                const badgeText = s.active ? "● Live" : formatTimeAgo(s.minutesAgo);
+                const tokenClass = s.tokens > 100000 ? "high" : s.tokens > 50000 ? "med" : "";
+                const model = s.model?.replace("claude-", "")?.replace("anthropic/", "") || "";
+                const cardClass = s.active ? "active" : s.recentlyActive ? "recent-active" : "";
+                const status = s.active ? "live" : s.recentlyActive ? "recent" : "idle";
 
-              // Generate topic pills (filtered by privacy settings)
-              let topicHtml = "";
-              if (s.topic) {
-                const topics = s.topic
-                  .split(", ")
-                  .map((t) => t.trim())
-                  .filter((t) => t && !isTopicHidden(t));
-                if (topics.length > 0) {
-                  const pills = topics
-                    .map((t) => {
-                      const className = t.toLowerCase().replace(/[^a-z]/g, "");
-                      return `<span class="topic-pill ${className}">${escapeHtml(t)}</span>`;
-                    })
-                    .join("");
-                  topicHtml = `<div class="card-topics">${pills}</div>`;
+                // Generate topic pills (filtered by privacy settings)
+                let topicHtml = "";
+                if (s.topic) {
+                  const topics = s.topic
+                    .split(", ")
+                    .map((t) => t.trim())
+                    .filter((t) => t && !isTopicHidden(t));
+                  if (topics.length > 0) {
+                    const pills = topics
+                      .map((t) => {
+                        const className = t.toLowerCase().replace(/[^a-z]/g, "");
+                        return `<span class="topic-pill ${className}">${escapeHtml(t)}</span>`;
+                      })
+                      .join("");
+                    topicHtml = `<div class="card-topics">${pills}</div>`;
+                  }
                 }
-              }
-              const previewHtml = s.preview
-                ? `<div class="card-preview">${escapeHtml(s.preview)}</div>`
-                : "";
-              // Cerebro tag (filtered by privacy settings)
-              const cerebroTagHtml = s.cerebroTopic && !isTopicHidden(s.cerebroTopic)
-                ? `<span class="cerebro-tag" title="Cerebro topic: ${escapeHtml(s.cerebroTopic)}">🏷️ ${escapeHtml(s.cerebroTopic)}</span>`
-                : "";
+                const previewHtml = s.preview
+                  ? `<div class="card-preview">${escapeHtml(s.preview)}</div>`
+                  : "";
+                // Cerebro tag (filtered by privacy settings)
+                const cerebroTagHtml =
+                  s.cerebroTopic && !isTopicHidden(s.cerebroTopic)
+                    ? `<span class="cerebro-tag" title="Cerebro topic: ${escapeHtml(s.cerebroTopic)}">🏷️ ${escapeHtml(s.cerebroTopic)}</span>`
+                    : "";
 
-              // Originator info
-              let originatorHtml = "";
-              if (s.originator) {
-                const displayName = s.originator.displayName || s.originator.username || "Unknown";
-                const initial = displayName.charAt(0).toUpperCase();
-                originatorHtml = `
+                // Originator info
+                let originatorHtml = "";
+                if (s.originator) {
+                  const displayName =
+                    s.originator.displayName || s.originator.username || "Unknown";
+                  const initial = displayName.charAt(0).toUpperCase();
+                  originatorHtml = `
                             <div class="session-originator">
                                 <span class="originator-avatar">${initial}</span>
                                 <span>${escapeHtml(displayName)}</span>
                             </div>
                         `;
-              }
+                }
 
-              // Activity state indicator
-              const activityState = s.activityState || { state: "idle", icon: "💤", label: "Idle" };
-              const activityHtml = `
+                // Activity state indicator
+                const activityState = s.activityState || {
+                  state: "idle",
+                  icon: "💤",
+                  label: "Idle",
+                };
+                const activityHtml = `
                         <div class="activity-wrapper" title="${activityState.label}">
                             <span class="activity-indicator ${activityState.state}">${activityState.icon}</span>
                             <span class="activity-label">${activityState.label}</span>
                         </div>
                     `;
 
-              // Build metrics bar (fitness tracker style)
-              const m = s.metrics || { burnRate: 0, toolCalls: 0, minutesActive: 0 };
-              const burnRateClass = m.burnRate > 5000 ? "hot" : "";
-              const burnRateFormatted =
-                m.burnRate > 1000 ? (m.burnRate / 1000).toFixed(1) + "k" : m.burnRate;
-              const timeActiveFormatted =
-                m.minutesActive > 60
-                  ? Math.floor(m.minutesActive / 60) + "h " + (m.minutesActive % 60) + "m"
-                  : m.minutesActive + "m";
+                // Build metrics bar (fitness tracker style)
+                const m = s.metrics || { burnRate: 0, toolCalls: 0, minutesActive: 0 };
+                const burnRateClass = m.burnRate > 5000 ? "hot" : "";
+                const burnRateFormatted =
+                  m.burnRate > 1000 ? (m.burnRate / 1000).toFixed(1) + "k" : m.burnRate;
+                const timeActiveFormatted =
+                  m.minutesActive > 60
+                    ? Math.floor(m.minutesActive / 60) + "h " + (m.minutesActive % 60) + "m"
+                    : m.minutesActive + "m";
 
-              // Operator metric (clickable to show user stats)
-              const operatorName = s.originator?.displayName || s.originator?.username || null;
-              const operatorId = s.originator?.userId || s.originator?.id || null;
-              const operatorMetricHtml = operatorName 
-                ? `<div class="metric-ring operator" title="User: ${escapeHtml(operatorName)}" onclick="event.stopPropagation(); openOperatorModal('${escapeHtml(operatorId || operatorName)}')">
+                // Operator metric (clickable to show user stats)
+                const operatorName = s.originator?.displayName || s.originator?.username || null;
+                const operatorId = s.originator?.userId || s.originator?.id || null;
+                const operatorMetricHtml = operatorName
+                  ? `<div class="metric-ring operator" title="User: ${escapeHtml(operatorName)}" onclick="event.stopPropagation(); openOperatorModal('${escapeHtml(operatorId || operatorName)}')">
                       <span class="metric-icon">👤</span>
-                      <span class="metric-value" style="font-size: 0.7rem; max-width: 50px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(operatorName.split(' ')[0])}</span>
+                      <span class="metric-value" style="font-size: 0.7rem; max-width: 50px; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(operatorName.split(" ")[0])}</span>
                       <span class="metric-label">user</span>
                    </div>`
-                : `<div class="metric-ring operator" title="Unknown user">
+                  : `<div class="metric-ring operator" title="Unknown user">
                       <span class="metric-icon">👤</span>
                       <span class="metric-value">—</span>
                       <span class="metric-label">user</span>
                    </div>`;
 
-              const metricsHtml = `
+                const metricsHtml = `
                         <div class="metrics-bar">
                             <div class="metric-ring burn ${burnRateClass}" title="Token burn rate: ${m.burnRate} tokens/min">
                                 <span class="metric-icon">🔥</span>
@@ -2006,7 +2237,7 @@ Jonathan Tsai (@jontsai)
                         </div>
                     `;
 
-              return `
+                return `
                     <div class="session-card ${cardClass}" data-status="${status}" data-channel="${s.channel}" data-kind="${s.sessionType || s.kind}" onclick="openDetail('${escapeHtml(s.sessionKey)}', '${escapeHtml(s.label)}')">
                         <div class="card-header">
                             <div class="card-icon ${iconClass}">${icon}</div>
@@ -2031,8 +2262,9 @@ Jonathan Tsai (@jontsai)
                         ${metricsHtml}
                     </div>
                     `;
-            })
-            .join(""));
+              })
+              .join(""),
+          );
         }
 
         applyFilter();
@@ -2042,32 +2274,38 @@ Jonathan Tsai (@jontsai)
       function renderCron(cron) {
         const cronEl = document.getElementById("cron-jobs");
         cronData = cron; // Store for re-rendering after privacy changes
-        
+
         // Filter out hidden crons
-        const visibleCrons = cron.filter(c => !isCronHidden(c));
+        const visibleCrons = cron.filter((c) => !isCronHidden(c));
         const hiddenCronsCount = cron.length - visibleCrons.length;
-        
+
         // Show hidden count breakdown if any are hidden
-        const cronCountText = hiddenCronsCount > 0
-          ? `${cron.length} (${visibleCrons.length} visible, ${hiddenCronsCount} hidden)`
-          : cron.length;
+        const cronCountText =
+          hiddenCronsCount > 0
+            ? `${cron.length} (${visibleCrons.length} visible, ${hiddenCronsCount} hidden)`
+            : cron.length;
         $set("cron-count", "textContent", cronCountText);
         $set("nav-cron-count", "textContent", cron.length);
 
         if (visibleCrons.length === 0) {
-          smartUpdate(cronEl, `
+          smartUpdate(
+            cronEl,
+            `
                     <div class="empty-state">
                         <div class="empty-state-icon">⏰</div>
                         <div class="empty-state-text">No scheduled jobs</div>
                     </div>
-                `);
+                `,
+          );
         } else {
-          smartUpdate(cronEl, visibleCrons
-            .map((c) => {
-              const humanSchedule = c.scheduleHuman
-                ? `<div class="cron-schedule-human">${escapeHtml(c.scheduleHuman)}</div>`
-                : "";
-              return `
+          smartUpdate(
+            cronEl,
+            visibleCrons
+              .map((c) => {
+                const humanSchedule = c.scheduleHuman
+                  ? `<div class="cron-schedule-human">${escapeHtml(c.scheduleHuman)}</div>`
+                  : "";
+                return `
                     <div class="cron-card ${c.enabled === false ? "disabled" : ""}">
                         <div class="cron-icon">⏰</div>
                         <div class="cron-info">
@@ -2084,8 +2322,9 @@ Jonathan Tsai (@jontsai)
                         </div>
                     </div>
                 `;
-            })
-            .join(""));
+              })
+              .join(""),
+          );
         }
       }
 
@@ -2100,7 +2339,9 @@ Jonathan Tsai (@jontsai)
         $set("nav-operator-count", "textContent", operatorsData.length);
 
         if (operatorsData.length === 0) {
-          smartUpdate(operatorsEl, `
+          smartUpdate(
+            operatorsEl,
+            `
                     <div class="empty-state">
                         <div class="empty-state-icon">👥</div>
                         <div class="empty-state-text">No operators configured</div>
@@ -2108,27 +2349,30 @@ Jonathan Tsai (@jontsai)
                             Operators are auto-detected from session activity
                         </div>
                     </div>
-                `);
+                `,
+          );
         } else {
-          smartUpdate(operatorsEl, operatorsData
-            .map((op) => {
-              const roleClass = op.role || "user";
-              const initial = (op.name || op.username || "?").charAt(0).toUpperCase();
-              const avatarHtml = op.avatar
-                ? `<img src="${escapeHtml(op.avatar)}" alt="${escapeHtml(op.name)}">`
-                : initial;
+          smartUpdate(
+            operatorsEl,
+            operatorsData
+              .map((op) => {
+                const roleClass = op.role || "user";
+                const initial = (op.name || op.username || "?").charAt(0).toUpperCase();
+                const avatarHtml = op.avatar
+                  ? `<img src="${escapeHtml(op.avatar)}" alt="${escapeHtml(op.name)}">`
+                  : initial;
 
-              const activeSessions = op.stats?.activeSessions || 0;
-              const totalSessions = op.stats?.totalSessions || 0;
+                const activeSessions = op.stats?.activeSessions || 0;
+                const totalSessions = op.stats?.totalSessions || 0;
 
-              let lastSeenText = "Never";
-              if (op.stats?.lastSeen) {
-                const lastSeen = new Date(op.stats.lastSeen);
-                const minutesAgo = Math.floor((Date.now() - lastSeen.getTime()) / 60000);
-                lastSeenText = minutesAgo < 1 ? "Just now" : formatTimeAgo(minutesAgo);
-              }
+                let lastSeenText = "Never";
+                if (op.stats?.lastSeen) {
+                  const lastSeen = new Date(op.stats.lastSeen);
+                  const minutesAgo = Math.floor((Date.now() - lastSeen.getTime()) / 60000);
+                  lastSeenText = minutesAgo < 1 ? "Just now" : formatTimeAgo(minutesAgo);
+                }
 
-              return `
+                return `
                     <div class="operator-card role-${roleClass}" style="cursor: pointer;" onclick="openOperatorModal('${escapeHtml(op.id || op.username)}')">
                         <div class="operator-header">
                             <div class="operator-avatar">${avatarHtml}</div>
@@ -2154,8 +2398,9 @@ Jonathan Tsai (@jontsai)
                         </div>
                     </div>
                     `;
-            })
-            .join(""));
+              })
+              .join(""),
+          );
         }
       }
 
@@ -2172,27 +2417,27 @@ Jonathan Tsai (@jontsai)
 
       // Store current token stats for window switching
       let currentTokenStats = null;
-      
+
       // Get saved savings window preference (default to 7dma for stability)
       function getSavingsWindowPref() {
-        return localStorage.getItem('savingsWindow') || '7dma';
+        return localStorage.getItem("savingsWindow") || "7dma";
       }
-      
+
       // Save savings window preference
       function setSavingsWindowPref(window) {
-        localStorage.setItem('savingsWindow', window);
+        localStorage.setItem("savingsWindow", window);
       }
-      
+
       // Update savings display based on selected window
       function updateSavingsDisplay(stats, windowKey) {
         const savingsStat = document.getElementById("savings-stat");
         const savingsEl = document.getElementById("est-savings");
-        
+
         if (!stats || !savingsStat || !savingsEl) return;
-        
+
         // Get the window-specific data or fall back to 24h
-        const windowData = stats.savingsWindows?.[windowKey] || stats.savingsWindows?.['24h'];
-        
+        const windowData = stats.savingsWindows?.[windowKey] || stats.savingsWindows?.["24h"];
+
         if (windowData?.estSavings) {
           savingsEl.textContent = windowData.estSavings;
           savingsEl.title = `${windowData.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo) [${windowData.label}]`;
@@ -2211,7 +2456,7 @@ Jonathan Tsai (@jontsai)
       function renderTokenStats(stats) {
         if (!stats) return;
         currentTokenStats = stats; // Store for window switching
-        
+
         $set("total-tokens", "textContent", stats.total || "0");
         $set("active-sessions", "textContent", stats.activeCount || 0);
         $set("input-tokens", "textContent", stats.input || "0");
@@ -2222,14 +2467,14 @@ Jonathan Tsai (@jontsai)
         $set("nav-monthly-cost", "textContent", stats.estMonthlyCost || "-");
         $set("nav-avg-tokens", "textContent", stats.avgTokensPerSession || "-");
         $set("nav-avg-cost", "textContent", stats.avgCostPerSession || "-");
-        
+
         // Load preference and update selector
         const savedWindow = getSavingsWindowPref();
         const windowSelect = document.getElementById("savings-window-select");
         if (windowSelect) {
           windowSelect.value = savedWindow;
         }
-        
+
         // Show savings for selected window
         updateSavingsDisplay(stats, savedWindow);
       }
@@ -2319,7 +2564,11 @@ Jonathan Tsai (@jontsai)
 
         // Memory - Show "X% used" with "X of Y" summary
         const memPercent = vitals.memory?.percent || 0;
-        $set("mem-percent", "innerHTML", memPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set(
+          "mem-percent",
+          "innerHTML",
+          memPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>',
+        );
         $set("mem-bar", "style.width", memPercent + "%");
 
         const memBar = document.getElementById("mem-bar");
@@ -2355,7 +2604,11 @@ Jonathan Tsai (@jontsai)
 
         // Disk - Show "X% used" with "X of Y" summary
         const diskPercent = vitals.disk?.percent || 0;
-        $set("disk-percent", "innerHTML", diskPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
+        $set(
+          "disk-percent",
+          "innerHTML",
+          diskPercent + '% <small style="font-size:0.6em;opacity:0.7">used</small>',
+        );
         $set("disk-bar", "style.width", diskPercent + "%");
 
         const diskBar = document.getElementById("disk-bar");
@@ -2411,202 +2664,226 @@ Jonathan Tsai (@jontsai)
       function $set(id, prop, value) {
         const el = document.getElementById(id);
         if (!el) return null;
-        if (prop === 'innerHTML') el.innerHTML = value;
-        else if (prop === 'textContent') el.textContent = value;
-        else if (prop === 'className') el.className = value;
-        else if (prop.startsWith('style.')) el.style[prop.slice(6)] = value;
+        if (prop === "innerHTML") el.innerHTML = value;
+        else if (prop === "textContent") el.textContent = value;
+        else if (prop === "className") el.className = value;
+        else if (prop.startsWith("style.")) el.style[prop.slice(6)] = value;
         return el;
       }
 
       function renderLlmUsage(data) {
         // Wrap in try-catch to prevent crashes from blocking other renders
         try {
-        // Handle auth errors - show clear error state instead of 0%
-        if (data?.errorType === "auth" || data?.claude?.session?.error) {
-          const errorMsg = "⚠️ Auth Error";
-          const errorDetail = "API key lacks user:profile scope";
-          const clickableError = '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>';
-          
-          // Session card
-          $set("claude-session-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
-          $set("claude-session-bar", "style.width", "0%");
-          $set("claude-session-bar", "className", "vital-bar-fill gray");
-          $set("claude-session-remaining", "textContent", "N/A");
-          $set("claude-session-reset", "innerHTML", clickableError);
-          
-          // Weekly card
-          $set("claude-weekly-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
-          $set("claude-weekly-bar", "style.width", "0%");
-          $set("claude-weekly-bar", "className", "vital-bar-fill gray");
-          $set("claude-weekly-remaining", "textContent", "N/A");
-          $set("claude-weekly-reset", "innerHTML", clickableError);
-          
-          // Sonnet card
-          $set("sonnet-weekly-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
-          $set("sonnet-weekly-bar", "style.width", "0%");
-          $set("sonnet-weekly-bar", "className", "vital-bar-fill gray");
-          $set("sonnet-weekly-remaining", "textContent", "N/A");
-          $set("sonnet-weekly-reset", "innerHTML", clickableError);
-          
-          // Compact cards - Claude
-          const compactSessionEl = document.getElementById("claude-compact-session-pct");
-          const compactSessionBar = document.getElementById("claude-compact-session-bar");
-          if (compactSessionEl) compactSessionEl.textContent = "N/A";
-          if (compactSessionBar) {
-            compactSessionBar.style.width = "0%";
-            compactSessionBar.className = "quota-bar-fill gray";
+          // Handle auth errors - show clear error state instead of 0%
+          if (data?.errorType === "auth" || data?.claude?.session?.error) {
+            const errorMsg = "⚠️ Auth Error";
+            const errorDetail = "API key lacks user:profile scope";
+            const clickableError =
+              '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>';
+
+            // Session card
+            $set("claude-session-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
+            $set("claude-session-bar", "style.width", "0%");
+            $set("claude-session-bar", "className", "vital-bar-fill gray");
+            $set("claude-session-remaining", "textContent", "N/A");
+            $set("claude-session-reset", "innerHTML", clickableError);
+
+            // Weekly card
+            $set("claude-weekly-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
+            $set("claude-weekly-bar", "style.width", "0%");
+            $set("claude-weekly-bar", "className", "vital-bar-fill gray");
+            $set("claude-weekly-remaining", "textContent", "N/A");
+            $set("claude-weekly-reset", "innerHTML", clickableError);
+
+            // Sonnet card
+            $set("sonnet-weekly-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
+            $set("sonnet-weekly-bar", "style.width", "0%");
+            $set("sonnet-weekly-bar", "className", "vital-bar-fill gray");
+            $set("sonnet-weekly-remaining", "textContent", "N/A");
+            $set("sonnet-weekly-reset", "innerHTML", clickableError);
+
+            // Compact cards - Claude
+            const compactSessionEl = document.getElementById("claude-compact-session-pct");
+            const compactSessionBar = document.getElementById("claude-compact-session-bar");
+            if (compactSessionEl) compactSessionEl.textContent = "N/A";
+            if (compactSessionBar) {
+              compactSessionBar.style.width = "0%";
+              compactSessionBar.className = "quota-bar-fill gray";
+            }
+            const compactWeekEl = document.getElementById("claude-compact-week-pct");
+            const compactWeekBar = document.getElementById("claude-compact-week-bar");
+            if (compactWeekEl) compactWeekEl.textContent = "N/A";
+            if (compactWeekBar) {
+              compactWeekBar.style.width = "0%";
+              compactWeekBar.className = "quota-bar-fill gray";
+            }
+
+            // Compact cards - Codex (show 0% but with gray bars since we don't track Codex via API)
+            const codex5hEl = document.getElementById("codex-5h-pct");
+            const codex5hBar = document.getElementById("codex-5h-bar");
+            const codexDayEl = document.getElementById("codex-day-pct");
+            const codexDayBar = document.getElementById("codex-day-bar");
+            if (codex5hEl) codex5hEl.textContent = "0%";
+            if (codex5hBar) {
+              codex5hBar.style.width = "0%";
+              codex5hBar.className = "quota-bar-fill low";
+            }
+            if (codexDayEl) codexDayEl.textContent = "0%";
+            if (codexDayBar) {
+              codexDayBar.style.width = "0%";
+              codexDayBar.className = "quota-bar-fill low";
+            }
+            $set("codex-tasks", "textContent", "0 total");
+            $set("llm-sync-time", "textContent", errorMsg);
+
+            // Still render routing data if available
+            if (data.routing) {
+              const ct = data.routing.claudeTasks || 0;
+              const cx = data.routing.codexTasks || 0;
+              const total = data.routing.total || 0;
+              $set(
+                "llm-routing-summary",
+                "textContent",
+                total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet",
+              );
+
+              // Task routing counts
+              $set("codex-tasks", "textContent", total + " total");
+              $set("claude-task-count", "textContent", ct);
+              $set("codex-task-count", "textContent", cx);
+            }
+            return;
           }
-          const compactWeekEl = document.getElementById("claude-compact-week-pct");
-          const compactWeekBar = document.getElementById("claude-compact-week-bar");
-          if (compactWeekEl) compactWeekEl.textContent = "N/A";
-          if (compactWeekBar) {
-            compactWeekBar.style.width = "0%";
-            compactWeekBar.className = "quota-bar-fill gray";
+
+          if (!data || data.error) {
+            $set("llm-sync-time", "textContent", data?.needsSync ? "Needs sync" : "Error");
+            return;
           }
-          
-          // Compact cards - Codex (show 0% but with gray bars since we don't track Codex via API)
-          const codex5hEl = document.getElementById("codex-5h-pct");
-          const codex5hBar = document.getElementById("codex-5h-bar");
-          const codexDayEl = document.getElementById("codex-day-pct");
-          const codexDayBar = document.getElementById("codex-day-bar");
-          if (codex5hEl) codex5hEl.textContent = "0%";
-          if (codex5hBar) {
-            codex5hBar.style.width = "0%";
-            codex5hBar.className = "quota-bar-fill low";
+
+          // Sync time
+          if (data.claude?.lastSynced) {
+            const synced = new Date(data.claude.lastSynced);
+            const ago = Math.round((Date.now() - synced) / 60000);
+            $set(
+              "llm-sync-time",
+              "textContent",
+              ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`,
+            );
+          } else if (data.source === "live") {
+            $set("llm-sync-time", "textContent", "Live");
           }
-          if (codexDayEl) codexDayEl.textContent = "0%";
-          if (codexDayBar) {
-            codexDayBar.style.width = "0%";
-            codexDayBar.className = "quota-bar-fill low";
-          }
-          $set("codex-tasks", "textContent", "0 total");
-          $set("llm-sync-time", "textContent", errorMsg);
-          
-          // Still render routing data if available
+
+          // Routing summary - show task counts clearly
           if (data.routing) {
             const ct = data.routing.claudeTasks || 0;
             const cx = data.routing.codexTasks || 0;
             const total = data.routing.total || 0;
-            $set("llm-routing-summary", "textContent",
-              total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet");
-            
-            // Task routing counts
-            $set("codex-tasks", "textContent", total + " total");
-            $set("claude-task-count", "textContent", ct);
-            $set("codex-task-count", "textContent", cx);
+            $set(
+              "llm-routing-summary",
+              "textContent",
+              total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet",
+            );
           }
-          return;
-        }
-        
-        if (!data || data.error) {
-          $set("llm-sync-time", "textContent", data?.needsSync ? "Needs sync" : "Error");
-          return;
-        }
 
-        // Sync time
-        if (data.claude?.lastSynced) {
-          const synced = new Date(data.claude.lastSynced);
-          const ago = Math.round((Date.now() - synced) / 60000);
-          $set("llm-sync-time", "textContent", ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`);
-        } else if (data.source === "live") {
-          $set("llm-sync-time", "textContent", "Live");
-        }
+          // Claude Session - Show USED as primary (bar fills with consumption)
+          const sessionRemaining = data.claude?.session?.remainingPct || 0;
+          const sessionUsed = data.claude?.session?.usedPct || 0;
+          $set(
+            "claude-session-pct",
+            "innerHTML",
+            sessionUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>',
+          );
+          $set("claude-session-bar", "style.width", sessionUsed + "%");
+          $set("claude-session-remaining", "textContent", sessionRemaining + "%");
+          $set("claude-session-reset", "textContent", data.claude?.session?.resetsIn || "-");
 
-        // Routing summary - show task counts clearly
-        if (data.routing) {
-          const ct = data.routing.claudeTasks || 0;
-          const cx = data.routing.codexTasks || 0;
-          const total = data.routing.total || 0;
-          $set("llm-routing-summary", "textContent",
-            total > 0 ? `${ct} Claude / ${cx} Codex (${total} tasks)` : "No coding tasks yet");
-        }
-
-        // Claude Session - Show USED as primary (bar fills with consumption)
-        const sessionRemaining = data.claude?.session?.remainingPct || 0;
-        const sessionUsed = data.claude?.session?.usedPct || 0;
-        $set("claude-session-pct", "innerHTML", sessionUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
-        $set("claude-session-bar", "style.width", sessionUsed + "%");
-        $set("claude-session-remaining", "textContent", sessionRemaining + "%");
-        $set("claude-session-reset", "textContent", data.claude?.session?.resetsIn || "-");
-
-        // Color based on used - red when nearly depleted (high usage)
-        const sessionBar = document.getElementById("claude-session-bar");
-        if (sessionBar) {
-          sessionBar.className =
-            "vital-bar-fill " + (sessionUsed > 80 ? "red" : sessionUsed > 50 ? "yellow" : "green");
-        }
-
-        // Claude Weekly - Show USED as primary
-        const weeklyRemaining = data.claude?.weekly?.remainingPct || 0;
-        const weeklyUsed = data.claude?.weekly?.usedPct || 0;
-        $set("claude-weekly-pct", "innerHTML", weeklyUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
-        $set("claude-weekly-bar", "style.width", weeklyUsed + "%");
-        $set("claude-weekly-remaining", "textContent", weeklyRemaining + "%");
-        $set("claude-weekly-reset", "textContent", data.claude?.weekly?.resets || "-");
-
-        const weeklyBar = document.getElementById("claude-weekly-bar");
-        if (weeklyBar) {
-          weeklyBar.className =
-            "vital-bar-fill " + (weeklyUsed > 80 ? "red" : weeklyUsed > 50 ? "yellow" : "green");
-        }
-
-        // Also update the compact quota card (uses different element IDs)
-        const compactSessionEl = document.getElementById("claude-compact-session-pct");
-        const compactSessionBar = document.getElementById("claude-compact-session-bar");
-        if (compactSessionEl) compactSessionEl.textContent = sessionUsed + "%";
-        if (compactSessionBar) {
-          compactSessionBar.style.width = sessionUsed + "%";
-          compactSessionBar.className =
-            "quota-bar-fill " + (sessionUsed < 50 ? "low" : sessionUsed < 80 ? "medium" : "high");
-        }
-
-        const compactWeekEl = document.getElementById("claude-compact-week-pct");
-        const compactWeekBar = document.getElementById("claude-compact-week-bar");
-        if (compactWeekEl) compactWeekEl.textContent = weeklyUsed + "%";
-        if (compactWeekBar) {
-          compactWeekBar.style.width = weeklyUsed + "%";
-          compactWeekBar.className =
-            "quota-bar-fill " + (weeklyUsed < 50 ? "low" : weeklyUsed < 80 ? "medium" : "high");
-        }
-
-        // Sonnet Weekly - Show USED as primary
-        const sonnetRemaining = data.claude?.sonnet?.remainingPct || 0;
-        const sonnetUsed = data.claude?.sonnet?.usedPct || 0;
-        $set("sonnet-weekly-pct", "innerHTML", sonnetUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>');
-        $set("sonnet-weekly-bar", "style.width", sonnetUsed + "%");
-        $set("sonnet-weekly-remaining", "textContent", sonnetRemaining + "%");
-        $set("sonnet-weekly-reset", "textContent", data.claude?.sonnet?.resets || "-");
-
-        const sonnetBar = document.getElementById("sonnet-weekly-bar");
-        if (sonnetBar) {
-          sonnetBar.className =
-            "vital-bar-fill " + (sonnetUsed > 80 ? "red" : sonnetUsed > 50 ? "yellow" : "green");
-        }
-
-        // Task Routing
-        const totalTasks = data.routing?.total || 0;
-        const claudeTasks = data.routing?.claudeTasks || 0;
-        const codexTasks = data.routing?.codexTasks || 0;
-        $set("codex-tasks", "textContent", totalTasks + " total");
-        $set("claude-task-count", "textContent", claudeTasks);
-        $set("codex-task-count", "textContent", codexTasks);
-
-        // Codex floor status - shows if we're meeting the 20% minimum
-        const floorStatus = document.getElementById("codex-floor-status");
-        const codexPct = data.routing?.codexPct || 0;
-        const codexFloor = data.routing?.codexFloor || 20;
-        if (floorStatus) {
-          if (totalTasks === 0) {
-            floorStatus.className = "pressure-indicator";
-            floorStatus.textContent = `Codex ≥20%: No tasks yet`;
-          } else if (codexPct >= codexFloor) {
-            floorStatus.className = "pressure-indicator normal";
-            floorStatus.textContent = `Codex ≥20%: ✓ ${codexPct}%`;
-          } else {
-            floorStatus.className = "pressure-indicator warning";
-            floorStatus.textContent = `Codex ≥20%: ${codexPct}% (need more)`;
+          // Color based on used - red when nearly depleted (high usage)
+          const sessionBar = document.getElementById("claude-session-bar");
+          if (sessionBar) {
+            sessionBar.className =
+              "vital-bar-fill " +
+              (sessionUsed > 80 ? "red" : sessionUsed > 50 ? "yellow" : "green");
           }
-        }
+
+          // Claude Weekly - Show USED as primary
+          const weeklyRemaining = data.claude?.weekly?.remainingPct || 0;
+          const weeklyUsed = data.claude?.weekly?.usedPct || 0;
+          $set(
+            "claude-weekly-pct",
+            "innerHTML",
+            weeklyUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>',
+          );
+          $set("claude-weekly-bar", "style.width", weeklyUsed + "%");
+          $set("claude-weekly-remaining", "textContent", weeklyRemaining + "%");
+          $set("claude-weekly-reset", "textContent", data.claude?.weekly?.resets || "-");
+
+          const weeklyBar = document.getElementById("claude-weekly-bar");
+          if (weeklyBar) {
+            weeklyBar.className =
+              "vital-bar-fill " + (weeklyUsed > 80 ? "red" : weeklyUsed > 50 ? "yellow" : "green");
+          }
+
+          // Also update the compact quota card (uses different element IDs)
+          const compactSessionEl = document.getElementById("claude-compact-session-pct");
+          const compactSessionBar = document.getElementById("claude-compact-session-bar");
+          if (compactSessionEl) compactSessionEl.textContent = sessionUsed + "%";
+          if (compactSessionBar) {
+            compactSessionBar.style.width = sessionUsed + "%";
+            compactSessionBar.className =
+              "quota-bar-fill " + (sessionUsed < 50 ? "low" : sessionUsed < 80 ? "medium" : "high");
+          }
+
+          const compactWeekEl = document.getElementById("claude-compact-week-pct");
+          const compactWeekBar = document.getElementById("claude-compact-week-bar");
+          if (compactWeekEl) compactWeekEl.textContent = weeklyUsed + "%";
+          if (compactWeekBar) {
+            compactWeekBar.style.width = weeklyUsed + "%";
+            compactWeekBar.className =
+              "quota-bar-fill " + (weeklyUsed < 50 ? "low" : weeklyUsed < 80 ? "medium" : "high");
+          }
+
+          // Sonnet Weekly - Show USED as primary
+          const sonnetRemaining = data.claude?.sonnet?.remainingPct || 0;
+          const sonnetUsed = data.claude?.sonnet?.usedPct || 0;
+          $set(
+            "sonnet-weekly-pct",
+            "innerHTML",
+            sonnetUsed + '% <small style="font-size:0.6em;opacity:0.7">used</small>',
+          );
+          $set("sonnet-weekly-bar", "style.width", sonnetUsed + "%");
+          $set("sonnet-weekly-remaining", "textContent", sonnetRemaining + "%");
+          $set("sonnet-weekly-reset", "textContent", data.claude?.sonnet?.resets || "-");
+
+          const sonnetBar = document.getElementById("sonnet-weekly-bar");
+          if (sonnetBar) {
+            sonnetBar.className =
+              "vital-bar-fill " + (sonnetUsed > 80 ? "red" : sonnetUsed > 50 ? "yellow" : "green");
+          }
+
+          // Task Routing
+          const totalTasks = data.routing?.total || 0;
+          const claudeTasks = data.routing?.claudeTasks || 0;
+          const codexTasks = data.routing?.codexTasks || 0;
+          $set("codex-tasks", "textContent", totalTasks + " total");
+          $set("claude-task-count", "textContent", claudeTasks);
+          $set("codex-task-count", "textContent", codexTasks);
+
+          // Codex floor status - shows if we're meeting the 20% minimum
+          const floorStatus = document.getElementById("codex-floor-status");
+          const codexPct = data.routing?.codexPct || 0;
+          const codexFloor = data.routing?.codexFloor || 20;
+          if (floorStatus) {
+            if (totalTasks === 0) {
+              floorStatus.className = "pressure-indicator";
+              floorStatus.textContent = `Codex ≥20%: No tasks yet`;
+            } else if (codexPct >= codexFloor) {
+              floorStatus.className = "pressure-indicator normal";
+              floorStatus.textContent = `Codex ≥20%: ✓ ${codexPct}%`;
+            } else {
+              floorStatus.className = "pressure-indicator warning";
+              floorStatus.textContent = `Codex ≥20%: ${codexPct}% (need more)`;
+            }
+          }
         } catch (e) {
           console.error("[renderLlmUsage] Error:", e.message);
         }
@@ -2661,7 +2938,8 @@ Jonathan Tsai (@jontsai)
           if (avgLatency > 0) {
             const latencySec = (avgLatency / 1000).toFixed(1);
             latencyEl.textContent = `Avg latency: ${latencySec}s`;
-            latencyEl.className = "pressure-indicator " + (avgLatency > 30000 ? "warning" : "normal");
+            latencyEl.className =
+              "pressure-indicator " + (avgLatency > 30000 ? "warning" : "normal");
           } else {
             latencyEl.textContent = "Avg latency: -";
           }
@@ -2698,7 +2976,7 @@ Jonathan Tsai (@jontsai)
           $set("nav-monthly-cost", "textContent", data.tokenStats.estMonthlyCost || "-");
           $set("nav-avg-tokens", "textContent", data.tokenStats.avgTokensPerSession || "-");
           $set("nav-avg-cost", "textContent", data.tokenStats.avgCostPerSession || "-");
-          
+
           // Show savings if positive
           const savingsStat = document.getElementById("savings-stat");
           const savingsEl = document.getElementById("est-savings");
@@ -2737,19 +3015,24 @@ Jonathan Tsai (@jontsai)
         // Recent files
         const recentEl = document.getElementById("memory-recent-files");
         if (memory.recentFiles && memory.recentFiles.length > 0) {
-          smartUpdate(recentEl, memory.recentFiles
-            .map(
-              (f) => `
+          smartUpdate(
+            recentEl,
+            memory.recentFiles
+              .map(
+                (f) => `
                     <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;">
                         <span style="color: var(--accent);">📄 ${escapeHtml(f.name)}</span>
                         <span style="color: var(--text-muted);">${f.sizeFormatted} • ${f.age}</span>
                     </div>
                 `,
-            )
-            .join(""));
+              )
+              .join(""),
+          );
         } else {
-          smartUpdate(recentEl,
-            '<em style="color: var(--text-muted); font-size: 0.8rem;">No memory files yet</em>');
+          smartUpdate(
+            recentEl,
+            '<em style="color: var(--text-muted); font-size: 0.8rem;">No memory files yet</em>',
+          );
         }
       }
 
@@ -2757,7 +3040,7 @@ Jonathan Tsai (@jontsai)
       function renderCerebro(cerebro) {
         // Store for re-rendering when privacy settings change
         window.lastCerebroData = cerebro;
-        
+
         const notInitEl = document.getElementById("cerebro-not-initialized");
         const initEl = document.getElementById("cerebro-initialized");
 
@@ -2767,10 +3050,10 @@ Jonathan Tsai (@jontsai)
           if (initEl) initEl.style.display = "none";
           $set("cerebro-count", "textContent", "not initialized");
           $set("nav-cerebro-count", "textContent", "-");
-          
+
           // Update init commands with actual configured path
           if (cerebro && cerebro.cerebroPath) {
-            const basePath = cerebro.cerebroPath.replace(/^\/Users\/[^/]+/, '~');
+            const basePath = cerebro.cerebroPath.replace(/^\/Users\/[^/]+/, "~");
             $set("cerebro-init-topics-cmd", "textContent", `mkdir -p ${basePath}/topics`);
             $set("cerebro-init-orphans-cmd", "textContent", `mkdir -p ${basePath}/orphans`);
           }
@@ -2783,13 +3066,14 @@ Jonathan Tsai (@jontsai)
 
         // Calculate hidden topics count from current view
         const allTopics = cerebro.recentTopics || [];
-        const hiddenTopicsCount = allTopics.filter(t => isTopicHidden(t.name)).length;
+        const hiddenTopicsCount = allTopics.filter((t) => isTopicHidden(t.name)).length;
         const visibleTopicsCount = allTopics.length - hiddenTopicsCount;
-        
+
         // Update counts with hidden breakdown (updates dynamically on hide/unhide)
-        const countText = hiddenTopicsCount > 0 
-          ? `${cerebro.topics.total} topics (${visibleTopicsCount} visible, ${hiddenTopicsCount} hidden)`
-          : `${cerebro.topics.total} topics`;
+        const countText =
+          hiddenTopicsCount > 0
+            ? `${cerebro.topics.total} topics (${visibleTopicsCount} visible, ${hiddenTopicsCount} hidden)`
+            : `${cerebro.topics.total} topics`;
         $set("cerebro-count", "textContent", countText);
         $set("nav-cerebro-count", "textContent", cerebro.topics.total);
 
@@ -2803,37 +3087,39 @@ Jonathan Tsai (@jontsai)
 
         // Recent topics with action buttons (filtered by privacy settings)
         const recentEl = document.getElementById("cerebro-recent-topics");
-        const visibleTopics = allTopics.filter(t => !isTopicHidden(t.name));
-        
-        if (visibleTopics.length > 0) {
-          smartUpdate(recentEl, visibleTopics
-            .map((t) => {
-              const statusIcon =
-                t.status === "active" ? "🟢" : t.status === "resolved" ? "✅" : "⏸️";
-              const statusColor =
-                t.status === "active"
-                  ? "var(--green)"
-                  : t.status === "resolved"
-                    ? "var(--accent)"
-                    : "var(--text-muted)";
+        const visibleTopics = allTopics.filter((t) => !isTopicHidden(t.name));
 
-              // Action buttons based on status (always include hide button)
-              const hideBtn = `<button class="topic-action-btn hide" onclick="quickHideTopic('${escapeHtml(t.name).replace(/'/g, "\\'")}', '${escapeHtml(t.title || t.name).replace(/'/g, "\\'")}'); event.stopPropagation();" title="Hide topic">👁️</button>`;
-              let actionButtons = "";
-              if (t.status === "active") {
-                actionButtons = `
+        if (visibleTopics.length > 0) {
+          smartUpdate(
+            recentEl,
+            visibleTopics
+              .map((t) => {
+                const statusIcon =
+                  t.status === "active" ? "🟢" : t.status === "resolved" ? "✅" : "⏸️";
+                const statusColor =
+                  t.status === "active"
+                    ? "var(--green)"
+                    : t.status === "resolved"
+                      ? "var(--accent)"
+                      : "var(--text-muted)";
+
+                // Action buttons based on status (always include hide button)
+                const hideBtn = `<button class="topic-action-btn hide" onclick="quickHideTopic('${escapeHtml(t.name).replace(/'/g, "\\'")}', '${escapeHtml(t.title || t.name).replace(/'/g, "\\'")}'); event.stopPropagation();" title="Hide topic">👁️</button>`;
+                let actionButtons = "";
+                if (t.status === "active") {
+                  actionButtons = `
                             <button class="topic-action-btn resolve" onclick="updateTopicStatus('${escapeHtml(t.name)}', 'resolved')" title="Mark as resolved">✓</button>
                             <button class="topic-action-btn park" onclick="updateTopicStatus('${escapeHtml(t.name)}', 'parked')" title="Park topic">⏸</button>
                             ${hideBtn}
                         `;
-              } else {
-                actionButtons = `
+                } else {
+                  actionButtons = `
                             <button class="topic-action-btn reactivate" onclick="updateTopicStatus('${escapeHtml(t.name)}', 'active')" title="Reactivate topic">↩</button>
                             ${hideBtn}
                         `;
-              }
+                }
 
-              return `
+                return `
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;">
                             <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
                                 <span>${statusIcon}</span>
@@ -2846,11 +3132,14 @@ Jonathan Tsai (@jontsai)
                             <span style="color: var(--text-muted); margin-left: 8px;">${t.age || "-"}</span>
                         </div>
                     `;
-            })
-            .join(""));
+              })
+              .join(""),
+          );
         } else {
-          smartUpdate(recentEl,
-            '<em style="color: var(--text-muted); font-size: 0.8rem;">No active topics yet</em>');
+          smartUpdate(
+            recentEl,
+            '<em style="color: var(--text-muted); font-size: 0.8rem;">No active topics yet</em>',
+          );
         }
 
         // Last updated
@@ -2899,13 +3188,13 @@ Jonathan Tsai (@jontsai)
 
       // Cost breakdown modal
       let cachedCostData = null;
-      
+
       async function openCostModal() {
         document.getElementById("cost-modal").classList.remove("hidden");
         document.getElementById("cost-modal").classList.add("visible");
         document.getElementById("cost-modal-overlay").classList.remove("hidden");
         document.getElementById("cost-modal-overlay").classList.add("visible");
-        
+
         // Fetch cost breakdown data
         try {
           const res = await fetch("/api/cost-breakdown");
@@ -2913,10 +3202,11 @@ Jonathan Tsai (@jontsai)
           cachedCostData = data;
           renderCostBreakdown(data);
         } catch (e) {
-          document.getElementById("cost-tokens").innerHTML = '<em style="color:var(--red)">Failed to load cost data</em>';
+          document.getElementById("cost-tokens").innerHTML =
+            '<em style="color:var(--red)">Failed to load cost data</em>';
         }
       }
-      
+
       function closeCostModal() {
         document.getElementById("cost-modal").classList.remove("visible");
         document.getElementById("cost-modal-overlay").classList.remove("visible");
@@ -2925,7 +3215,7 @@ Jonathan Tsai (@jontsai)
           document.getElementById("cost-modal-overlay").classList.add("hidden");
         }, 200);
       }
-      
+
       // Auth fix modal
       function openAuthModal() {
         document.getElementById("auth-modal").classList.remove("hidden");
@@ -2933,7 +3223,7 @@ Jonathan Tsai (@jontsai)
         document.getElementById("auth-modal-overlay").classList.remove("hidden");
         document.getElementById("auth-modal-overlay").classList.add("visible");
       }
-      
+
       function closeAuthModal() {
         document.getElementById("auth-modal").classList.remove("visible");
         document.getElementById("auth-modal-overlay").classList.remove("visible");
@@ -2942,30 +3232,32 @@ Jonathan Tsai (@jontsai)
           document.getElementById("auth-modal-overlay").classList.add("hidden");
         }, 200);
       }
-      
+
       // Operator modal
       async function openOperatorModal(operatorId) {
         document.getElementById("operator-modal").classList.remove("hidden");
         document.getElementById("operator-modal").classList.add("visible");
         document.getElementById("operator-modal-overlay").classList.remove("hidden");
         document.getElementById("operator-modal-overlay").classList.add("visible");
-        
+
         // Show loading state
-        document.getElementById("operator-modal-content").innerHTML = '<div class="loading-state">Loading user stats...</div>';
-        
+        document.getElementById("operator-modal-content").innerHTML =
+          '<div class="loading-state">Loading user stats...</div>';
+
         try {
           // Fetch operator data from API
           const res = await fetch("/api/operators");
           const data = await res.json();
-          
+
           // Find the operator by ID or name
-          const operator = data.operators?.find(op => 
-            op.id === operatorId || 
-            op.metadata?.slackId === operatorId ||
-            op.displayName === operatorId ||
-            op.username === operatorId
+          const operator = data.operators?.find(
+            (op) =>
+              op.id === operatorId ||
+              op.metadata?.slackId === operatorId ||
+              op.displayName === operatorId ||
+              op.username === operatorId,
           );
-          
+
           if (operator) {
             renderOperatorModal(operator, data.sessions || []);
           } else {
@@ -2984,31 +3276,36 @@ Jonathan Tsai (@jontsai)
           `;
         }
       }
-      
+
       function renderOperatorModal(operator, allSessions) {
         const displayName = operator.displayName || operator.username || "Unknown";
         document.getElementById("operator-modal-name").textContent = displayName;
-        
+
         // Calculate user stats
-        const userSessions = sessionsData.filter(s => 
-          s.originator?.userId === operator.id || 
-          s.originator?.userId === operator.metadata?.slackId ||
-          s.originator?.displayName === displayName
+        const userSessions = sessionsData.filter(
+          (s) =>
+            s.originator?.userId === operator.id ||
+            s.originator?.userId === operator.metadata?.slackId ||
+            s.originator?.displayName === displayName,
         );
-        
-        const activeSessions = userSessions.filter(s => s.active).length;
+
+        const activeSessions = userSessions.filter((s) => s.active).length;
         const totalTokens = userSessions.reduce((sum, s) => sum + (s.tokens || 0), 0);
-        const tokensFormatted = totalTokens > 1000000 
-          ? (totalTokens / 1000000).toFixed(1) + "M"
-          : totalTokens > 1000
-            ? (totalTokens / 1000).toFixed(1) + "k"
-            : totalTokens;
-        
+        const tokensFormatted =
+          totalTokens > 1000000
+            ? (totalTokens / 1000000).toFixed(1) + "M"
+            : totalTokens > 1000
+              ? (totalTokens / 1000).toFixed(1) + "k"
+              : totalTokens;
+
         const initial = displayName.charAt(0).toUpperCase();
-        const roleLabel = operator.role === "owner" ? "👑 Owner" 
-                        : operator.role === "admin" ? "⭐ Admin" 
-                        : "👤 User";
-        
+        const roleLabel =
+          operator.role === "owner"
+            ? "👑 Owner"
+            : operator.role === "admin"
+              ? "⭐ Admin"
+              : "👤 User";
+
         document.getElementById("operator-modal-content").innerHTML = `
           <div class="detail-section">
             <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
@@ -3018,7 +3315,7 @@ Jonathan Tsai (@jontsai)
               <div>
                 <div style="font-size: 1.2rem; font-weight: 600;">${escapeHtml(displayName)}</div>
                 <div style="color: var(--text-muted); font-size: 0.85rem;">${roleLabel}</div>
-                ${operator.source ? `<div style="color: var(--text-muted); font-size: 0.75rem;">via ${operator.source}</div>` : ''}
+                ${operator.source ? `<div style="color: var(--text-muted); font-size: 0.75rem;">via ${operator.source}</div>` : ""}
               </div>
             </div>
           </div>
@@ -3029,24 +3326,31 @@ Jonathan Tsai (@jontsai)
               <div class="detail-row"><span class="detail-label">Active Sessions</span><span class="detail-value">${activeSessions}</span></div>
               <div class="detail-row"><span class="detail-label">Total Sessions</span><span class="detail-value">${userSessions.length}</span></div>
               <div class="detail-row"><span class="detail-label">Total Tokens</span><span class="detail-value">${tokensFormatted}</span></div>
-              <div class="detail-row"><span class="detail-label">First Seen</span><span class="detail-value">${operator.firstSeen ? new Date(operator.firstSeen).toLocaleDateString() : '—'}</span></div>
+              <div class="detail-row"><span class="detail-label">First Seen</span><span class="detail-value">${operator.firstSeen ? new Date(operator.firstSeen).toLocaleDateString() : "—"}</span></div>
             </div>
           </div>
           
           <div class="detail-section">
             <h3>💬 Recent Sessions</h3>
             <div class="detail-box" style="font-size: 0.85rem;">
-              ${userSessions.slice(0, 5).map(s => `
+              ${
+                userSessions
+                  .slice(0, 5)
+                  .map(
+                    (s) => `
                 <div class="detail-row" style="cursor: pointer;" onclick="closeOperatorModal(); openDetail('${escapeHtml(s.sessionKey)}', '${escapeHtml(s.label)}')">
-                  <span class="detail-label">${s.active ? '🟢' : '⚪'} ${escapeHtml(s.label?.substring(0, 30) || 'Unknown')}${(s.label?.length || 0) > 30 ? '...' : ''}</span>
+                  <span class="detail-label">${s.active ? "🟢" : "⚪"} ${escapeHtml(s.label?.substring(0, 30) || "Unknown")}${(s.label?.length || 0) > 30 ? "..." : ""}</span>
                   <span class="detail-value">${((s.tokens || 0) / 1000).toFixed(1)}k</span>
                 </div>
-              `).join('') || '<em style="color: var(--text-muted)">No sessions found</em>'}
+              `,
+                  )
+                  .join("") || '<em style="color: var(--text-muted)">No sessions found</em>'
+              }
             </div>
           </div>
         `;
       }
-      
+
       function closeOperatorModal() {
         document.getElementById("operator-modal").classList.remove("visible");
         document.getElementById("operator-modal-overlay").classList.remove("visible");
@@ -3055,37 +3359,39 @@ Jonathan Tsai (@jontsai)
           document.getElementById("operator-modal-overlay").classList.add("hidden");
         }, 200);
       }
-      
+
       // Privacy Settings - Topics, Sessions, Crons, Display Options
       // Server-side storage with localStorage as cache/fallback
-      const HIDDEN_TOPICS_KEY = 'openclawHiddenTopics';
-      const HIDDEN_SESSIONS_KEY = 'openclawHiddenSessions';
-      const HIDDEN_CRONS_KEY = 'openclawHiddenCrons';
-      const HIDE_HOSTNAME_KEY = 'openclawHideHostname';
-      const PRIVACY_CACHE_KEY = 'openclawPrivacyCache';
-      
+      const HIDDEN_TOPICS_KEY = "openclawHiddenTopics";
+      const HIDDEN_SESSIONS_KEY = "openclawHiddenSessions";
+      const HIDDEN_CRONS_KEY = "openclawHiddenCrons";
+      const HIDE_HOSTNAME_KEY = "openclawHideHostname";
+      const PRIVACY_CACHE_KEY = "openclawPrivacyCache";
+
       // In-memory cache of privacy settings (populated from server on load)
       let privacySettingsCache = null;
-      
+
       // Load privacy settings from server (called on page load)
       async function loadPrivacyFromServer() {
         try {
-          const res = await fetch('/api/privacy');
+          const res = await fetch("/api/privacy");
           if (res.ok) {
             const settings = await res.json();
             privacySettingsCache = settings;
             // Update localStorage cache
             localStorage.setItem(PRIVACY_CACHE_KEY, JSON.stringify(settings));
             // Migrate old localStorage data if server is empty
-            if ((!settings.hiddenTopics || settings.hiddenTopics.length === 0) && 
-                (!settings.hiddenSessions || settings.hiddenSessions.length === 0) &&
-                (!settings.hiddenCrons || settings.hiddenCrons.length === 0)) {
+            if (
+              (!settings.hiddenTopics || settings.hiddenTopics.length === 0) &&
+              (!settings.hiddenSessions || settings.hiddenSessions.length === 0) &&
+              (!settings.hiddenCrons || settings.hiddenCrons.length === 0)
+            ) {
               await migrateLocalStorageToServer();
             }
             return settings;
           }
         } catch (e) {
-          console.warn('Failed to load privacy from server, using localStorage cache:', e.message);
+          console.warn("Failed to load privacy from server, using localStorage cache:", e.message);
         }
         // Fallback to localStorage cache
         try {
@@ -3096,10 +3402,15 @@ Jonathan Tsai (@jontsai)
           }
         } catch (e) {}
         // Final fallback - empty settings
-        privacySettingsCache = { hiddenTopics: [], hiddenSessions: [], hiddenCrons: [], hideHostname: false };
+        privacySettingsCache = {
+          hiddenTopics: [],
+          hiddenSessions: [],
+          hiddenCrons: [],
+          hideHostname: false,
+        };
         return privacySettingsCache;
       }
-      
+
       // Save privacy settings to server (debounced)
       let privacySaveTimeout = null;
       async function savePrivacyToServer() {
@@ -3107,38 +3418,38 @@ Jonathan Tsai (@jontsai)
         if (privacySaveTimeout) clearTimeout(privacySaveTimeout);
         privacySaveTimeout = setTimeout(async () => {
           try {
-            const res = await fetch('/api/privacy', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(privacySettingsCache)
+            const res = await fetch("/api/privacy", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(privacySettingsCache),
             });
             if (res.ok) {
               // Update localStorage cache
               localStorage.setItem(PRIVACY_CACHE_KEY, JSON.stringify(privacySettingsCache));
-              console.log('[Privacy] Settings saved to server');
+              console.log("[Privacy] Settings saved to server");
             } else {
-              console.warn('[Privacy] Failed to save to server:', await res.text());
+              console.warn("[Privacy] Failed to save to server:", await res.text());
             }
           } catch (e) {
-            console.warn('[Privacy] Failed to save to server:', e.message);
+            console.warn("[Privacy] Failed to save to server:", e.message);
           }
         }, 500);
       }
-      
+
       // Migrate old localStorage data to server (one-time migration)
       async function migrateLocalStorageToServer() {
         const oldTopics = getLocalHiddenItems(HIDDEN_TOPICS_KEY);
         const oldSessions = getLocalHiddenItems(HIDDEN_SESSIONS_KEY);
         const oldCrons = getLocalHiddenItems(HIDDEN_CRONS_KEY);
-        const oldHostname = localStorage.getItem(HIDE_HOSTNAME_KEY) === 'true';
-        
+        const oldHostname = localStorage.getItem(HIDE_HOSTNAME_KEY) === "true";
+
         if (oldTopics.length || oldSessions.length || oldCrons.length || oldHostname) {
-          console.log('[Privacy] Migrating localStorage data to server...');
+          console.log("[Privacy] Migrating localStorage data to server...");
           privacySettingsCache = {
             hiddenTopics: oldTopics,
             hiddenSessions: oldSessions,
             hiddenCrons: oldCrons,
-            hideHostname: oldHostname
+            hideHostname: oldHostname,
           };
           await savePrivacyToServer();
           // Clear old localStorage keys after migration
@@ -3148,168 +3459,168 @@ Jonathan Tsai (@jontsai)
           localStorage.removeItem(HIDE_HOSTNAME_KEY);
         }
       }
-      
+
       // Generic localStorage helpers (for migration/fallback only)
       function getLocalHiddenItems(key) {
         try {
           const stored = localStorage.getItem(key);
           if (!stored) return [];
           const parsed = JSON.parse(stored);
-          return parsed.map(item => typeof item === 'string' ? { id: item, name: item } : item);
+          return parsed.map((item) => (typeof item === "string" ? { id: item, name: item } : item));
         } catch (e) {
           return [];
         }
       }
-      
+
       // Topic-specific functions (use in-memory cache backed by server)
-      function getHiddenTopics() { 
-        return privacySettingsCache?.hiddenTopics || []; 
+      function getHiddenTopics() {
+        return privacySettingsCache?.hiddenTopics || [];
       }
-      function setHiddenTopics(topics) { 
+      function setHiddenTopics(topics) {
         if (!privacySettingsCache) privacySettingsCache = {};
-        privacySettingsCache.hiddenTopics = topics; 
+        privacySettingsCache.hiddenTopics = topics;
         savePrivacyToServer();
       }
       function isTopicHidden(topicId) {
         const hidden = getHiddenTopics();
-        const normalized = (topicId || '').toLowerCase().trim();
-        return hidden.some(h => (h.id || '').toLowerCase().trim() === normalized);
+        const normalized = (topicId || "").toLowerCase().trim();
+        return hidden.some((h) => (h.id || "").toLowerCase().trim() === normalized);
       }
-      
-      // Session-specific functions  
-      function getHiddenSessions() { 
-        return privacySettingsCache?.hiddenSessions || []; 
+
+      // Session-specific functions
+      function getHiddenSessions() {
+        return privacySettingsCache?.hiddenSessions || [];
       }
-      function setHiddenSessions(sessions) { 
+      function setHiddenSessions(sessions) {
         if (!privacySettingsCache) privacySettingsCache = {};
-        privacySettingsCache.hiddenSessions = sessions; 
+        privacySettingsCache.hiddenSessions = sessions;
         savePrivacyToServer();
       }
       function isSessionHidden(session) {
         const hidden = getHiddenSessions();
-        const key = (session.sessionKey || session.key || '').toLowerCase().trim();
-        return hidden.some(h => (h.id || '').toLowerCase().trim() === key);
+        const key = (session.sessionKey || session.key || "").toLowerCase().trim();
+        return hidden.some((h) => (h.id || "").toLowerCase().trim() === key);
       }
-      
+
       // Cron-specific functions
-      function getHiddenCrons() { 
-        return privacySettingsCache?.hiddenCrons || []; 
+      function getHiddenCrons() {
+        return privacySettingsCache?.hiddenCrons || [];
       }
-      function setHiddenCrons(crons) { 
+      function setHiddenCrons(crons) {
         if (!privacySettingsCache) privacySettingsCache = {};
-        privacySettingsCache.hiddenCrons = crons; 
+        privacySettingsCache.hiddenCrons = crons;
         savePrivacyToServer();
       }
       function isCronHidden(cron) {
         const hidden = getHiddenCrons();
-        const id = (cron.id || cron.jobId || '').toLowerCase().trim();
+        const id = (cron.id || cron.jobId || "").toLowerCase().trim();
         // Match on id only (exact match)
-        return hidden.some(h => (h.id || '').toLowerCase().trim() === id);
+        return hidden.some((h) => (h.id || "").toLowerCase().trim() === id);
       }
-      
+
       // Add functions (manual entry - uses input as both id and name)
       function addHiddenTopic() {
-        const input = document.getElementById('privacy-add-topic');
-        const topic = (input.value || '').trim();
+        const input = document.getElementById("privacy-add-topic");
+        const topic = (input.value || "").trim();
         if (!topic) return;
-        
+
         const hidden = getHiddenTopics();
-        if (!hidden.some(h => (h.id || '').toLowerCase() === topic.toLowerCase())) {
+        if (!hidden.some((h) => (h.id || "").toLowerCase() === topic.toLowerCase())) {
           hidden.push({ id: topic, name: topic });
           setHiddenTopics(hidden);
         }
-        input.value = '';
+        input.value = "";
         renderPrivacyLists();
         refreshAllViews();
       }
-      
+
       function addHiddenSession() {
-        const input = document.getElementById('privacy-add-session');
-        const session = (input.value || '').trim();
+        const input = document.getElementById("privacy-add-session");
+        const session = (input.value || "").trim();
         if (!session) return;
-        
+
         const hidden = getHiddenSessions();
-        if (!hidden.some(h => (h.id || '').toLowerCase() === session.toLowerCase())) {
+        if (!hidden.some((h) => (h.id || "").toLowerCase() === session.toLowerCase())) {
           hidden.push({ id: session, name: session });
           setHiddenSessions(hidden);
         }
-        input.value = '';
+        input.value = "";
         renderPrivacyLists();
         refreshAllViews();
       }
-      
+
       function addHiddenCron() {
-        const input = document.getElementById('privacy-add-cron');
-        const cron = (input.value || '').trim();
+        const input = document.getElementById("privacy-add-cron");
+        const cron = (input.value || "").trim();
         if (!cron) return;
-        
+
         const hidden = getHiddenCrons();
-        if (!hidden.some(h => (h.id || '').toLowerCase() === cron.toLowerCase())) {
+        if (!hidden.some((h) => (h.id || "").toLowerCase() === cron.toLowerCase())) {
           hidden.push({ id: cron, name: cron });
           setHiddenCrons(hidden);
         }
-        input.value = '';
+        input.value = "";
         renderPrivacyLists();
         refreshAllViews();
       }
-      
+
       // Quick-hide from card (called by hide icon on cards)
       // Stores id for matching, name for display
       function quickHideTopic(id, name) {
         const hidden = getHiddenTopics();
-        if (!hidden.some(h => (h.id || '').toLowerCase() === id.toLowerCase())) {
+        if (!hidden.some((h) => (h.id || "").toLowerCase() === id.toLowerCase())) {
           hidden.push({ id: id, name: name || id });
           setHiddenTopics(hidden);
         }
         refreshAllViews();
         showToast(`Topic "${name || id}" hidden. Open Privacy Settings to unhide.`);
       }
-      
+
       function quickHideSession(id, name) {
         const hidden = getHiddenSessions();
-        if (!hidden.some(h => (h.id || '').toLowerCase() === id.toLowerCase())) {
+        if (!hidden.some((h) => (h.id || "").toLowerCase() === id.toLowerCase())) {
           hidden.push({ id: id, name: name || id });
           setHiddenSessions(hidden);
         }
         refreshAllViews();
         showToast(`Session "${name || id}" hidden. Open Privacy Settings to unhide.`);
       }
-      
+
       function quickHideCron(id, name) {
         const hidden = getHiddenCrons();
-        if (!hidden.some(h => (h.id || '').toLowerCase() === id.toLowerCase())) {
+        if (!hidden.some((h) => (h.id || "").toLowerCase() === id.toLowerCase())) {
           hidden.push({ id: id, name: name || id });
           setHiddenCrons(hidden);
         }
         refreshAllViews();
         showToast(`Cron job "${name || id}" hidden. Open Privacy Settings to unhide.`);
       }
-      
+
       // Remove functions (by id)
       function removeHiddenTopic(id) {
         const hidden = getHiddenTopics();
-        const filtered = hidden.filter(h => (h.id || '').toLowerCase() !== id.toLowerCase());
+        const filtered = hidden.filter((h) => (h.id || "").toLowerCase() !== id.toLowerCase());
         setHiddenTopics(filtered);
         renderPrivacyLists();
         refreshAllViews();
       }
-      
+
       function removeHiddenSession(id) {
         const hidden = getHiddenSessions();
-        const filtered = hidden.filter(h => (h.id || '').toLowerCase() !== id.toLowerCase());
+        const filtered = hidden.filter((h) => (h.id || "").toLowerCase() !== id.toLowerCase());
         setHiddenSessions(filtered);
         renderPrivacyLists();
         refreshAllViews();
       }
-      
+
       function removeHiddenCron(id) {
         const hidden = getHiddenCrons();
-        const filtered = hidden.filter(h => (h.id || '').toLowerCase() !== id.toLowerCase());
+        const filtered = hidden.filter((h) => (h.id || "").toLowerCase() !== id.toLowerCase());
         setHiddenCrons(filtered);
         renderPrivacyLists();
         refreshAllViews();
       }
-      
+
       // Clear all
       function clearAllPrivacySettings() {
         setHiddenTopics([]);
@@ -3318,43 +3629,43 @@ Jonathan Tsai (@jontsai)
         setHideHostname(false);
         renderPrivacyLists();
         // Update checkbox
-        const hostnameCheckbox = document.getElementById('privacy-hide-hostname');
+        const hostnameCheckbox = document.getElementById("privacy-hide-hostname");
         if (hostnameCheckbox) hostnameCheckbox.checked = false;
         refreshAllViews();
       }
-      
+
       // Hostname privacy (use server-backed cache)
       function isHostnameHidden() {
         return privacySettingsCache?.hideHostname || false;
       }
-      
+
       function setHideHostname(hide) {
         if (!privacySettingsCache) privacySettingsCache = {};
         privacySettingsCache.hideHostname = hide;
         savePrivacyToServer();
       }
-      
+
       function toggleHideHostname() {
-        const checkbox = document.getElementById('privacy-hide-hostname');
+        const checkbox = document.getElementById("privacy-hide-hostname");
         setHideHostname(checkbox.checked);
         updateHostnameDisplay();
       }
-      
+
       function updateHostnameDisplay() {
-        const hostnameEl = document.getElementById('vitals-hostname');
+        const hostnameEl = document.getElementById("vitals-hostname");
         if (hostnameEl) {
           if (isHostnameHidden()) {
-            hostnameEl.style.filter = 'blur(8px)';
-            hostnameEl.style.userSelect = 'none';
-            hostnameEl.title = 'Hidden for privacy';
+            hostnameEl.style.filter = "blur(8px)";
+            hostnameEl.style.userSelect = "none";
+            hostnameEl.title = "Hidden for privacy";
           } else {
-            hostnameEl.style.filter = '';
-            hostnameEl.style.userSelect = '';
-            hostnameEl.title = '';
+            hostnameEl.style.filter = "";
+            hostnameEl.style.userSelect = "";
+            hostnameEl.title = "";
           }
         }
       }
-      
+
       // Refresh all views after privacy change
       function refreshAllViews() {
         if (window.lastCerebroData) renderCerebro(window.lastCerebroData);
@@ -3362,83 +3673,98 @@ Jonathan Tsai (@jontsai)
         if (cronData && cronData.length > 0) renderCron(cronData);
         updateHostnameDisplay();
       }
-      
+
       // Render all privacy lists
       function renderPrivacyLists() {
         renderHiddenTopicsList();
         renderHiddenSessionsList();
         renderHiddenCronsList();
       }
-      
+
       function renderHiddenTopicsList() {
-        const container = document.getElementById('hidden-topics-list');
+        const container = document.getElementById("hidden-topics-list");
         if (!container) return;
         const hidden = getHiddenTopics();
-        
+
         // Update count in heading
-        const countEl = document.getElementById('privacy-topics-count');
+        const countEl = document.getElementById("privacy-topics-count");
         if (countEl) countEl.textContent = `(${hidden.length})`;
-        
+
         if (hidden.length === 0) {
-          container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>';
+          container.innerHTML =
+            '<em style="color: var(--text-muted); font-size: 0.85rem;">No topics hidden</em>';
           return;
         }
-        
+
         // Display name, but remove by id
-        container.innerHTML = hidden.map(item => `
+        container.innerHTML = hidden
+          .map(
+            (item) => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
             <span>${escapeHtml(item.name || item.id)}</span>
             <button onclick="removeHiddenTopic('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
-        `).join('');
+        `,
+          )
+          .join("");
       }
-      
+
       function renderHiddenSessionsList() {
-        const container = document.getElementById('hidden-sessions-list');
+        const container = document.getElementById("hidden-sessions-list");
         if (!container) return;
         const hidden = getHiddenSessions();
-        
+
         // Update count in heading
-        const countEl = document.getElementById('privacy-sessions-count');
+        const countEl = document.getElementById("privacy-sessions-count");
         if (countEl) countEl.textContent = `(${hidden.length})`;
-        
+
         if (hidden.length === 0) {
-          container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No sessions hidden</em>';
+          container.innerHTML =
+            '<em style="color: var(--text-muted); font-size: 0.85rem;">No sessions hidden</em>';
           return;
         }
-        
+
         // Display name, but remove by id
-        container.innerHTML = hidden.map(item => `
+        container.innerHTML = hidden
+          .map(
+            (item) => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
             <span>${escapeHtml(item.name || item.id)}</span>
             <button onclick="removeHiddenSession('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
-        `).join('');
+        `,
+          )
+          .join("");
       }
-      
+
       function renderHiddenCronsList() {
-        const container = document.getElementById('hidden-crons-list');
+        const container = document.getElementById("hidden-crons-list");
         if (!container) return;
         const hidden = getHiddenCrons();
-        
+
         // Update count in heading
-        const countEl = document.getElementById('privacy-crons-count');
+        const countEl = document.getElementById("privacy-crons-count");
         if (countEl) countEl.textContent = `(${hidden.length})`;
-        
+
         if (hidden.length === 0) {
-          container.innerHTML = '<em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>';
+          container.innerHTML =
+            '<em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>';
           return;
         }
-        
+
         // Display name, but remove by id
-        container.innerHTML = hidden.map(item => `
+        container.innerHTML = hidden
+          .map(
+            (item) => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
             <span>${escapeHtml(item.name || item.id)}</span>
             <button onclick="removeHiddenCron('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
           </div>
-        `).join('');
+        `,
+          )
+          .join("");
       }
-      
+
       function openPrivacyModal() {
         document.getElementById("privacy-modal").classList.remove("hidden");
         document.getElementById("privacy-modal").classList.add("visible");
@@ -3446,10 +3772,10 @@ Jonathan Tsai (@jontsai)
         document.getElementById("privacy-modal-overlay").classList.add("visible");
         renderPrivacyLists();
         // Set checkbox state
-        const hostnameCheckbox = document.getElementById('privacy-hide-hostname');
+        const hostnameCheckbox = document.getElementById("privacy-hide-hostname");
         if (hostnameCheckbox) hostnameCheckbox.checked = isHostnameHidden();
       }
-      
+
       function closePrivacyModal() {
         document.getElementById("privacy-modal").classList.remove("visible");
         document.getElementById("privacy-modal-overlay").classList.remove("visible");
@@ -3458,12 +3784,15 @@ Jonathan Tsai (@jontsai)
           document.getElementById("privacy-modal-overlay").classList.add("hidden");
         }, 200);
       }
-      
+
       // Format currency with commas
       function formatCurrency(n, decimals = 2) {
-        return (n || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        return (n || 0).toLocaleString("en-US", {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals,
+        });
       }
-      
+
       function renderCostBreakdown(data) {
         // Token usage
         document.getElementById("cost-tokens").innerHTML = `
@@ -3473,15 +3802,15 @@ Jonathan Tsai (@jontsai)
           <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">${(data.cacheWrite || 0).toLocaleString()}</span></div>
           <div class="detail-row"><span class="detail-label">API Requests</span><span class="detail-value">${(data.requests || 0).toLocaleString()}</span></div>
         `;
-        
+
         // Pricing rates
         document.getElementById("cost-rates").innerHTML = `
-          <div class="detail-row"><span class="detail-label">Input</span><span class="detail-value">$${data.rates?.input || '15.00'}/1M tokens</span></div>
-          <div class="detail-row"><span class="detail-label">Output</span><span class="detail-value">$${data.rates?.output || '75.00'}/1M tokens</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">$${data.rates?.cacheRead || '1.50'}/1M tokens (90% discount)</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">$${data.rates?.cacheWrite || '18.75'}/1M tokens (25% premium)</span></div>
+          <div class="detail-row"><span class="detail-label">Input</span><span class="detail-value">$${data.rates?.input || "15.00"}/1M tokens</span></div>
+          <div class="detail-row"><span class="detail-label">Output</span><span class="detail-value">$${data.rates?.output || "75.00"}/1M tokens</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">$${data.rates?.cacheRead || "1.50"}/1M tokens (90% discount)</span></div>
+          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">$${data.rates?.cacheWrite || "18.75"}/1M tokens (25% premium)</span></div>
         `;
-        
+
         // Calculation breakdown
         const calc = data.calculation || {};
         document.getElementById("cost-calculation").innerHTML = `
@@ -3494,37 +3823,38 @@ Jonathan Tsai (@jontsai)
             <span class="detail-value"><strong>$${formatCurrency(data.totalCost)}</strong></span>
           </div>
         `;
-        
+
         // Savings - show all three windows (24h, 3da, 7da)
         const planCost = data.planCost || 200;
-        const planName = data.planName || 'Claude Code Max';
+        const planName = data.planName || "Claude Code Max";
         const windows = data.windows || {};
-        
+
         // Build savings rows for each window
-        const windowOrder = ['24h', '3d', '7d'];
-        const windowLabels = { '24h': '24h', '3d': '3dma', '7d': '7dma' };
-        
+        const windowOrder = ["24h", "3d", "7d"];
+        const windowLabels = { "24h": "24h", "3d": "3dma", "7d": "7dma" };
+
         let savingsHtml = `
           <div class="detail-row"><span class="detail-label">${planName}</span><span class="detail-value">$${planCost}/month</span></div>
           <div style="margin-top: 12px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">Projected Monthly Cost by Window:</div>
         `;
-        
+
         let hasSavings = false;
         for (const key of windowOrder) {
           const w = windows[key];
           if (!w) continue;
-          
+
           const dailyAvg = w.dailyAvg || 0;
           const monthlyProjected = w.monthlyProjected || 0;
           const savings = w.monthlySavings || 0;
           const pct = w.savingsPercent || 0;
-          
+
           if (savings > 0) hasSavings = true;
-          
-          const savingsStr = savings > 0 
-            ? `<span style="color: var(--green);">↓$${Math.round(savings).toLocaleString()}/mo (${pct}%)</span>`
-            : `<span style="color: var(--text-muted);">-</span>`;
-          
+
+          const savingsStr =
+            savings > 0
+              ? `<span style="color: var(--green);">↓$${Math.round(savings).toLocaleString()}/mo (${pct}%)</span>`
+              : `<span style="color: var(--text-muted);">-</span>`;
+
           savingsHtml += `
             <div class="detail-row">
               <span class="detail-label">${windowLabels[key]}</span>
@@ -3532,7 +3862,7 @@ Jonathan Tsai (@jontsai)
             </div>
           `;
         }
-        
+
         if (!hasSavings) {
           savingsHtml += `
             <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
@@ -3540,26 +3870,30 @@ Jonathan Tsai (@jontsai)
             </p>
           `;
         }
-        
+
         document.getElementById("cost-savings").innerHTML = savingsHtml;
-        
+
         // Top sessions by tokens
         const topSessions = data.topSessions || [];
         if (topSessions.length > 0) {
-          document.getElementById("cost-top-sessions").innerHTML = topSessions.map((s, i) => {
-            const tokensFormatted = s.tokens >= 1000000 
-              ? (s.tokens / 1000000).toFixed(1) + 'M' 
-              : s.tokens >= 1000 
-                ? (s.tokens / 1000).toFixed(1) + 'k' 
-                : s.tokens;
-            const statusIcon = s.active ? '🟢' : '⚪';
-            return `<div class="detail-row">
-              <span class="detail-label">${statusIcon} ${s.label.substring(0, 30)}${s.label.length > 30 ? '...' : ''}</span>
+          document.getElementById("cost-top-sessions").innerHTML = topSessions
+            .map((s, i) => {
+              const tokensFormatted =
+                s.tokens >= 1000000
+                  ? (s.tokens / 1000000).toFixed(1) + "M"
+                  : s.tokens >= 1000
+                    ? (s.tokens / 1000).toFixed(1) + "k"
+                    : s.tokens;
+              const statusIcon = s.active ? "🟢" : "⚪";
+              return `<div class="detail-row">
+              <span class="detail-label">${statusIcon} ${s.label.substring(0, 30)}${s.label.length > 30 ? "..." : ""}</span>
               <span class="detail-value">${tokensFormatted}</span>
             </div>`;
-          }).join('');
+            })
+            .join("");
         } else {
-          document.getElementById("cost-top-sessions").innerHTML = '<em style="color: var(--text-muted)">No session data available</em>';
+          document.getElementById("cost-top-sessions").innerHTML =
+            '<em style="color: var(--text-muted)">No session data available</em>';
         }
       }
 
@@ -3577,7 +3911,7 @@ Jonathan Tsai (@jontsai)
 
         try {
           const res = await fetch(`/api/session?key=${encodeURIComponent(key)}`, {
-            signal: controller.signal
+            signal: controller.signal,
           });
           clearTimeout(timeoutId);
 
@@ -3598,7 +3932,8 @@ Jonathan Tsai (@jontsai)
         } catch (e) {
           clearTimeout(timeoutId);
           console.error("Failed to fetch detail:", e);
-          const msg = e.name === 'AbortError' ? 'Request timed out' : (e.message || 'Failed to load session');
+          const msg =
+            e.name === "AbortError" ? "Request timed out" : e.message || "Failed to load session";
           renderDetailError(msg);
         }
       }
@@ -3631,7 +3966,9 @@ Jonathan Tsai (@jontsai)
             : "";
 
         // Overview
-        smartUpdate(document.getElementById("detail-overview"), `
+        smartUpdate(
+          document.getElementById("detail-overview"),
+          `
                 <div class="detail-row"><span class="detail-label">Channel</span><span class="detail-value">${data.channel || "-"}</span></div>
                 <div class="detail-row"><span class="detail-label">Model</span><span class="detail-value">${data.model || "-"}</span></div>
                 <div class="detail-row"><span class="detail-label">Total Tokens</span><span class="detail-value">${data.tokens?.toLocaleString() || "-"}</span></div>
@@ -3639,10 +3976,14 @@ Jonathan Tsai (@jontsai)
                 ${cacheDisplay}
                 ${costDisplay}
                 <div class="detail-row"><span class="detail-label">Last Active</span><span class="detail-value">${data.lastActive || "-"}</span></div>
-            `);
+            `,
+        );
 
         // Summary
-        smartUpdate(document.getElementById("detail-summary"), data.summary || "<em>No summary</em>");
+        smartUpdate(
+          document.getElementById("detail-summary"),
+          data.summary || "<em>No summary</em>",
+        );
 
         // Links/References
         const allText = (data.messages || []).map((m) => m.text).join(" ");
@@ -3650,83 +3991,106 @@ Jonathan Tsai (@jontsai)
         if (data.links) links.push(...data.links);
 
         if (links.length > 0) {
-          smartUpdate(document.getElementById("detail-links"), links
-            .map((l) => {
-              const cls =
-                l.type === "linear"
-                  ? "linear"
-                  : l.type === "github"
-                    ? "github"
-                    : l.type === "file"
-                      ? "file"
-                      : "slack";
-              const icon =
-                l.type === "linear"
-                  ? "📋"
-                  : l.type === "github"
-                    ? "🐙"
-                    : l.type === "file"
-                      ? "📁"
-                      : "💬";
-              if (l.url) {
-                return `<a href="${l.url}" target="_blank" class="link-tag ${cls}">${icon} ${l.id}</a>`;
-              }
-              return `<span class="link-tag ${cls}">${icon} ${l.id}</span>`;
-            })
-            .join(" "));
+          smartUpdate(
+            document.getElementById("detail-links"),
+            links
+              .map((l) => {
+                const cls =
+                  l.type === "linear"
+                    ? "linear"
+                    : l.type === "github"
+                      ? "github"
+                      : l.type === "file"
+                        ? "file"
+                        : "slack";
+                const icon =
+                  l.type === "linear"
+                    ? "📋"
+                    : l.type === "github"
+                      ? "🐙"
+                      : l.type === "file"
+                        ? "📁"
+                        : "💬";
+                if (l.url) {
+                  return `<a href="${l.url}" target="_blank" class="link-tag ${cls}">${icon} ${l.id}</a>`;
+                }
+                return `<span class="link-tag ${cls}">${icon} ${l.id}</span>`;
+              })
+              .join(" "),
+          );
         } else {
-          smartUpdate(document.getElementById("detail-links"),
-            '<em style="color: var(--text-muted)">No references detected</em>');
+          smartUpdate(
+            document.getElementById("detail-links"),
+            '<em style="color: var(--text-muted)">No references detected</em>',
+          );
         }
 
         // Needs Attention
         if (data.needsAttention?.length > 0) {
-          smartUpdate(document.getElementById("detail-attention"), data.needsAttention
-            .map((a) => `<div class="attention-item">${escapeHtml(a)}</div>`)
-            .join(""));
+          smartUpdate(
+            document.getElementById("detail-attention"),
+            data.needsAttention
+              .map((a) => `<div class="attention-item">${escapeHtml(a)}</div>`)
+              .join(""),
+          );
         } else {
-          smartUpdate(document.getElementById("detail-attention"),
-            '<em style="color: var(--text-muted)">Nothing needs attention</em>');
+          smartUpdate(
+            document.getElementById("detail-attention"),
+            '<em style="color: var(--text-muted)">Nothing needs attention</em>',
+          );
         }
 
         // Facts
         if (data.facts?.length > 0) {
-          smartUpdate(document.getElementById("detail-facts"), data.facts
-            .map((f) => `<div class="attention-item">✅ ${escapeHtml(f)}</div>`)
-            .join(""));
+          smartUpdate(
+            document.getElementById("detail-facts"),
+            data.facts.map((f) => `<div class="attention-item">✅ ${escapeHtml(f)}</div>`).join(""),
+          );
         } else {
-          smartUpdate(document.getElementById("detail-facts"),
-            '<em style="color: var(--text-muted)">No key facts</em>');
+          smartUpdate(
+            document.getElementById("detail-facts"),
+            '<em style="color: var(--text-muted)">No key facts</em>',
+          );
         }
 
         // Tools
         if (data.tools?.length > 0) {
-          smartUpdate(document.getElementById("detail-tools"), data.tools
-            .map(
-              (t) =>
-                `<span class="tool-tag"><code>${t.name}</code> <span class="tool-count">×${t.count}</span></span>`,
-            )
-            .join(""));
+          smartUpdate(
+            document.getElementById("detail-tools"),
+            data.tools
+              .map(
+                (t) =>
+                  `<span class="tool-tag"><code>${t.name}</code> <span class="tool-count">×${t.count}</span></span>`,
+              )
+              .join(""),
+          );
         } else {
-          smartUpdate(document.getElementById("detail-tools"),
-            '<em style="color: var(--text-muted)">No tools used</em>');
+          smartUpdate(
+            document.getElementById("detail-tools"),
+            '<em style="color: var(--text-muted)">No tools used</em>',
+          );
         }
 
         // Messages
         if (data.messages?.length > 0) {
-          smartUpdate(document.getElementById("detail-messages"), data.messages
-            .map(
-              (m) => `
+          smartUpdate(
+            document.getElementById("detail-messages"),
+            data.messages
+              .map(
+                (m) => `
                     <div class="message-item">
                         <div class="message-role ${m.role}">${m.role === "user" ? "👤 User" : "🦞 Assistant"}</div>
                         <div class="message-text">${escapeHtml(m.text?.slice(0, 400) || "")}${m.text?.length > 400 ? "..." : ""}</div>
                     </div>
                 `,
-            )
-            .join(""));
+              )
+              .join(""),
+          );
         } else {
-          smartUpdate(document.getElementById("detail-messages"),
-            '<em style="color: var(--text-muted)">No messages</em>');
+          smartUpdate(
+            document.getElementById("detail-messages"),
+            '<em style="color: var(--text-muted)">No messages</em>',
+          );
         }
       }
 
@@ -3914,24 +4278,28 @@ Jonathan Tsai (@jontsai)
         countElement.textContent = subagents.length;
 
         if (subagents.length === 0) {
-          smartUpdate(grid,
-            '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem;">No active sub-agents</div>');
+          smartUpdate(
+            grid,
+            '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9rem;">No active sub-agents</div>',
+          );
           return;
         }
 
-        smartUpdate(grid, subagents
-          .map((s) => {
-            const ageMinutes = Math.round(s.ageMs / 60000);
-            const ageHours = Math.round(s.ageMs / 3600000);
-            const ageDisplay = ageMinutes < 60 ? `${ageMinutes}m` : `${ageHours}h`;
-            const statusClass = ageHours > 2 ? "stale" : s.tokens > 1000 ? "active" : "idle";
-            const statusText = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+        smartUpdate(
+          grid,
+          subagents
+            .map((s) => {
+              const ageMinutes = Math.round(s.ageMs / 60000);
+              const ageHours = Math.round(s.ageMs / 3600000);
+              const ageDisplay = ageMinutes < 60 ? `${ageMinutes}m` : `${ageHours}h`;
+              const statusClass = ageHours > 2 ? "stale" : s.tokens > 1000 ? "active" : "idle";
+              const statusText = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
 
-            // Build the session key for detail panel
-            const sessionKey = `agent:main:subagent:${s.id}`;
-            const label = s.task || `Sub-agent ${s.shortId}`;
-            
-            return `
+              // Build the session key for detail panel
+              const sessionKey = `agent:main:subagent:${s.id}`;
+              const label = s.task || `Sub-agent ${s.shortId}`;
+
+              return `
                     <div class="subagent-card ${statusClass}" onclick="openDetail('${escapeHtml(sessionKey)}', '${escapeHtml(label.substring(0, 60))}')" style="cursor: pointer;">
                         <div class="subagent-header">
                             <div class="subagent-info">
@@ -3942,8 +4310,9 @@ Jonathan Tsai (@jontsai)
                         </div>
                     </div>
                 `;
-          })
-          .join(""));
+            })
+            .join(""),
+        );
       }
 
       // Enhanced Token Stats with Quota Visualization
@@ -4056,30 +4425,30 @@ Jonathan Tsai (@jontsai)
       async function init() {
         // Load privacy settings from server first (before rendering any data)
         await loadPrivacyFromServer();
-        console.log('[Privacy] Settings loaded from server');
-        
+        console.log("[Privacy] Settings loaded from server");
+
         connectSSE();
         // Fetch data after short delay to ensure DOM is ready
         // This fixes a race condition on initial page load
         setTimeout(fetchData, 100);
-        
+
         // Apply privacy settings on load
         updateHostnameDisplay();
-        
+
         // Initialize privacy checkbox state
-        const hostnameCheckbox = document.getElementById('privacy-hide-hostname');
+        const hostnameCheckbox = document.getElementById("privacy-hide-hostname");
         if (hostnameCheckbox) {
           hostnameCheckbox.checked = isHostnameHidden();
         }
-        
+
         // Set up savings window selector
         const windowSelect = document.getElementById("savings-window-select");
         if (windowSelect) {
           // Load saved preference
           windowSelect.value = getSavingsWindowPref();
-          
+
           // Handle changes
-          windowSelect.addEventListener("change", function(e) {
+          windowSelect.addEventListener("change", function (e) {
             const newWindow = e.target.value;
             setSavingsWindowPref(newWindow);
             if (currentTokenStats) {
@@ -4090,8 +4459,8 @@ Jonathan Tsai (@jontsai)
       }
 
       // Ensure DOM is ready before initializing
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
       } else {
         setTimeout(init, 0);
       }

@@ -21,13 +21,13 @@ export function escapeHtml(text) {
  * @param {string} newHtml - New HTML content
  */
 export function smartUpdate(targetEl, newHtml) {
-  if (typeof morphdom === 'undefined') {
+  if (typeof morphdom === "undefined") {
     // Fallback if morphdom not loaded
     targetEl.innerHTML = newHtml;
     return;
   }
   // Create a temporary container with the new content
-  const temp = document.createElement('div');
+  const temp = document.createElement("div");
   temp.innerHTML = newHtml;
   // If target has single child and temp has single child, morph directly
   if (targetEl.children.length === 1 && temp.children.length === 1) {

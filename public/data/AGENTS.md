@@ -2,14 +2,15 @@
 
 **DO NOT COMMIT** the following files — they contain user-specific data:
 
-| File | Purpose | Template |
-|------|---------|----------|
-| `operators.json` | User/operator info from sessions | `operators.json.example` |
+| File                    | Purpose                          | Template                        |
+| ----------------------- | -------------------------------- | ------------------------------- |
+| `operators.json`        | User/operator info from sessions | `operators.json.example`        |
 | `privacy-settings.json` | Hidden topics/sessions for demos | `privacy-settings.json.example` |
 
 ## Why?
 
 These files are generated at runtime and contain:
+
 - User IDs and usernames
 - Session counts and activity
 - Privacy preferences (what the user hides)

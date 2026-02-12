@@ -4,11 +4,11 @@ Automated enforcement of rules from `AGENTS.md` and `CONTRIBUTING.md`.
 
 ## Checks
 
-| Check | Rule Source | Description |
-|-------|-------------|-------------|
-| `version-sync.sh` | CONTRIBUTING.md | Ensures `package.json` and `SKILL.md` versions match |
-| `no-user-data.sh` | public/data/AGENTS.md | Blocks commits of user-specific data files |
-| `no-secrets.sh` | AGENTS.md | Scans for accidentally committed secrets |
+| Check             | Rule Source           | Description                                          |
+| ----------------- | --------------------- | ---------------------------------------------------- |
+| `version-sync.sh` | CONTRIBUTING.md       | Ensures `package.json` and `SKILL.md` versions match |
+| `no-user-data.sh` | public/data/AGENTS.md | Blocks commits of user-specific data files           |
+| `no-secrets.sh`   | AGENTS.md             | Scans for accidentally committed secrets             |
 
 ## Adding New Checks
 

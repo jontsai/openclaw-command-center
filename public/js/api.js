@@ -78,10 +78,7 @@ export function connectSSE(onUpdate, onStatusChange) {
 
       // Exponential backoff for reconnection
       sseReconnectAttempts++;
-      const delay = Math.min(
-        1000 * Math.pow(2, sseReconnectAttempts - 1),
-        SSE_MAX_RECONNECT_DELAY
-      );
+      const delay = Math.min(1000 * Math.pow(2, sseReconnectAttempts - 1), SSE_MAX_RECONNECT_DELAY);
       console.log(`[SSE] Reconnecting in ${delay}ms (attempt ${sseReconnectAttempts})`);
 
       // Start polling as fallback while disconnected

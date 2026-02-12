@@ -244,6 +244,7 @@ Follow [semver](https://semver.org/):
 | Breaking changes              | `major` | `0.1.0 → 1.0.0` |
 
 ⚠️ **Important:** When bumping version, update **both** files:
+
 - `package.json` — `"version": "X.Y.Z"`
 - `SKILL.md` — `version: X.Y.Z` (in frontmatter)
 
