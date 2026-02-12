@@ -68,4 +68,5 @@ DASHBOARD_AUTH_MODE=tailscale node lib/server.js
 ## Links
 
 - [GitHub](https://github.com/jontsai/openclaw-command-center)
+- [ClawHub](https://www.clawhub.ai/jontsai/command-center)
 - [Documentation](https://github.com/jontsai/openclaw-command-center#readme)
