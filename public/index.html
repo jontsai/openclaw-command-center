@@ -2677,7 +2677,6 @@
           // Handle auth errors - show clear error state instead of 0%
           if (data?.errorType === "auth" || data?.claude?.session?.error) {
             const errorMsg = "⚠️ Auth Error";
-            const errorDetail = "API key lacks user:profile scope";
             const clickableError =
               '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>';
 
@@ -3843,7 +3842,6 @@
           const w = windows[key];
           if (!w) continue;
 
-          const dailyAvg = w.dailyAvg || 0;
           const monthlyProjected = w.monthlyProjected || 0;
           const savings = w.monthlySavings || 0;
           const pct = w.savingsPercent || 0;
