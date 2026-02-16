@@ -71,6 +71,14 @@ describe("server", () => {
       `Expected 2xx/3xx/4xx status for root, got: ${statusCode}`,
     );
   });
+
+  it("blocks path traversal attempts", async () => {
+    const { statusCode } = await httpGet(`http://localhost:${TEST_PORT}/../../etc/passwd`);
+    assert.ok(
+      statusCode === 403 || statusCode === 404,
+      `Expected 403/404 for traversal path, got: ${statusCode}`,
+    );
+  });
 });
 
 /**

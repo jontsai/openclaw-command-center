@@ -27,9 +27,15 @@
     "mode": "none",
     "_modeOptions": "none | token | tailscale | cloudflare | allowlist",
     "token": null,
+    "allowLocalhostBypass": false,
     "allowedUsers": [],
     "allowedIPs": ["127.0.0.1", "::1"],
     "publicPaths": ["/api/health", "/api/whoami", "/favicon.ico"]
+  },
+
+  "cors": {
+    "_comment": "Same-origin by default. Add explicit origins only when needed.",
+    "allowedOrigins": []
   },
 
   "dashboard": {
