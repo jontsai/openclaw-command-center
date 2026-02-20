@@ -1,10 +1,10 @@
-const { describe, it } = require("node:test");
+const { describe, it, afterEach } = require("node:test");
 const assert = require("node:assert");
 
 // We import the module to test its exports and pure functions.
 // The jobs module relies on dynamic ESM import of external jobs API,
 // so we focus on testing what's available without that dependency.
-const { handleJobsRequest, isJobsRoute } = require("../lib/jobs");
+const { handleJobsRequest, isJobsRoute, _resetForTesting } = require("../lib/jobs");
 
 describe("jobs module", () => {
   describe("exports", () => {
@@ -60,7 +60,15 @@ describe("jobs module", () => {
   });
 
   describe("handleJobsRequest()", () => {
+    afterEach(() => {
+      // Reset API state after each test
+      _resetForTesting();
+    });
+
     it("returns 500 when jobs API is not available", async () => {
+      // Force API to be unavailable for this test
+      _resetForTesting({ forceUnavailable: true });
+
       let statusCode = null;
       let body = null;
 
