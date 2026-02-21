@@ -3,10 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OpenClaw Command Center</title>
+    <title data-i18n="app.title">OpenClaw Command Center</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="css/dashboard.css" />
     <script src="js/lib/morphdom.min.js"></script>
+    <script src="js/i18n.js"></script>
     <!-- Shared Sidebar Loader -->
     <script src="js/sidebar.js"></script>
   </head>
@@ -26,30 +27,57 @@
           >
             ☰
           </button>
-          <h1 class="page-title">OpenClaw Command Center</h1>
+          <h1 class="page-title" data-i18n="app.title">OpenClaw Command Center</h1>
+          <div
+            id="lang-switcher"
+            style="
+              display: inline-flex;
+              align-items: center;
+              gap: 6px;
+              margin-left: 12px;
+              flex-shrink: 0;
+            "
+          >
+            <span style="font-size: 0.75rem; opacity: 0.8">🌐</span>
+            <select
+              id="lang-select"
+              style="
+                font-size: 0.8rem;
+                padding: 3px 8px;
+                background: var(--card-bg, #161b22);
+                color: var(--text, #c9d1d9);
+                border: 1px solid var(--border, #30363d);
+                border-radius: 4px;
+                cursor: pointer;
+              "
+            >
+              <option value="en">English</option>
+              <option value="zh-CN">简体中文</option>
+            </select>
+          </div>
         </div>
         <div class="status-pill" id="connection-status" title="SSE connection status">
           <div class="pulse" id="connection-pulse"></div>
-          <span id="gateway-status">Connecting...</span>
+          <span id="gateway-status" data-i18n="app.connecting">Connecting...</span>
         </div>
       </header>
 
       <div class="stats-bar">
         <div class="stat">
           <div class="stat-value" id="total-tokens">-</div>
-          <div class="stat-label">Total Tokens</div>
+          <div class="stat-label" data-i18n="stats.totalTokens">Total Tokens</div>
         </div>
         <div class="stat">
           <div class="stat-value" id="input-tokens">-</div>
-          <div class="stat-label">Input</div>
+          <div class="stat-label" data-i18n="stats.input">Input</div>
         </div>
         <div class="stat">
           <div class="stat-value" id="output-tokens">-</div>
-          <div class="stat-label">Output</div>
+          <div class="stat-label" data-i18n="stats.output">Output</div>
         </div>
         <div class="stat" title="Sessions active within last 15 minutes">
           <div class="stat-value" id="active-sessions">-</div>
-          <div class="stat-label">Active (15m)</div>
+          <div class="stat-label" data-i18n="stats.active15m">Active (15m)</div>
         </div>
         <div
           class="stat"
@@ -58,7 +86,7 @@
           style="cursor: pointer"
         >
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label">Est. Cost (24h) 📊</div>
+          <div class="stat-label" data-i18n="stats.estCost24h">Est. Cost (24h) 📊</div>
         </div>
         <div
           class="stat"
@@ -75,7 +103,9 @@
             -
           </div>
           <div class="stat-label" style="display: flex; align-items: center; gap: 4px">
-            <span onclick="openCostModal()">Est. Monthly Savings</span>
+            <span onclick="openCostModal()" data-i18n="stats.estMonthlySavings"
+              >Est. Monthly Savings</span
+            >
             <select
               id="savings-window-select"
               style="
@@ -98,11 +128,11 @@
         </div>
         <div class="stat" title="Main session capacity">
           <div class="stat-value" id="main-capacity">-</div>
-          <div class="stat-label">Main</div>
+          <div class="stat-label" data-i18n="stats.main">Main</div>
         </div>
         <div class="stat" title="Sub-agent capacity">
           <div class="stat-value" id="subagent-capacity">-</div>
-          <div class="stat-label">Sub-agents</div>
+          <div class="stat-label" data-i18n="stats.subagents">Sub-agents</div>
         </div>
       </div>
 
@@ -369,11 +399,23 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-          <div class="quick-actions-title">⚡ Quick Actions</div>
-          <button class="quick-action-btn" onclick="runHealthCheck()">🔍 Health Check</button>
-          <button class="quick-action-btn" onclick="getGatewayStatus()">🚪 Gateway Status</button>
+          <div class="quick-actions-title" data-i18n="quickActions.title">⚡ Quick Actions</div>
+          <button
+            class="quick-action-btn"
+            onclick="runHealthCheck()"
+            data-i18n="quickActions.healthCheck"
+          >
+            🔍 Health Check
+          </button>
+          <button
+            class="quick-action-btn"
+            onclick="getGatewayStatus()"
+            data-i18n="quickActions.gatewayStatus"
+          >
+            🚪 Gateway Status
+          </button>
           <button class="quick-action-btn" onclick="pruneStalesSessions()">
-            🧹 Clean Stale Sessions
+            <span data-i18n="quickActions.cleanStale">🧹 Clean Stale Sessions</span>
           </button>
         </div>
 
@@ -1266,7 +1308,8 @@
       </main>
 
       <div class="refresh-bar">
-        <span id="refresh-mode">Real-time updates via SSE</span> • Last updated:
+        <span id="refresh-mode" data-i18n="connection.realtime">Real-time updates via SSE ⚡</span>
+        • Last updated:
         <span id="last-updated"
           ><span class="loading-dots"><span></span><span></span><span></span></span
         ></span>
@@ -1575,7 +1618,11 @@
             <button class="btn-primary" onclick="addHiddenCron()">Add</button>
           </div>
           <div id="hidden-crons-list" style="min-height: 30px">
-            <em style="color: var(--text-muted); font-size: 0.85rem">No cron jobs hidden</em>
+            <em
+              style="color: var(--text-muted); font-size: 0.85rem"
+              data-i18n="privacy.noCronHidden"
+              >No cron jobs hidden</em
+            >
           </div>
         </div>
 
@@ -1632,9 +1679,12 @@
         hasPrev: false,
       };
 
+      const i18nText = (key, params = {}, fallback = key) =>
+        window.I18N?.t ? window.I18N.t(key, params, fallback) : fallback;
+
       // Utility functions
       function formatTimeAgo(mins) {
-        if (mins < 1) return "now";
+        if (mins < 1) return i18nText("time.now", {}, "now");
         if (mins < 60) return `${mins}m`;
         if (mins < 1440) return `${Math.round(mins / 60)}h`;
         return `${Math.round(mins / 1440)}d`;
@@ -2013,7 +2063,11 @@
         // Update timestamp
         const now = new Date().toLocaleTimeString();
         $set("last-updated", "textContent", now);
-        $set("sidebar-updated", "textContent", `Updated: ${now}`);
+        $set(
+          "sidebar-updated",
+          "textContent",
+          i18nText("sidebar.updated", { time: now }, `Updated: ${now}`),
+        );
 
         // Render each section
         if (state.vitals) renderVitals(state.vitals);
@@ -2076,7 +2130,11 @@
 
         const now = new Date().toLocaleTimeString();
         $set("last-updated", "textContent", now);
-        $set("sidebar-updated", "textContent", `Updated: ${now}`);
+        $set(
+          "sidebar-updated",
+          "textContent",
+          i18nText("sidebar.updated", { time: now }, `Updated: ${now}`),
+        );
       }
 
       // Render just sessions (for progressive loading)
@@ -2369,7 +2427,10 @@
                 if (op.stats?.lastSeen) {
                   const lastSeen = new Date(op.stats.lastSeen);
                   const minutesAgo = Math.floor((Date.now() - lastSeen.getTime()) / 60000);
-                  lastSeenText = minutesAgo < 1 ? "Just now" : formatTimeAgo(minutesAgo);
+                  lastSeenText =
+                    minutesAgo < 1
+                      ? i18nText("time.justNow", {}, "Just now")
+                      : formatTimeAgo(minutesAgo);
                 }
 
                 return `
@@ -3701,7 +3762,7 @@
             (item) => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
             <span>${escapeHtml(item.name || item.id)}</span>
-            <button onclick="removeHiddenTopic('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+            <button onclick="removeHiddenTopic('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="${i18nText("actions.remove", {}, "Remove")}">✕</button>
           </div>
         `,
           )
@@ -3729,7 +3790,7 @@
             (item) => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
             <span>${escapeHtml(item.name || item.id)}</span>
-            <button onclick="removeHiddenSession('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+            <button onclick="removeHiddenSession('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="${i18nText("actions.remove", {}, "Remove")}">✕</button>
           </div>
         `,
           )
@@ -3746,8 +3807,7 @@
         if (countEl) countEl.textContent = `(${hidden.length})`;
 
         if (hidden.length === 0) {
-          container.innerHTML =
-            '<em style="color: var(--text-muted); font-size: 0.85rem;">No cron jobs hidden</em>';
+          container.innerHTML = `<em style="color: var(--text-muted); font-size: 0.85rem;">${i18nText("privacy.noCronHidden", {}, "No cron jobs hidden")}</em>`;
           return;
         }
 
@@ -3757,7 +3817,7 @@
             (item) => `
           <div style="display: inline-flex; align-items: center; padding: 4px 10px; background: var(--bg); border-radius: 12px; margin: 2px; font-size: 0.85rem;">
             <span>${escapeHtml(item.name || item.id)}</span>
-            <button onclick="removeHiddenCron('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Remove">✕</button>
+            <button onclick="removeHiddenCron('${escapeHtml(item.id).replace(/'/g, "\\'")}')" style="background: none; border: none; color: var(--error); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="${i18nText("actions.remove", {}, "Remove")}">✕</button>
           </div>
         `,
           )
@@ -4121,11 +4181,19 @@
 
         // Update refresh bar mode indicator
         if (status === "connected") {
-          refreshMode.textContent = "Real-time updates via SSE ⚡";
+          refreshMode.textContent = i18nText(
+            "connection.realtime",
+            {},
+            "Real-time updates via SSE ⚡",
+          );
         } else if (status === "disconnected") {
-          refreshMode.textContent = "Polling mode (SSE disconnected)";
+          refreshMode.textContent = i18nText(
+            "connection.polling",
+            {},
+            "Polling mode (SSE disconnected)",
+          );
         } else {
-          refreshMode.textContent = "Connecting...";
+          refreshMode.textContent = i18nText("app.connecting", {}, "Connecting...");
         }
       }
 
@@ -4138,7 +4206,7 @@
           return;
         }
 
-        setConnectionStatus("connecting", "Connecting...");
+        setConnectionStatus("connecting", i18nText("app.connecting", {}, "Connecting..."));
 
         try {
           eventSource = new EventSource("/api/events");
@@ -4174,7 +4242,11 @@
               // Update timestamp on heartbeat
               const now = new Date().toLocaleTimeString();
               document.getElementById("last-updated").textContent = now + " ⚡";
-              document.getElementById("sidebar-updated").textContent = `Live: ${now}`;
+              document.getElementById("sidebar-updated").textContent = i18nText(
+                "sidebar.live",
+                { time: now },
+                `Live: ${now}`,
+              );
             } catch (err) {}
           });
 
@@ -4209,7 +4281,11 @@
         // Update timestamp with live indicator
         const now = new Date().toLocaleTimeString();
         document.getElementById("last-updated").textContent = now + " ⚡";
-        document.getElementById("sidebar-updated").textContent = `Live: ${now}`;
+        document.getElementById("sidebar-updated").textContent = i18nText(
+          "sidebar.live",
+          { time: now },
+          `Live: ${now}`,
+        );
 
         // Render full state (unified approach)
         renderFullState(data);
@@ -4454,6 +4530,13 @@
             }
           });
         }
+
+        window.addEventListener("i18n:updated", () => {
+          fetchData();
+          renderHiddenCronsList();
+          renderHiddenSessionsList();
+          renderHiddenTopicsList();
+        });
       }
 
       // Ensure DOM is ready before initializing

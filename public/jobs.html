@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Jobs - OpenClaw Command Center</title>
+    <title data-i18n="jobs.pageTitle">AI Jobs - OpenClaw Command Center</title>
     <style>
       :root {
         --bg: #0d1117;
@@ -858,6 +858,7 @@
         }
       }
     </style>
+    <script src="/js/i18n.js"></script>
     <!-- Shared Sidebar Loader -->
     <script src="/js/sidebar.js"></script>
   </head>
@@ -869,10 +870,18 @@
     <div class="main-wrapper" id="main-wrapper">
       <header>
         <div class="header-left">
-          <h1 class="page-title">🤖 AI Jobs Dashboard</h1>
+          <h1 class="page-title" data-i18n="jobs.dashboard">🤖 AI Jobs Dashboard</h1>
         </div>
         <div class="header-actions">
-          <button class="job-action-btn" onclick="refreshJobs()" title="Refresh">🔄 Refresh</button>
+          <button
+            class="job-action-btn"
+            onclick="refreshJobs()"
+            title="Refresh"
+            data-i18n="jobs.refresh"
+            data-i18n-title="jobs.refresh"
+          >
+            🔄 Refresh
+          </button>
         </div>
       </header>
 
@@ -880,27 +889,27 @@
       <div class="stats-bar" id="stats-bar">
         <div class="stat">
           <div class="stat-value" id="stat-total">—</div>
-          <div class="stat-label">Total Jobs</div>
+          <div class="stat-label" data-i18n="jobs.totalJobs">Total Jobs</div>
         </div>
         <div class="stat">
           <div class="stat-value green" id="stat-active">—</div>
-          <div class="stat-label">Active</div>
+          <div class="stat-label" data-i18n="jobs.active">Active</div>
         </div>
         <div class="stat">
           <div class="stat-value yellow" id="stat-paused">—</div>
-          <div class="stat-label">Paused</div>
+          <div class="stat-label" data-i18n="jobs.paused">Paused</div>
         </div>
         <div class="stat">
           <div class="stat-value" id="stat-running">—</div>
-          <div class="stat-label">Running</div>
+          <div class="stat-label" data-i18n="jobs.running">Running</div>
         </div>
         <div class="stat">
           <div class="stat-value green" id="stat-success-rate">—</div>
-          <div class="stat-label">Success Rate</div>
+          <div class="stat-label" data-i18n="jobs.successRate">Success Rate</div>
         </div>
         <div class="stat">
           <div class="stat-value red" id="stat-failures">—</div>
-          <div class="stat-label">Recent Failures</div>
+          <div class="stat-label" data-i18n="jobs.recentFailures">Recent Failures</div>
         </div>
       </div>
 
@@ -908,16 +917,20 @@
         <!-- Filters -->
         <div class="filters-bar">
           <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">
-            All <span class="filter-count" id="filter-all-count">0</span>
+            <span data-i18n="jobs.all">All</span>
+            <span class="filter-count" id="filter-all-count">0</span>
           </button>
           <button class="filter-btn" data-filter="active" onclick="setFilter('active')">
-            🟢 Active <span class="filter-count" id="filter-active-count">0</span>
+            🟢 <span data-i18n="jobs.active">Active</span>
+            <span class="filter-count" id="filter-active-count">0</span>
           </button>
           <button class="filter-btn" data-filter="paused" onclick="setFilter('paused')">
-            ⏸️ Paused <span class="filter-count" id="filter-paused-count">0</span>
+            ⏸️ <span data-i18n="jobs.paused">Paused</span>
+            <span class="filter-count" id="filter-paused-count">0</span>
           </button>
           <button class="filter-btn" data-filter="failed" onclick="setFilter('failed')">
-            🔴 Failed <span class="filter-count" id="filter-failed-count">0</span>
+            🔴 <span data-i18n="jobs.failed">Failed</span>
+            <span class="filter-count" id="filter-failed-count">0</span>
           </button>
         </div>
 
@@ -925,12 +938,12 @@
         <div class="section">
           <div id="jobs-loading" class="loading">
             <div class="loading-spinner"></div>
-            <span>Loading jobs...</span>
+            <span data-i18n="jobs.loadingJobs">Loading jobs...</span>
           </div>
 
           <div id="jobs-empty" class="empty-state" style="display: none">
             <div class="empty-state-icon">⚙️</div>
-            <div class="empty-state-text">No jobs found</div>
+            <div class="empty-state-text" data-i18n="jobs.noJobs">No jobs found</div>
             <div class="empty-state-hint">
               Job definitions are loaded from $OPENCLAW_JOBS_DIR/definitions/
             </div>
@@ -947,28 +960,30 @@
     <div class="modal-overlay" id="history-modal">
       <div class="modal">
         <div class="modal-header">
-          <span class="modal-title" id="history-modal-title">Run History</span>
+          <span class="modal-title" id="history-modal-title" data-i18n="jobs.runHistory"
+            >Run History</span
+          >
           <button class="modal-close" onclick="closeHistoryModal()">×</button>
         </div>
         <div class="modal-content">
           <div id="history-loading" class="loading">
             <div class="loading-spinner"></div>
-            <span>Loading history...</span>
+            <span data-i18n="jobs.loadingHistory">Loading history...</span>
           </div>
           <table class="history-table" id="history-table" style="display: none">
             <thead>
               <tr>
-                <th>Status</th>
-                <th>Started</th>
-                <th>Duration</th>
-                <th>Details</th>
+                <th data-i18n="jobs.status">Status</th>
+                <th data-i18n="jobs.started">Started</th>
+                <th data-i18n="jobs.duration">Duration</th>
+                <th data-i18n="jobs.details">Details</th>
               </tr>
             </thead>
             <tbody id="history-tbody"></tbody>
           </table>
           <div id="history-empty" class="empty-state" style="display: none">
             <div class="empty-state-icon">📭</div>
-            <div class="empty-state-text">No run history yet</div>
+            <div class="empty-state-text" data-i18n="jobs.noHistory">No run history yet</div>
           </div>
         </div>
       </div>
@@ -982,14 +997,17 @@
       let jobs = [];
       let currentFilter = "all";
       let refreshTimer = null;
+      const t = (key, params = {}, fallback = key) =>
+        window.I18N?.t ? window.I18N.t(key, params, fallback) : fallback;
 
       // Format schedule for display
       function formatSchedule(schedule) {
         if (!schedule) return "—";
         if (typeof schedule === "string") return schedule;
         if (schedule.cron) return schedule.cron;
-        if (schedule.interval) return `Every ${schedule.interval}`;
-        if (schedule.at) return `At ${schedule.at}`;
+        if (schedule.interval)
+          return t("jobs.every", { value: schedule.interval }, `Every ${schedule.interval}`);
+        if (schedule.at) return t("jobs.at", { value: schedule.at }, `At ${schedule.at}`);
         return JSON.stringify(schedule);
       }
 
@@ -1027,33 +1045,39 @@
                             ${job.description ? `<div class="job-description">${escapeHtml(job.description)}</div>` : ""}
                         </div>
                         <span class="job-badge badge-${status}">
-                            ${status === "paused" ? "Paused" : status === "failed" ? "Failing" : "Active"}
+                            ${
+                              status === "paused"
+                                ? t("jobs.paused", {}, "Paused")
+                                : status === "failed"
+                                  ? t("jobs.statusFailing", {}, "Failing")
+                                  : t("jobs.active", {}, "Active")
+                            }
                         </span>
                     </div>
                     
                     <div class="job-schedule">
                         <span class="schedule-icon">📅</span>
                         <span class="schedule-cron">${escapeHtml(formatSchedule(job.schedule))}</span>
-                        <span class="schedule-next">Next: ${job.nextRunRelative || "—"}</span>
+                        <span class="schedule-next">${t("jobs.next", { value: job.nextRunRelative || "—" }, `Next: ${job.nextRunRelative || "—"}`)}</span>
                     </div>
                     
                     <div class="job-tags">
-                        <span class="job-tag lane">🛤️ ${job.lane || "medium"}</span>
+                        <span class="job-tag lane">${t("jobs.lane", { value: job.lane || "medium" }, `🛤️ ${job.lane || "medium"}`)}</span>
                         ${(job.tags || []).map((t) => `<span class="job-tag">${escapeHtml(t)}</span>`).join("")}
                     </div>
                     
                     <div class="job-stats">
                         <div class="job-stat">
                             <div class="job-stat-value">${job.stats?.totalRuns || 0}</div>
-                            <div class="job-stat-label">Runs</div>
+                            <div class="job-stat-label">${t("jobs.runs", {}, "Runs")}</div>
                         </div>
                         <div class="job-stat">
                             <div class="job-stat-value green">${successRate}</div>
-                            <div class="job-stat-label">Success</div>
+                            <div class="job-stat-label">${t("jobs.success", {}, "Success")}</div>
                         </div>
                         <div class="job-stat">
                             <div class="job-stat-value">${avgDuration}</div>
-                            <div class="job-stat-label">Avg Time</div>
+                            <div class="job-stat-label">${t("jobs.avgTime", {}, "Avg Time")}</div>
                         </div>
                     </div>
                     
@@ -1062,23 +1086,23 @@
                           job.lastRun
                             ? `
                             <span class="last-run-status ${job.stats?.streak?.type === "failed" ? "failed" : "success"}"></span>
-                            <span>Last run: ${job.lastRunRelative || "—"}</span>
+                            <span>${t("jobs.lastRun", { value: job.lastRunRelative || "—" }, `Last run: ${job.lastRunRelative || "—"}`)}</span>
                         `
-                            : "<span>Never run</span>"
+                            : `<span>${t("jobs.neverRun", {}, "Never run")}</span>`
                         }
                     </div>
                     
                     <div class="job-actions">
                         <button class="job-action-btn primary" onclick="runJob('${job.id}')" ${job.paused ? "disabled" : ""}>
-                            ▶️ Run
+                            ${t("jobs.run", {}, "▶️ Run")}
                         </button>
                         ${
                           job.paused
-                            ? `<button class="job-action-btn" onclick="resumeJob('${job.id}')">▶️ Resume</button>`
-                            : `<button class="job-action-btn" onclick="pauseJob('${job.id}')">⏸️ Pause</button>`
+                            ? `<button class="job-action-btn" onclick="resumeJob('${job.id}')">${t("jobs.resume", {}, "▶️ Resume")}</button>`
+                            : `<button class="job-action-btn" onclick="pauseJob('${job.id}')">${t("jobs.pause", {}, "⏸️ Pause")}</button>`
                         }
                         <button class="job-action-btn" onclick="showHistory('${job.id}', '${escapeHtml(job.name)}')">
-                            📜 History
+                            ${t("jobs.history", {}, "📜 History")}
                         </button>
                     </div>
                 </div>
@@ -1175,11 +1199,14 @@
           jobs = data.jobs || [];
           renderJobs();
           updateStats();
-          document.getElementById("sidebar-updated").textContent =
-            "Updated: " + new Date().toLocaleTimeString();
+          document.getElementById("sidebar-updated").textContent = t(
+            "sidebar.updated",
+            { time: new Date().toLocaleTimeString() },
+            "Updated: " + new Date().toLocaleTimeString(),
+          );
         } catch (e) {
           console.error("Failed to fetch jobs:", e);
-          showToast("Failed to load jobs", "error");
+          showToast(t("jobs.toastLoadFailed", {}, "Failed to load jobs"), "error");
         }
       }
 
@@ -1194,13 +1221,16 @@
           const res = await fetch(`/api/jobs/${encodeURIComponent(jobId)}/run`, { method: "POST" });
           const data = await res.json();
           if (data.success) {
-            showToast(`Job "${jobId}" queued for execution`, "success");
+            showToast(
+              t("jobs.toastRunQueued", { id: jobId }, `Job "${jobId}" queued for execution`),
+              "success",
+            );
             setTimeout(refreshJobs, 1000);
           } else {
-            showToast(data.error || "Failed to run job", "error");
+            showToast(data.error || t("jobs.toastRunFailed", {}, "Failed to run job"), "error");
           }
         } catch (e) {
-          showToast("Failed to run job", "error");
+          showToast(t("jobs.toastRunFailed", {}, "Failed to run job"), "error");
         }
       }
 
@@ -1212,13 +1242,13 @@
           });
           const data = await res.json();
           if (data.success) {
-            showToast(`Job "${jobId}" paused`, "success");
+            showToast(t("jobs.toastPaused", { id: jobId }, `Job "${jobId}" paused`), "success");
             refreshJobs();
           } else {
-            showToast(data.error || "Failed to pause job", "error");
+            showToast(data.error || t("jobs.toastPauseFailed", {}, "Failed to pause job"), "error");
           }
         } catch (e) {
-          showToast("Failed to pause job", "error");
+          showToast(t("jobs.toastPauseFailed", {}, "Failed to pause job"), "error");
         }
       }
 
@@ -1230,13 +1260,16 @@
           });
           const data = await res.json();
           if (data.success) {
-            showToast(`Job "${jobId}" resumed`, "success");
+            showToast(t("jobs.toastResumed", { id: jobId }, `Job "${jobId}" resumed`), "success");
             refreshJobs();
           } else {
-            showToast(data.error || "Failed to resume job", "error");
+            showToast(
+              data.error || t("jobs.toastResumeFailed", {}, "Failed to resume job"),
+              "error",
+            );
           }
         } catch (e) {
-          showToast("Failed to resume job", "error");
+          showToast(t("jobs.toastResumeFailed", {}, "Failed to resume job"), "error");
         }
       }
 
@@ -1249,7 +1282,7 @@
         const tbody = document.getElementById("history-tbody");
         const empty = document.getElementById("history-empty");
 
-        title.textContent = `Run History: ${jobName}`;
+        title.textContent = t("jobs.historyTitle", { name: jobName }, `Run History: ${jobName}`);
         modal.classList.add("visible");
         loading.style.display = "flex";
         table.style.display = "none";
@@ -1274,7 +1307,13 @@
                         <td>
                             <span class="run-status ${run.status}">
                                 ${run.status === "success" ? "✅" : run.status === "failed" ? "❌" : "⏳"}
-                                ${run.status}
+                                ${
+                                  run.status === "success"
+                                    ? t("jobs.statusSuccess", {}, run.status)
+                                    : run.status === "failed"
+                                      ? t("jobs.statusFailed", {}, run.status)
+                                      : t("jobs.statusRunning", {}, run.status)
+                                }
                             </span>
                         </td>
                         <td class="run-time">${run.startedAtRelative || run.startedAt || "—"}</td>
@@ -1322,6 +1361,12 @@
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape") closeHistoryModal();
         if (e.key === "r" && !e.metaKey && !e.ctrlKey) refreshJobs();
+      });
+
+      window.addEventListener("i18n:updated", function () {
+        if (jobs.length > 0) {
+          renderJobs();
+        }
       });
 
       // Initialize

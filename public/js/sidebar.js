@@ -50,6 +50,10 @@
 
       container.innerHTML = html;
 
+      if (window.I18N?.translateSubtree) {
+        window.I18N.translateSubtree(container);
+      }
+
       // Set active state based on current page
       setActiveNavItem();
 
@@ -272,7 +276,8 @@
     const el = document.getElementById("sidebar-updated");
     if (el && sidebarState.lastUpdated) {
       const timeStr = sidebarState.lastUpdated.toLocaleTimeString();
-      el.textContent = `Live: ${timeStr}`;
+      const t = window.I18N?.t;
+      el.textContent = t ? t("sidebar.live", { time: timeStr }) : `Live: ${timeStr}`;
     }
   }
 
@@ -334,6 +339,14 @@
 
     // Listen for hash changes to update active state
     window.addEventListener("hashchange", setActiveNavItem);
+    window.addEventListener("i18n:updated", () => {
+      const container = document.getElementById("sidebar-container");
+      if (container && window.I18N?.translateSubtree) {
+        window.I18N.translateSubtree(container);
+      }
+      updateTimestamp();
+      setActiveNavItem();
+    });
   }
 
   if (document.readyState === "loading") {
