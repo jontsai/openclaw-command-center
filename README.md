@@ -1,5 +1,7 @@
 # 🦞 OpenClaw Command Center
 
+English | [简体中文](README.zh-CN.md)
+
 <div align="center">
 
 **Mission control for your AI agents**
