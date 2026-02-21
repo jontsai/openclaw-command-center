@@ -1,0 +1,107 @@
+{
+  "app": {
+    "title": "OpenClaw Command Center",
+    "connecting": "Connecting..."
+  },
+  "sidebar": {
+    "title": "Command Center",
+    "navigation": "Navigation",
+    "settings": "Settings",
+    "quickStats": "Quick Stats",
+    "systemVitals": "System Vitals",
+    "llmUsage": "LLM Usage",
+    "sessions": "Sessions",
+    "cronJobs": "Cron Jobs",
+    "aiJobs": "AI Jobs",
+    "memory": "Memory",
+    "cerebro": "Cerebro",
+    "operators": "Operators",
+    "privacy": "Privacy",
+    "about": "About",
+    "tokens": "Tokens",
+    "estDaily": "Est. Daily",
+    "estMonthly": "Est. Monthly",
+    "avgTokSess": "Avg Tok/Sess",
+    "avgCostSess": "Avg $/Sess",
+    "autoRefresh": "Auto-refresh: 30s",
+    "live": "Live: {time}",
+    "updated": "Updated: {time}"
+  },
+  "stats": {
+    "totalTokens": "Total Tokens",
+    "input": "Input",
+    "output": "Output",
+    "active15m": "Active (15m)",
+    "estCost24h": "Est. Cost (24h) 📊",
+    "estMonthlySavings": "Est. Monthly Savings",
+    "main": "Main",
+    "subagents": "Sub-agents"
+  },
+  "quickActions": {
+    "title": "⚡ Quick Actions",
+    "healthCheck": "🔍 Health Check",
+    "gatewayStatus": "🚪 Gateway Status",
+    "cleanStale": "🧹 Clean Stale Sessions"
+  },
+  "time": {
+    "now": "now",
+    "justNow": "Just now"
+  },
+  "actions": {
+    "remove": "Remove"
+  },
+  "privacy": {
+    "noCronHidden": "No cron jobs hidden"
+  },
+  "connection": {
+    "realtime": "Real-time updates via SSE ⚡",
+    "polling": "Polling mode (SSE disconnected)"
+  },
+  "jobs": {
+    "pageTitle": "AI Jobs - OpenClaw Command Center",
+    "dashboard": "🤖 AI Jobs Dashboard",
+    "refresh": "🔄 Refresh",
+    "totalJobs": "Total Jobs",
+    "active": "Active",
+    "paused": "Paused",
+    "running": "Running",
+    "successRate": "Success Rate",
+    "recentFailures": "Recent Failures",
+    "all": "All",
+    "failed": "Failed",
+    "loadingJobs": "Loading jobs...",
+    "noJobs": "No jobs found",
+    "runHistory": "Run History",
+    "loadingHistory": "Loading history...",
+    "status": "Status",
+    "started": "Started",
+    "duration": "Duration",
+    "details": "Details",
+    "noHistory": "No run history yet",
+    "statusFailing": "Failing",
+    "next": "Next: {value}",
+    "lane": "🛤️ {value}",
+    "runs": "Runs",
+    "success": "Success",
+    "avgTime": "Avg Time",
+    "lastRun": "Last run: {value}",
+    "neverRun": "Never run",
+    "run": "▶️ Run",
+    "resume": "▶️ Resume",
+    "pause": "⏸️ Pause",
+    "history": "📜 History",
+    "every": "Every {value}",
+    "at": "At {value}",
+    "toastLoadFailed": "Failed to load jobs",
+    "toastRunQueued": "Job \"{id}\" queued for execution",
+    "toastRunFailed": "Failed to run job",
+    "toastPaused": "Job \"{id}\" paused",
+    "toastPauseFailed": "Failed to pause job",
+    "toastResumed": "Job \"{id}\" resumed",
+    "toastResumeFailed": "Failed to resume job",
+    "historyTitle": "Run History: {name}",
+    "statusSuccess": "Success",
+    "statusFailed": "Failed",
+    "statusRunning": "Running"
+  }
+}

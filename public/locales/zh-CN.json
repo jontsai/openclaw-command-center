@@ -1,0 +1,517 @@
+{
+  "app": {
+    "title": "OpenClaw 指挥中心",
+    "connecting": "连接中..."
+  },
+  "sidebar": {
+    "title": "指挥中心",
+    "navigation": "导航",
+    "settings": "设置",
+    "quickStats": "快速统计",
+    "systemVitals": "系统状态",
+    "llmUsage": "LLM 用量",
+    "sessions": "会话",
+    "cronJobs": "定时任务",
+    "aiJobs": "AI 任务",
+    "memory": "记忆",
+    "cerebro": "Cerebro",
+    "operators": "Operators（操作者）",
+    "privacy": "隐私",
+    "about": "关于",
+    "tokens": "Token",
+    "estDaily": "日预估",
+    "estMonthly": "月预估",
+    "avgTokSess": "平均 Token/会话",
+    "avgCostSess": "平均 $/会话",
+    "autoRefresh": "自动刷新：30秒",
+    "live": "实时：{time}",
+    "updated": "更新：{time}"
+  },
+  "stats": {
+    "totalTokens": "总 Token",
+    "input": "输入",
+    "output": "输出",
+    "active15m": "活跃（15分钟）",
+    "estCost24h": "预估成本（24小时）📊",
+    "estMonthlySavings": "预估月节省",
+    "main": "主会话",
+    "subagents": "子代理"
+  },
+  "quickActions": {
+    "title": "⚡ 快捷操作",
+    "healthCheck": "🔍 健康检查",
+    "gatewayStatus": "🚪 网关状态",
+    "cleanStale": "🧹 清理过期会话"
+  },
+  "time": {
+    "now": "刚刚",
+    "justNow": "刚刚"
+  },
+  "actions": {
+    "remove": "移除"
+  },
+  "privacy": {
+    "noCronHidden": "未隐藏任何定时任务"
+  },
+  "connection": {
+    "realtime": "通过 SSE 实时更新 ⚡",
+    "polling": "轮询模式（SSE 已断开）"
+  },
+  "phrases": {
+    "exact": {
+      "OpenClaw Command Center": "OpenClaw 指挥中心",
+      "Command Center": "指挥中心",
+      "Connecting...": "连接中...",
+      "Total Tokens": "总 Token",
+      "Input": "输入",
+      "Output": "输出",
+      "Active (15m)": "活跃（15分钟）",
+      "Est. Cost (24h) 📊": "预估成本（24小时）📊",
+      "Est. Monthly Savings": "预估月节省",
+      "Main": "主会话",
+      "Sub-agents": "子代理",
+      "System Vitals": "系统状态",
+      "LLM Fuel Gauges": "LLM 用量仪表",
+      "Sessions": "会话",
+      "Cron Jobs": "定时任务",
+      "Memory": "记忆",
+      "Operators": "Operators（操作者）",
+      "About": "关于",
+      "Quick Actions": "快捷操作",
+      "Health Check": "健康检查",
+      "Gateway Status": "网关状态",
+      "Clean Stale Sessions": "清理过期会话",
+      "Session Details": "会话详情",
+      "Overview": "概览",
+      "Summary": "摘要",
+      "References": "引用",
+      "Needs Attention": "需关注",
+      "Key Facts": "关键信息",
+      "Tools Used": "使用工具",
+      "Recent Messages": "最近消息",
+      "Send Message": "发送消息",
+      "Refresh": "刷新",
+      "Clear Session": "清空会话",
+      "Fix Claude Authentication": "修复 Claude 鉴权",
+      "Step 1: Refresh Claude Token": "步骤 1：刷新 Claude Token",
+      "Step 2: Update OpenClaw Agent": "步骤 2：更新 OpenClaw 代理",
+      "Step 3: Verify": "步骤 3：验证",
+      "Cost Breakdown (24h)": "成本明细（24小时）",
+      "Token Usage": "Token 用量",
+      "Pricing Rates (Claude Opus)": "价格费率（Claude Opus）",
+      "Calculation": "计算方式",
+      "Est. Savings": "预估节省",
+      "Top Sessions by Tokens (24h)": "按 Token 排名前会话（24小时）",
+      "User Stats": "用户统计",
+      "Loading user stats...": "正在加载用户统计...",
+      "Privacy Settings": "隐私设置",
+      "Hidden Topics": "隐藏话题",
+      "No topics hidden": "未隐藏任何话题",
+      "Hidden Sessions": "隐藏会话",
+      "No sessions hidden": "未隐藏任何会话",
+      "Hidden Cron Jobs": "隐藏定时任务",
+      "No cron jobs hidden": "未隐藏任何定时任务",
+      "Display Options": "显示选项",
+      "Hide system hostname": "隐藏系统主机名",
+      "Clear All Privacy Settings": "清除全部隐私设置",
+      "Status": "状态",
+      "Channel": "渠道",
+      "Kind": "类型",
+      "All": "全部",
+      "Live": "在线",
+      "Recent": "最近",
+      "Idle": "空闲",
+      "Slack": "Slack",
+      "Telegram": "Telegram",
+      "Discord": "Discord",
+      "Signal": "Signal",
+      "WhatsApp": "WhatsApp",
+      "Subagent": "子代理（Subagent）",
+      "Enabled": "启用",
+      "Disabled": "禁用",
+      "Schedule": "计划",
+      "Frequent (<1h)": "高频（<1小时）",
+      "Daily": "每日",
+      "Weekly": "每周",
+      "Type": "类型",
+      "Today": "今天",
+      "This Week": "本周",
+      "Older": "更早",
+      "Long-term curated memories": "长期整理后的记忆",
+      "Raw logs by date": "按日期保存的原始日志",
+      "Recent Memory Files": "最近记忆文件",
+      "Loading...": "加载中...",
+      "Cerebro Not Initialized": "Cerebro 未初始化",
+      "Topics by Status": "话题状态统计",
+      "Threads": "线程",
+      "Recent Active Topics": "最近活跃话题",
+      "No active topics yet": "暂无活跃话题",
+      "Open cerebro/": "打开 cerebro/ 目录",
+      "Loading operators...": "正在加载 Operators（操作者）...",
+      "Permission Levels": "权限级别",
+      "Owner": "所有者",
+      "Full control": "完全控制",
+      "Admin": "管理员",
+      "Manage users & settings": "管理用户和设置",
+      "User": "用户",
+      "Dashboard access": "看板访问权限",
+      "A Starcraft-inspired dashboard for OpenClaw orchestration": "受星际争霸启发的 OpenClaw 编排看板",
+      "BUILT BY": "开发者",
+      "INSPIRED BY": "灵感来源",
+      "No active sub-agents": "暂无活跃子代理",
+      "Session Usage": "会话用量",
+      "Weekly Usage": "周用量",
+      "5-Hour Usage": "5 小时用量",
+      "Daily Usage": "日用量",
+      "Tasks Today": "今日任务",
+      "Session Limit": "会话额度",
+      "1m avg": "1分钟均值",
+      "5m avg": "5分钟均值",
+      "15m avg": "15分钟均值",
+      "used of total": "已用 / 总量",
+      "IOPS": "IOPS",
+      "MB/s": "MB/秒",
+      "KB/t": "KB/次",
+      "tok/min": "Token/分钟",
+      "v0.2.0": "v0.2.0",
+      "MIT License": "MIT 许可证",
+      "used": "已用",
+      "available": "可用",
+      "user": "用户",
+      "sys": "系统",
+      "idle": "空闲",
+      "cores": "核心",
+      "App": "应用",
+      "Wired": "常驻内存（Wired）",
+      "Compressed": "压缩内存",
+      "Cached": "缓存",
+      "Normal": "正常",
+      "Checking...": "检测中...",
+      "API Usage": "API 用量",
+      "ChatGPT Plus": "ChatGPT Plus",
+      "Status:": "状态：",
+      "Channel:": "渠道：",
+      "Kind:": "类型：",
+      "Schedule:": "计划：",
+      "Type:": "类型：",
+      "Age:": "时间：",
+      "size": "大小",
+      "lines": "行数",
+      "files": "文件",
+      "total": "总计",
+      "active": "活跃",
+      "resolved": "已解决",
+      "parked": "暂挂",
+      "tracked": "已跟踪",
+      "orphans": "孤立话题",
+      "No active sessions": "暂无活跃会话",
+      "No scheduled jobs": "暂无定时任务",
+      "No operators configured": "未配置 Operators（操作者）",
+      "Last Seen": "最后在线",
+      "Auth Error - Click to Fix": "鉴权错误 - 点击修复",
+      "N/A": "不可用",
+      "No memory files yet": "暂无记忆文件",
+      "Failed to load cost data": "加载成本数据失败",
+      "Operator not found": "未找到 Operator（操作者）",
+      "Failed to load user data": "加载用户数据失败",
+      "Active Sessions": "活跃会话",
+      "Total Sessions": "会话总数",
+      "First Seen": "首次出现",
+      "No sessions found": "未找到会话",
+      "Input Tokens": "输入 Token",
+      "Output Tokens": "输出 Token",
+      "Cache Read": "缓存读取",
+      "Cache Write": "缓存写入",
+      "API Requests": "API 请求数",
+      "Input Cost": "输入成本",
+      "Output Cost": "输出成本",
+      "Cache Read Cost": "缓存读取成本",
+      "Cache Write Cost": "缓存写入成本",
+      "Est. API Cost": "预估 API 成本",
+      "Projected Monthly Cost by Window:": "按时间窗口预测月成本：",
+      "No session data available": "暂无会话数据",
+      "Est. Cost": "预估成本",
+      "Cache (R/W)": "缓存（读/写）",
+      "Channel": "渠道",
+      "Model": "模型",
+      "Input / Output": "输入 / 输出",
+      "Last Active": "最后活跃",
+      "No summary": "暂无摘要",
+      "No references detected": "未检测到引用",
+      "Nothing needs attention": "暂无需关注项",
+      "No key facts": "暂无关键信息",
+      "No tools used": "未使用工具",
+      "No messages": "暂无消息",
+      "Navigation": "导航",
+      "Settings": "设置",
+      "Quick Stats": "快速统计",
+      "LLM Fuel Gauges": "LLM 用量仪表",
+      "System Vitals": "系统状态",
+      "LLM Usage": "LLM 用量",
+      "Privacy": "隐私",
+      "Total tokens (24h)": "总 Token（24小时）",
+      "Click for breakdown": "点击查看明细",
+      "Projected monthly cost": "预测月成本",
+      "Average tokens per session": "每会话平均 Token",
+      "Average cost per session": "每会话平均成本",
+      "SSE connection status": "SSE 连接状态",
+      "Sessions active within last 15 minutes": "最近 15 分钟内活跃会话",
+      "Click for cost breakdown": "点击查看成本明细",
+      "Main session capacity": "主会话容量",
+      "Sub-agent capacity": "子代理容量",
+      "Memory actively used by apps": "应用正在使用的内存",
+      "Memory that can't be swapped (kernel, drivers)": "不可交换内存（内核、驱动）",
+      "Memory compressed to save space": "为节省空间而压缩的内存",
+      "Recently-used data, can be reclaimed": "近期使用数据，可回收",
+      "Average routing latency (classification + execution)": "平均路由延迟（分类 + 执行）",
+      "AI Jobs Dashboard": "AI 任务面板",
+      "Privacy Settings": "隐私设置",
+      "No topics hidden": "未隐藏任何话题",
+      "No sessions hidden": "未隐藏任何会话",
+      "Hide topics and sessions from display for privacy during demos/screenshots. Settings are stored in your browser only.": "为保护演示/截图隐私，可隐藏话题和会话。设置仅保存在你的浏览器中。",
+      "Tip: You can also click the 👁️ icon on any session card to hide it quickly.": "提示：你也可以点击任意会话卡片上的 👁️ 图标快速隐藏。",
+      "Open Terminal and run:": "打开终端并运行：",
+      "Follow the prompts to authenticate with your Claude account.": "按提示完成 Claude 账号认证。",
+      "Run the onboard wizard to update your agent credentials:": "运行引导向导更新代理凭据：",
+      "Or manually update the main agent:": "或手动更新主代理：",
+      "Select \"Claude Code CLI\" when prompted for the auth source.": "当提示选择认证来源时，选择 \"Claude Code CLI\"。",
+      "Refresh this dashboard or run:": "刷新此看板，或运行：",
+      "You should see your usage percentages instead of an auth error.": "你应该看到用量百分比，而不是鉴权错误。",
+      "Memory editing UI coming soon (Inside Out style!)": "记忆编辑 UI 即将上线（Inside Out 风格！）",
+      "Cerebro tracks conversation topics and threads across sessions.": "Cerebro 用于跨会话追踪对话话题与线程。",
+      "To initialize Cerebro:": "初始化 Cerebro：",
+      "Threads linked to topics": "关联到话题的线程",
+      "No active sub-agents": "暂无活跃子代理",
+      "No active topics yet": "暂无活跃话题",
+      "No memory files yet": "暂无记忆文件",
+      "No references detected": "未检测到引用",
+      "Nothing needs attention": "暂无需关注项",
+      "No key facts": "暂无关键信息",
+      "No tools used": "未使用工具",
+      "No messages": "暂无消息",
+      "No summary": "暂无摘要",
+      "No session data available": "暂无会话数据",
+      "No sessions found": "未找到会话",
+      "Loading user stats...": "正在加载用户统计...",
+      "Loading operators...": "正在加载 Operators（操作者）...",
+      "Loading...": "加载中...",
+      "Add": "添加",
+      "Remove": "移除",
+      "Prev": "上一页",
+      "Next": "下一页",
+      "Last updated:": "最后更新：",
+      "Built by": "开发者",
+      "remaining": "剩余",
+      "resets in": "后重置",
+      "resets": "重置",
+      "Avg latency": "平均延迟"
+    },
+    "patterns": [
+      {
+        "pattern": "^Live:\\s*(.+)$",
+        "replace": "实时：$1"
+      },
+      {
+        "pattern": "^Updated:\\s*(.+)$",
+        "replace": "更新：$1"
+      },
+      {
+        "pattern": "^Uptime:\\s*(.+)$",
+        "replace": "运行时长：$1"
+      },
+      {
+        "pattern": "^Routing:\\s*(.+)$",
+        "replace": "路由：$1"
+      },
+      {
+        "pattern": "^Last updated:\\s*(.*)$",
+        "replace": "最后更新：$1"
+      },
+      {
+        "pattern": "^Last run:\\s*(.+)$",
+        "replace": "上次运行：$1"
+      },
+      {
+        "pattern": "^Run History:\\s*(.+)$",
+        "replace": "运行历史：$1"
+      },
+      {
+        "pattern": "^Operator not found:\\s*(.+)$",
+        "replace": "未找到 Operator（操作者）：$1"
+      },
+      {
+        "pattern": "^Error:\\s*(.+)$",
+        "replace": "错误：$1"
+      },
+      {
+        "pattern": "^via\\s+(.+)$",
+        "replace": "来源：$1"
+      },
+      {
+        "pattern": "^Avg latency:\\s*(.+)$",
+        "replace": "平均延迟：$1"
+      },
+      {
+        "pattern": "^(\\d+) total topics$",
+        "replace": "$1 个话题"
+      },
+      {
+        "pattern": "^(\\d+) tracked$",
+        "replace": "$1 个已跟踪"
+      },
+      {
+        "pattern": "^(\\d+) orphans$",
+        "replace": "$1 个孤立"
+      },
+      {
+        "pattern": "^ID:\\s*(.+) • (\\d+) tokens • (.+)$",
+        "replace": "ID：$1 • $2 Token • $3"
+      },
+      {
+        "pattern": "^Auto-refresh:\\s*30s$",
+        "replace": "自动刷新：30秒"
+      },
+      {
+        "pattern": "^Polling Mode$",
+        "replace": "轮询模式"
+      },
+      {
+        "pattern": "^Real-time updates via SSE$",
+        "replace": "通过 SSE 实时更新"
+      },
+      {
+        "pattern": "^Just now$",
+        "replace": "刚刚"
+      },
+      {
+        "pattern": "^now$",
+        "replace": "刚刚"
+      }
+    ],
+    "reversePatterns": [
+      {
+        "pattern": "^实时：\\s*(.+)$",
+        "replace": "Live: $1"
+      },
+      {
+        "pattern": "^更新：\\s*(.+)$",
+        "replace": "Updated: $1"
+      },
+      {
+        "pattern": "^运行时长：\\s*(.+)$",
+        "replace": "Uptime: $1"
+      },
+      {
+        "pattern": "^路由：\\s*(.+)$",
+        "replace": "Routing: $1"
+      },
+      {
+        "pattern": "^最后更新：\\s*(.*)$",
+        "replace": "Last updated: $1"
+      },
+      {
+        "pattern": "^上次运行：\\s*(.+)$",
+        "replace": "Last run: $1"
+      },
+      {
+        "pattern": "^运行历史：\\s*(.+)$",
+        "replace": "Run History: $1"
+      },
+      {
+        "pattern": "^未找到 Operator（操作者）：\\s*(.+)$",
+        "replace": "Operator not found: $1"
+      },
+      {
+        "pattern": "^错误：\\s*(.+)$",
+        "replace": "Error: $1"
+      },
+      {
+        "pattern": "^来源：\\s*(.+)$",
+        "replace": "via $1"
+      },
+      {
+        "pattern": "^平均延迟：\\s*(.+)$",
+        "replace": "Avg latency: $1"
+      },
+      {
+        "pattern": "^(\\d+) 个话题$",
+        "replace": "$1 total topics"
+      },
+      {
+        "pattern": "^(\\d+) 个已跟踪$",
+        "replace": "$1 tracked"
+      },
+      {
+        "pattern": "^(\\d+) 个孤立$",
+        "replace": "$1 orphans"
+      },
+      {
+        "pattern": "^ID：\\s*(.+) • (\\d+) Token • (.+)$",
+        "replace": "ID: $1 • $2 tokens • $3"
+      },
+      {
+        "pattern": "^自动刷新：30秒$",
+        "replace": "Auto-refresh: 30s"
+      },
+      {
+        "pattern": "^轮询模式$",
+        "replace": "Polling Mode"
+      },
+      {
+        "pattern": "^通过 SSE 实时更新$",
+        "replace": "Real-time updates via SSE"
+      },
+      {
+        "pattern": "^刚刚$",
+        "replace": "Just now"
+      }
+    ]
+  },
+  "jobs": {
+    "pageTitle": "AI 任务 - OpenClaw 指挥中心",
+    "dashboard": "🤖 AI 任务面板",
+    "refresh": "🔄 刷新",
+    "totalJobs": "任务总数",
+    "active": "启用",
+    "paused": "暂停",
+    "running": "运行中",
+    "successRate": "成功率",
+    "recentFailures": "最近失败",
+    "all": "全部",
+    "failed": "失败",
+    "loadingJobs": "正在加载任务...",
+    "noJobs": "未找到任务",
+    "runHistory": "运行历史",
+    "loadingHistory": "正在加载历史...",
+    "status": "状态",
+    "started": "开始时间",
+    "duration": "耗时",
+    "details": "详情",
+    "noHistory": "暂无运行历史",
+    "statusFailing": "持续失败",
+    "next": "下次：{value}",
+    "lane": "🛤️ {value}",
+    "runs": "运行次数",
+    "success": "成功",
+    "avgTime": "平均耗时",
+    "lastRun": "上次运行：{value}",
+    "neverRun": "从未运行",
+    "run": "▶️ 运行",
+    "resume": "▶️ 恢复",
+    "pause": "⏸️ 暂停",
+    "history": "📜 历史",
+    "every": "每 {value}",
+    "at": "在 {value}",
+    "toastLoadFailed": "加载任务失败",
+    "toastRunQueued": "任务 \"{id}\" 已加入执行队列",
+    "toastRunFailed": "执行任务失败",
+    "toastPaused": "任务 \"{id}\" 已暂停",
+    "toastPauseFailed": "暂停任务失败",
+    "toastResumed": "任务 \"{id}\" 已恢复",
+    "toastResumeFailed": "恢复任务失败",
+    "historyTitle": "运行历史：{name}",
+    "statusSuccess": "成功",
+    "statusFailed": "失败",
+    "statusRunning": "运行中"
+  }
+}
