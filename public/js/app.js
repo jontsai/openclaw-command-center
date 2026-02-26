@@ -23,6 +23,7 @@ const state = {
   memory: null,
   cerebro: null,
   subagents: [],
+  feed: [],
   lastUpdated: null,
   connected: false,
 };
@@ -61,6 +62,14 @@ function connectSSE() {
   eventSource.addEventListener("update", (e) => {
     const data = JSON.parse(e.data);
     handleStateUpdate(data);
+  });
+
+  eventSource.addEventListener("feed", (e) => {
+    const entry = JSON.parse(e.data);
+    state.feed.push(entry);
+    // Keep last 200
+    if (state.feed.length > 200) state.feed = state.feed.slice(-200);
+    renderFeed();
   });
 
   eventSource.addEventListener("heartbeat", (e) => {
@@ -117,6 +126,7 @@ function renderAll() {
   renderTokenStats();
   renderLlmUsage();
   renderSessions();
+  renderFeed();
   renderCron();
   renderMemory();
   renderCerebro();
@@ -212,6 +222,50 @@ function renderSessions() {
   // Placeholder - will be extracted to component
 }
 
+function renderFeed() {
+  const container = document.getElementById("feed-entries");
+  if (!container) return;
+
+  const entries = state.feed;
+  setText("feed-count", String(entries.length));
+
+  if (entries.length === 0) {
+    container.innerHTML =
+      '<div class="empty-state" style="padding:24px;text-align:center;color:var(--text-muted)">No activity yet</div>';
+    return;
+  }
+
+  // Show newest first
+  const html = entries
+    .slice()
+    .reverse()
+    .map((e) => {
+      const sevClass =
+        e.severity === "critical"
+          ? "feed-critical"
+          : e.severity === "warning"
+            ? "feed-warning"
+            : "feed-info";
+      const badge =
+        e.severity === "critical"
+          ? '<span class="feed-badge feed-critical">CRITICAL</span>'
+          : e.severity === "warning"
+            ? '<span class="feed-badge feed-warning">WARNING</span>'
+            : '<span class="feed-badge feed-info">INFO</span>';
+      const time = new Date(e.ts).toLocaleTimeString();
+      const type = e.type ? `<span class="feed-type">${e.type}</span>` : "";
+      return `<div class="feed-entry ${sevClass}">${badge} ${type}<span class="feed-time">${time}</span><span class="feed-msg">${escapeHtml(e.message)}</span></div>`;
+    })
+    .join("");
+
+  container.innerHTML = html;
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 function renderCron() {
   // Placeholder - will be extracted to component
 }
@@ -293,12 +347,26 @@ async function fetchState() {
 // INITIALIZATION
 // ============================================================================
 
+async function fetchFeed() {
+  try {
+    const response = await fetch("/api/feed");
+    const data = await response.json();
+    if (data.entries) {
+      state.feed = data.entries;
+      renderFeed();
+    }
+  } catch (e) {
+    console.warn("[Feed] Failed to fetch:", e.message);
+  }
+}
+
 function init() {
   console.log("[App] Initializing OpenClaw Command Center");
   connectSSE();
 
   // Initial fetch to populate immediately
   setTimeout(fetchState, 100);
+  setTimeout(fetchFeed, 200);
 }
 
 // Start when DOM is ready
