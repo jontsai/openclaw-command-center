@@ -24,6 +24,10 @@ Closes #
 
 <!-- Mark completed items with an 'x' -->
 
+- [ ] Tests pass (`npm test`)
+- [ ] Lint clean (`npm run lint` — 0 errors)
+- [ ] PROGRESS.md updated (if applicable)
+- [ ] Upstream sync verified (`git fetch upstream && git merge upstream/main`)
 - [ ] My code follows the project's style guidelines
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code, particularly in hard-to-understand areas
