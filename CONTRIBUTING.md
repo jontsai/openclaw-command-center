@@ -9,6 +9,7 @@ First off, thank you for considering contributing to OpenClaw Command Center! Th
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Development Setup](#development-setup)
+- [Keeping Your Fork in Sync](#keeping-your-fork-in-sync)
 - [Making Contributions](#making-contributions)
 - [Pull Request Process](#pull-request-process)
 - [Style Guidelines](#style-guidelines)
@@ -70,6 +71,33 @@ This project adheres to our [Code of Conduct](./CODE_OF_CONDUCT.md). By particip
    ```bash
    npm run dev
    ```
+
+## 🔄 Keeping Your Fork in Sync
+
+Always sync your fork with upstream before starting new work. This prevents merge conflicts and keeps your `main` branch up to date.
+
+### The "Sync Before Branch" Ritual
+
+```bash
+# 1. Fetch latest upstream changes
+git fetch upstream
+
+# 2. Switch to main and merge upstream
+git checkout main
+git merge upstream/main
+
+# 3. Push updated main to your fork
+git push origin main
+
+# 4. Create your feature branch from synced main
+git checkout -b feat/your-feature-name
+```
+
+### Automated Sync
+
+The repository includes a GitHub Actions workflow (`.github/workflows/upstream-sync.yml`) that runs every Monday at 09:00 UTC. It checks for new upstream commits and opens an auto-PR if any are found. This ensures forks stay current even without manual syncing.
+
+For a detailed guide on fork management, conflict resolution, and the sync workflow, see [docs/guides/upstream-sync.md](./docs/guides/upstream-sync.md).
 
 ## 🛠️ Making Contributions
 
