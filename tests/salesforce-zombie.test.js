@@ -13,11 +13,12 @@ describe("salesforce-zombie module", () => {
     process.env.OPENCLAW_WORKSPACE = path.join(tmpDir, "workspace");
     fs.mkdirSync(process.env.OPENCLAW_WORKSPACE, { recursive: true });
 
-    // Clear require cache so config, feed, and salesforce-zombie reload
+    // Clear require cache so config, feed, db, and salesforce-zombie reload
     for (const key of Object.keys(require.cache)) {
       if (
         key.includes("config.js") ||
         key.includes("feed.js") ||
+        key.includes("db.js") ||
         key.includes("salesforce-zombie.js")
       ) {
         delete require.cache[key];
@@ -37,6 +38,7 @@ describe("salesforce-zombie module", () => {
       if (
         key.includes("config.js") ||
         key.includes("feed.js") ||
+        key.includes("db.js") ||
         key.includes("salesforce-zombie.js")
       ) {
         delete require.cache[key];
@@ -159,9 +161,10 @@ describe("salesforce-zombie module", () => {
     assert.ok(records[0].message.includes("Acme Corp"));
     assert.strictEqual(records[0].meta.leadId, "lead-1");
 
-    // Verify written to JSONL
+    // Verify written to JSONL (parse last line — file may have multiple entries)
     const raw = fs.readFileSync(feedPath, "utf8").trim();
-    const parsed = JSON.parse(raw);
+    const lines = raw.split("\n").filter(Boolean);
+    const parsed = JSON.parse(lines[lines.length - 1]);
     assert.strictEqual(parsed.type, "zombie_risk");
 
     fs.unlinkSync(feedPath);
