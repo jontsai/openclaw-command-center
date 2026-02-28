@@ -25,6 +25,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
+      - name: Install system dependencies
+        run: sudo apt-get install -y sysstat
+
       - name: Install dependencies
         run: npm ci
 
