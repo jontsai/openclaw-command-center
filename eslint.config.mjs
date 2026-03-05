@@ -29,9 +29,13 @@ export default [
       "no-console": "off",
     },
   },
-  // Relax rules for existing lib code (large files with many patterns)
+  // Ignore build output
   {
-    files: ["lib/**/*.js"],
+    ignores: ["lib/server.js"],
+  },
+  // Relax rules for source code (many patterns)
+  {
+    files: ["src/**/*.js"],
     rules: {
       "no-empty": "warn",
       "no-case-declarations": "warn",

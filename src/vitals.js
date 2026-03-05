@@ -73,7 +73,6 @@ async function refreshVitalsAsync() {
     // Parse CPU usage from top (platform-specific)
     if (topOutput) {
       if (isLinux) {
-        // Linux: %Cpu(s):  5.9 us,  2.0 sy,  0.0 ni, 91.5 id,  0.5 wa, ...
         const userMatch = topOutput.match(/([\d.]+)\s*us/);
         const sysMatch = topOutput.match(/([\d.]+)\s*sy/);
         const idleMatch = topOutput.match(/([\d.]+)\s*id/);
@@ -84,7 +83,6 @@ async function refreshVitalsAsync() {
           vitals.cpu.usage = Math.round(vitals.cpu.userPercent + vitals.cpu.sysPercent);
         }
       } else {
-        // macOS: CPU usage: 5.9% user, 2.0% sys, 91.5% idle
         const userMatch = topOutput.match(/([\d.]+)%\s*user/);
         const sysMatch = topOutput.match(/([\d.]+)%\s*sys/);
         const idleMatch = topOutput.match(/([\d.]+)%\s*idle/);
@@ -108,7 +106,6 @@ async function refreshVitalsAsync() {
 
     // Memory (platform-specific)
     if (isLinux) {
-      // Linux: parse /proc/meminfo
       const memTotalKB = parseInt(memTotalRaw, 10) || 0;
       const memAvailableMatch = memInfoRaw.match(/MemAvailable:\s+(\d+)/);
       const memFreeMatch = memInfoRaw.match(/MemFree:\s+(\d+)/);
@@ -116,13 +113,11 @@ async function refreshVitalsAsync() {
       vitals.memory.total = memTotalKB * 1024;
       const memAvailable = parseInt(memAvailableMatch?.[1] || memFreeMatch?.[1] || 0, 10) * 1024;
 
-      // On Linux, "used" = total - available (more accurate than total - free)
       vitals.memory.used = vitals.memory.total - memAvailable;
       vitals.memory.free = memAvailable;
       vitals.memory.percent =
         vitals.memory.total > 0 ? Math.round((vitals.memory.used / vitals.memory.total) * 100) : 0;
     } else {
-      // macOS: parse vm_stat
       const pageSizeMatch = memInfoRaw.match(/page size of (\d+) bytes/);
       const pageSize = pageSizeMatch ? parseInt(pageSizeMatch[1], 10) : 4096;
       const activePages = parseInt((memInfoRaw.match(/Pages active:\s+(\d+)/) || [])[1] || 0, 10);
@@ -143,7 +138,7 @@ async function refreshVitalsAsync() {
     vitals.memory.pressure =
       vitals.memory.percent > 90 ? "critical" : vitals.memory.percent > 75 ? "warning" : "normal";
 
-    // Secondary async calls (chip info, iostat) - macOS only for chip info
+    // Secondary async calls (chip info, iostat)
     const iostatCmd = isLinux
       ? "timeout 5 iostat -d -o JSON 1 2 2>/dev/null || echo ''"
       : "iostat -d -c 2 2>/dev/null | tail -1 || echo ''";
@@ -163,7 +158,6 @@ async function refreshVitalsAsync() {
       runCmd(iostatCmd, { fallback: "", timeout: 5000 }),
     ]);
 
-    // Get CPU brand on Linux
     if (isLinux) {
       const cpuBrand = await runCmd(
         "cat /proc/cpuinfo | grep 'model name' | head -1 | cut -d: -f2",
@@ -180,7 +174,6 @@ async function refreshVitalsAsync() {
         const iostatJson = JSON.parse(iostatRaw);
         const samples = iostatJson.sysstat.hosts[0].statistics;
         const disks = samples[samples.length - 1].disk;
-        // Pick the disk with the highest tps (most active), skipping loop devices
         const disk = disks
           .filter((d) => !d.disk_device.startsWith("loop"))
           .sort((a, b) => b.tps - a.tps)[0];
@@ -192,7 +185,7 @@ async function refreshVitalsAsync() {
           vitals.disk.kbPerTransfer = disk.tps > 0 ? (kbReadPerSec + kbWrtnPerSec) / disk.tps : 0;
         }
       } catch {
-        // JSON parse failed — leave disk values at defaults (zeros)
+        // JSON parse failed
       }
     } else {
       const iostatParts = iostatRaw.split(/\s+/);
@@ -221,7 +214,6 @@ async function refreshVitalsAsync() {
         }
       } catch (e) {}
     } else if (isMacOS) {
-      // Intel Mac: try osx-cpu-temp (tiny open-source SMC reader)
       const home = require("os").homedir();
       try {
         const temp = await runCmd(
@@ -235,7 +227,6 @@ async function refreshVitalsAsync() {
           }
         }
       } catch (e) {}
-      // Fallback: battery temperature via ioreg
       if (!vitals.temperature) {
         try {
           const ioregRaw = await runCmd(
@@ -280,17 +271,13 @@ async function refreshVitalsAsync() {
 setTimeout(() => refreshVitalsAsync(), 500);
 setInterval(() => refreshVitalsAsync(), VITALS_CACHE_TTL);
 
-// Get detailed system vitals (iStatMenus-style) - returns cached, triggers async refresh
 function getSystemVitals() {
   const now = Date.now();
-  // Trigger async refresh if stale or no cache
   if (!cachedVitals || now - lastVitalsUpdate > VITALS_CACHE_TTL) {
-    refreshVitalsAsync(); // Non-blocking
+    refreshVitalsAsync();
   }
-  // Return cached data if available
   if (cachedVitals) return cachedVitals;
 
-  // Return placeholder on first call (async refresh will populate cache within ~1s)
   return {
     hostname: "loading...",
     uptime: "",

@@ -26,45 +26,45 @@ describe("config module", () => {
 
   describe("expandPath()", () => {
     it("expands ~ to home directory", () => {
-      const { expandPath } = require("../lib/config");
+      const { expandPath } = require("../src/config");
       const result = expandPath("~/some/path");
       assert.strictEqual(result, path.join(os.homedir(), "some", "path"));
     });
 
     it("expands $HOME to home directory", () => {
-      const { expandPath } = require("../lib/config");
+      const { expandPath } = require("../src/config");
       const result = expandPath("$HOME/docs");
       assert.strictEqual(result, path.join(os.homedir(), "docs"));
     });
 
     it("expands ${HOME} to home directory", () => {
-      const { expandPath } = require("../lib/config");
+      const { expandPath } = require("../src/config");
       const result = expandPath("${HOME}/docs");
       assert.strictEqual(result, path.join(os.homedir(), "docs"));
     });
 
     it("returns null/undefined as-is", () => {
-      const { expandPath } = require("../lib/config");
+      const { expandPath } = require("../src/config");
       assert.strictEqual(expandPath(null), null);
       assert.strictEqual(expandPath(undefined), undefined);
     });
 
     it("returns path unchanged when no expansion needed", () => {
-      const { expandPath } = require("../lib/config");
+      const { expandPath } = require("../src/config");
       assert.strictEqual(expandPath("/absolute/path"), "/absolute/path");
     });
   });
 
   describe("detectWorkspace()", () => {
     it("returns a string path", () => {
-      const { detectWorkspace } = require("../lib/config");
+      const { detectWorkspace } = require("../src/config");
       const result = detectWorkspace();
       assert.strictEqual(typeof result, "string");
       assert.ok(result.length > 0, "workspace path should not be empty");
     });
 
     it("returns an absolute path", () => {
-      const { detectWorkspace } = require("../lib/config");
+      const { detectWorkspace } = require("../src/config");
       const result = detectWorkspace();
       assert.ok(path.isAbsolute(result), `Expected absolute path, got: ${result}`);
     });
@@ -72,7 +72,7 @@ describe("config module", () => {
 
   describe("loadConfig()", () => {
     it("returns an object with all required top-level keys", () => {
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.ok(config.server, "config should have server");
       assert.ok(config.paths, "config should have paths");
@@ -82,32 +82,32 @@ describe("config module", () => {
     });
 
     it("has default port of 3333", () => {
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.strictEqual(config.server.port, 3333);
     });
 
     it("has default auth mode of 'none'", () => {
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.strictEqual(config.auth.mode, "none");
     });
 
     it("has default host of localhost", () => {
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.strictEqual(config.server.host, "localhost");
     });
 
     it("has workspace path set", () => {
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.ok(config.paths.workspace, "workspace path should be set");
       assert.strictEqual(typeof config.paths.workspace, "string");
     });
 
     it("has memory path set", () => {
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.ok(config.paths.memory, "memory path should be set");
     });
@@ -122,7 +122,7 @@ describe("config module", () => {
           delete require.cache[key];
         }
       }
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.strictEqual(config.server.port, 9999);
     });
@@ -134,7 +134,7 @@ describe("config module", () => {
           delete require.cache[key];
         }
       }
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.strictEqual(config.server.host, "0.0.0.0");
     });
@@ -146,7 +146,7 @@ describe("config module", () => {
           delete require.cache[key];
         }
       }
-      const { loadConfig } = require("../lib/config");
+      const { loadConfig } = require("../src/config");
       const config = loadConfig();
       assert.strictEqual(config.auth.mode, "token");
     });

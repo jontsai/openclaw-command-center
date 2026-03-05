@@ -8,7 +8,7 @@ const {
   matchTopics,
   CONFIG,
   TOPIC_PATTERNS,
-} = require("../lib/topic-classifier");
+} = require("../scripts/topic-classifier");
 
 describe("topic-classifier module", () => {
   describe("exports", () => {

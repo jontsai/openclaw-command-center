@@ -4,7 +4,7 @@ const assert = require("node:assert");
 // We import the module to test its exports and pure functions.
 // The jobs module relies on dynamic ESM import of external jobs API,
 // so we focus on testing what's available without that dependency.
-const { handleJobsRequest, isJobsRoute, _resetForTesting } = require("../lib/jobs");
+const { handleJobsRequest, isJobsRoute, _resetForTesting } = require("../src/jobs");
 
 describe("jobs module", () => {
   describe("exports", () => {

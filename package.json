@@ -7,12 +7,12 @@
   "scripts": {
     "start": "node lib/server.js",
     "dev": "node --watch lib/server.js",
-    "dev:src": "esbuild lib/src/index.js --bundle --platform=node --outfile=lib/server.js --watch",
-    "build": "esbuild lib/src/index.js --bundle --platform=node --outfile=lib/server.js --banner:js='#!/usr/bin/env node' && prettier --write lib/server.js",
+    "dev:src": "esbuild src/index.js --bundle --platform=node --outfile=lib/server.js --watch",
+    "build": "esbuild src/index.js --bundle --platform=node --outfile=lib/server.js --banner:js='#!/usr/bin/env node' && prettier --write lib/server.js",
     "test": "node --test",
     "test:coverage": "node --test --experimental-test-coverage",
-    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint lib/ tests/",
-    "lint:fix": "ESLINT_USE_FLAT_CONFIG=true eslint lib/ tests/ --fix",
+    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint src/ tests/",
+    "lint:fix": "ESLINT_USE_FLAT_CONFIG=true eslint src/ tests/ --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "echo 'Ready to spawn Overlords 🦞'"

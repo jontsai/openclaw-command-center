@@ -11,7 +11,7 @@
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
-const { getOpenClawDir } = require("./config");
+const { getOpenClawDir } = require("../src/config");
 
 // Linear API configuration
 const LINEAR_API_URL = "https://api.linear.app/graphql";

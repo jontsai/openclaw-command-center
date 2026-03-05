@@ -12,7 +12,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { CONFIG: APP_CONFIG } = require("./config");
+const { CONFIG: APP_CONFIG } = require("../src/config");
 
 // Default config
 const CONFIG = {

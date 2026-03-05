@@ -1,16 +1,15 @@
 /**
- * OpenClaw CLI helpers for Command Center
- * Provides sync and async wrappers for running openclaw commands
+ * OpenClaw CLI helpers - wrappers for running openclaw commands
  */
 
 const { execSync, exec } = require("child_process");
 const { promisify } = require("util");
-
 const execAsync = promisify(exec);
 
 /**
- * Run openclaw command synchronously (blocking)
- * Use sparingly - prefer runOpenClawAsync for non-blocking operations
+ * Run openclaw CLI command synchronously
+ * @param {string} args - Command arguments
+ * @returns {string|null} - Command output or null on error
  */
 function runOpenClaw(args) {
   const profile = process.env.OPENCLAW_PROFILE || "";
@@ -24,14 +23,14 @@ function runOpenClaw(args) {
     });
     return result;
   } catch (e) {
-    // Don't log every failure - these are expected when CLI is slow
     return null;
   }
 }
 
 /**
- * Run openclaw command asynchronously (non-blocking)
- * Preferred method for most operations
+ * Run openclaw CLI command asynchronously
+ * @param {string} args - Command arguments
+ * @returns {Promise<string|null>} - Command output or null on error
  */
 async function runOpenClawAsync(args) {
   const profile = process.env.OPENCLAW_PROFILE || "";
@@ -50,11 +49,12 @@ async function runOpenClawAsync(args) {
 }
 
 /**
- * Extract JSON from CLI output that may contain doctor warnings or other prefix text
+ * Extract JSON from openclaw output (may have non-JSON prefix)
+ * @param {string} output - Raw CLI output
+ * @returns {string|null} - JSON string or null
  */
 function extractJSON(output) {
   if (!output) return null;
-  // Find the first { or [ which starts the JSON
   const jsonStart = output.search(/[[{]/);
   if (jsonStart === -1) return null;
   return output.slice(jsonStart);
