@@ -165,8 +165,31 @@ startTokenUsageRefresh(getOpenClawDir);
 // STATIC FILE SERVER
 // ============================================================================
 function serveStatic(req, res) {
-  let filePath = req.url === "/" ? "/index.html" : req.url;
-  filePath = path.join(DASHBOARD_DIR, filePath);
+  // Parse URL to safely extract pathname (ignoring query/hash)
+  const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+  const pathname = requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname;
+
+  // Reject any path containing ".." segments (path traversal)
+  if (pathname.includes("..")) {
+    res.writeHead(400);
+    res.end("Bad request");
+    return;
+  }
+
+  // Normalize and resolve to ensure path stays within DASHBOARD_DIR
+  const normalizedPath = path.normalize(pathname).replace(/^[/\\]+/, "");
+  const filePath = path.join(DASHBOARD_DIR, normalizedPath);
+
+  const resolvedDashboardDir = path.resolve(DASHBOARD_DIR);
+  const resolvedFilePath = path.resolve(filePath);
+  if (
+    !resolvedFilePath.startsWith(resolvedDashboardDir + path.sep) &&
+    resolvedFilePath !== resolvedDashboardDir
+  ) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
 
   const ext = path.extname(filePath);
   const contentTypes = {
@@ -194,8 +217,8 @@ function serveStatic(req, res) {
 // ============================================================================
 function handleApi(req, res) {
   const sessionsList = sessions.getSessions();
-  const tokenStats = getTokenStats(sessionsList);
   const capacity = state.getCapacity();
+  const tokenStats = getTokenStats(sessionsList, capacity, CONFIG);
 
   const data = {
     sessions: sessionsList,
@@ -323,7 +346,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data, null, 2));
   } else if (pathname === "/api/cost-breakdown") {
-    const data = getCostBreakdown(CONFIG, (opts) => sessions.getSessions(opts));
+    const data = getCostBreakdown(CONFIG, (opts) => sessions.getSessions(opts), getOpenClawDir);
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(data, null, 2));
   } else if (pathname === "/api/subagents") {
@@ -436,7 +459,7 @@ const server = http.createServer((req, res) => {
     const offset = (page - 1) * pageSize;
     const displaySessions = filteredSessions.slice(offset, offset + pageSize);
 
-    const tokenStats = getTokenStats(allSessions);
+    const tokenStats = getTokenStats(allSessions, state.getCapacity(), CONFIG);
     const capacity = state.getCapacity();
 
     res.writeHead(200, { "Content-Type": "application/json" });
@@ -617,9 +640,7 @@ server.listen(PORT, () => {
 
   // Background cache refresh
   const SESSIONS_CACHE_TTL = 10000;
-  const TOKEN_USAGE_CACHE_TTL = 30000;
   setInterval(() => sessions.refreshSessionsCache(), SESSIONS_CACHE_TTL);
-  setInterval(() => refreshTokenUsageAsync(getOpenClawDir), TOKEN_USAGE_CACHE_TTL);
 });
 
 // SSE heartbeat

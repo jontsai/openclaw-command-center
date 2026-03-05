@@ -215,8 +215,8 @@ function calculateCostForBucket(bucket, rates = TOKEN_RATES) {
 }
 
 // Get detailed cost breakdown for the modal
-function getCostBreakdown(config, getSessions) {
-  const usage = getDailyTokenUsage();
+function getCostBreakdown(config, getSessions, getOpenClawDir) {
+  const usage = getDailyTokenUsage(getOpenClawDir);
   if (!usage) {
     return { error: "Failed to get usage data" };
   }
@@ -323,7 +323,7 @@ function getTopSessionsByTokens(limit = 5, getSessions) {
 }
 
 // Calculate aggregate token stats
-function getTokenStats(sessions, capacity, config) {
+function getTokenStats(sessions, capacity, config = {}) {
   // Use capacity data if provided, otherwise compute from sessions
   let activeMainCount = capacity?.main?.active ?? 0;
   let activeSubagentCount = capacity?.subagent?.active ?? 0;
@@ -359,8 +359,8 @@ function getTokenStats(sessions, capacity, config) {
   const estCost = costs.totalCost;
 
   // Calculate savings vs plan cost (compare monthly to monthly)
-  const planCost = config.billing?.claudePlanCost || 200;
-  const planName = config.billing?.claudePlanName || "Claude Code Max";
+  const planCost = config?.billing?.claudePlanCost ?? 200;
+  const planName = config?.billing?.claudePlanName ?? "Claude Code Max";
   const monthlyApiCost = estCost * 30; // Project daily to monthly
   const monthlySavings = monthlyApiCost - planCost;
   const savingsPositive = monthlySavings > 0;

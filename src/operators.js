@@ -38,6 +38,16 @@ async function refreshOperatorsAsync(dataDir, getOpenClawDir) {
   if (operatorsRefreshing) return;
   operatorsRefreshing = true;
 
+  // Normalize timestamp to ms (handles ISO strings, numbers, and fallback)
+  const toMs = (ts, fallback) => {
+    if (typeof ts === "number" && Number.isFinite(ts)) return ts;
+    if (typeof ts === "string") {
+      const parsed = Date.parse(ts);
+      if (Number.isFinite(parsed)) return parsed;
+    }
+    return fallback;
+  };
+
   try {
     const openclawDir = getOpenClawDir();
     const sessionsDir = path.join(openclawDir, "agents", "main", "sessions");
@@ -98,13 +108,13 @@ async function refreshOperatorsAsync(dataDir, getOpenClawDir) {
                   name: username,
                   username: username,
                   source: "slack",
-                  firstSeen: entry.timestamp || stat.mtimeMs,
-                  lastSeen: entry.timestamp || stat.mtimeMs,
+                  firstSeen: toMs(entry.timestamp, stat.mtimeMs),
+                  lastSeen: toMs(entry.timestamp, stat.mtimeMs),
                   sessionCount: 1,
                 });
               } else {
                 const op = operatorsMap.get(userId);
-                op.lastSeen = Math.max(op.lastSeen, entry.timestamp || stat.mtimeMs);
+                op.lastSeen = Math.max(op.lastSeen, toMs(entry.timestamp, stat.mtimeMs));
                 op.sessionCount++;
               }
               break; // Found user for this session, move to next file
@@ -114,21 +124,21 @@ async function refreshOperatorsAsync(dataDir, getOpenClawDir) {
             const telegramMatch = text.match(/\[Telegram[^\]]*\]\s*([\w.-]+):/);
             if (telegramMatch) {
               const username = telegramMatch[1];
-              const oderId = `telegram:${username}`;
+              const operatorId = `telegram:${username}`;
 
-              if (!operatorsMap.has(oderId)) {
-                operatorsMap.set(oderId, {
-                  id: oderId,
+              if (!operatorsMap.has(operatorId)) {
+                operatorsMap.set(operatorId, {
+                  id: operatorId,
                   name: username,
                   username: username,
                   source: "telegram",
-                  firstSeen: entry.timestamp || stat.mtimeMs,
-                  lastSeen: entry.timestamp || stat.mtimeMs,
+                  firstSeen: toMs(entry.timestamp, stat.mtimeMs),
+                  lastSeen: toMs(entry.timestamp, stat.mtimeMs),
                   sessionCount: 1,
                 });
               } else {
-                const op = operatorsMap.get(oderId);
-                op.lastSeen = Math.max(op.lastSeen, entry.timestamp || stat.mtimeMs);
+                const op = operatorsMap.get(operatorId);
+                op.lastSeen = Math.max(op.lastSeen, toMs(entry.timestamp, stat.mtimeMs));
                 op.sessionCount++;
               }
               break;
@@ -153,13 +163,13 @@ async function refreshOperatorsAsync(dataDir, getOpenClawDir) {
                   name: label,
                   username: username,
                   source: "discord",
-                  firstSeen: entry.timestamp || stat.mtimeMs,
-                  lastSeen: entry.timestamp || stat.mtimeMs,
+                  firstSeen: toMs(entry.timestamp, stat.mtimeMs),
+                  lastSeen: toMs(entry.timestamp, stat.mtimeMs),
                   sessionCount: 1,
                 });
               } else {
                 const op = operatorsMap.get(opId);
-                op.lastSeen = Math.max(op.lastSeen, entry.timestamp || stat.mtimeMs);
+                op.lastSeen = Math.max(op.lastSeen, toMs(entry.timestamp, stat.mtimeMs));
                 op.sessionCount++;
               }
               break;
