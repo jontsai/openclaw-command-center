@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node lib/server.js",
     "dev": "node --watch lib/server.js",
+    "dev:src": "esbuild lib/src/index.js --bundle --platform=node --outfile=lib/server.js --watch",
+    "build": "esbuild lib/src/index.js --bundle --platform=node --outfile=lib/server.js --banner:js='#!/usr/bin/env node'",
     "test": "node --test",
     "test:coverage": "node --test --experimental-test-coverage",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint lib/ tests/",
@@ -39,8 +41,8 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {},
   "devDependencies": {
+    "esbuild": "^0.27.3",
     "eslint": "^8.56.0",
     "prettier": "^3.2.4"
   }

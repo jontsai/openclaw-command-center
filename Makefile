@@ -10,7 +10,7 @@ DASHBOARD_DIR := $(CURDIR)
 PORT := 3333
 
 .DEFAULT_GOAL := help
-.PHONY: help ensure start stop restart status logs attach clean release install-hooks check
+.PHONY: help ensure start stop restart status logs attach clean release install-hooks check test lint build
 
 # Include local overrides if they exist (not tracked in git)
 -include Makefile.local
@@ -126,3 +126,16 @@ install-hooks: ## Install git pre-commit hooks
 
 check: ## Run pre-commit checks manually
 	@./scripts/pre-commit
+
+# ============================================================================
+# Development targets
+# ============================================================================
+
+test: ## Run tests
+	@npm test
+
+lint: ## Run linter
+	@npm run lint
+
+build: ## Build bundled server.js from src modules
+	@npm run build
