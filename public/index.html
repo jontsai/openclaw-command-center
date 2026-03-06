@@ -2490,6 +2490,7 @@
 
       // Store current token stats for window switching
       let currentTokenStats = null;
+      let optionalDeps = null;
 
       // Get saved savings window preference (default to 7dma for stability)
       function getSavingsWindowPref() {
@@ -2705,6 +2706,13 @@
         $set("disk-throughput", "textContent", vitals.disk?.throughputMBps?.toFixed(2) || "0.00");
         $set("disk-kbt", "textContent", vitals.disk?.kbPerTransfer?.toFixed(1) || "0.0");
 
+        // Show dep hint for disk I/O if all zeros and dep missing
+        renderDepHint(
+          "disk-io-hint",
+          "disk-io",
+          !vitals.disk?.iops && !vitals.disk?.throughputMBps,
+        );
+
         // Temperature
         const temp = vitals.temperature;
         const tempNote = vitals.temperatureNote;
@@ -2734,7 +2742,58 @@
           if (tempStatusEl) {
             tempStatusEl.textContent = tempNote || "Unavailable";
           }
+          // Show dep hint for temperature if unavailable and dep missing
+          renderDepHint("temp-hint", "temperature", true);
         }
+      }
+
+      /**
+       * Render an inline hint when an optional dependency is missing.
+       * Creates/updates a small element showing install instructions.
+       */
+      function renderDepHint(elementId, affects, show) {
+        let el = document.getElementById(elementId);
+        if (!show || !optionalDeps) {
+          if (el) el.style.display = "none";
+          return;
+        }
+        const dep = optionalDeps.find((d) => d.affects === affects && !d.installed);
+        if (!dep) {
+          if (el) el.style.display = "none";
+          return;
+        }
+        if (!el) {
+          // Find parent card based on the hint id
+          const parentMap = { "disk-io-hint": "disk-iops", "temp-hint": "temp-status" };
+          const anchor = document.getElementById(parentMap[elementId]);
+          if (!anchor) return;
+          const card = anchor.closest(".vital-card");
+          if (!card) return;
+          el = document.createElement("div");
+          el.id = elementId;
+          el.style.cssText =
+            "margin-top:8px;padding:6px 10px;background:rgba(136,192,208,0.08);border:1px solid rgba(136,192,208,0.2);border-radius:6px;font-size:0.7rem;color:var(--text-muted);line-height:1.4";
+          card.appendChild(el);
+        }
+        el.style.display = "block";
+        const action = dep.installCmd
+          ? '<code style="background:rgba(136,192,208,0.15);padding:1px 5px;border-radius:3px;font-size:0.65rem">' +
+            dep.installCmd +
+            "</code>"
+          : dep.url
+            ? '<a href="' +
+              dep.url +
+              '" target="_blank" style="color:var(--accent)">' +
+              dep.name +
+              "</a>"
+            : "see docs";
+        el.innerHTML =
+          "\u{1F4A1} Install <strong>" +
+          dep.name +
+          "</strong> for " +
+          dep.purpose.toLowerCase() +
+          ": " +
+          action;
       }
 
       // Safe DOM helper - sets property only if element exists
@@ -4524,6 +4583,13 @@
           .then((d) => {
             const el = document.getElementById("app-version");
             if (el && d.version) el.textContent = "v" + d.version;
+          })
+          .catch(() => {});
+        // Fetch optional dependency status (once)
+        fetch("/api/vitals")
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.optionalDeps) optionalDeps = d.optionalDeps;
           })
           .catch(() => {});
         // Fetch data after short delay to ensure DOM is ready

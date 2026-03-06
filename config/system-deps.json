@@ -1,0 +1,46 @@
+{
+  "linux": [
+    {
+      "id": "sysstat",
+      "name": "sysstat",
+      "binary": "iostat",
+      "purpose": "Disk I/O vitals (IOPS, throughput)",
+      "affects": "disk-io",
+      "install": {
+        "apt": "sudo apt install -y sysstat",
+        "yum": "sudo yum install -y sysstat",
+        "dnf": "sudo dnf install -y sysstat",
+        "pacman": "sudo pacman -S --noconfirm sysstat",
+        "apk": "sudo apk add sysstat"
+      }
+    },
+    {
+      "id": "lm-sensors",
+      "name": "lm-sensors",
+      "binary": "sensors",
+      "purpose": "Additional temperature sensors",
+      "affects": "temperature",
+      "install": {
+        "apt": "sudo apt install -y lm-sensors",
+        "yum": "sudo yum install -y lm-sensors",
+        "dnf": "sudo dnf install -y lm-sensors",
+        "pacman": "sudo pacman -S --noconfirm lm_sensors",
+        "apk": "sudo apk add lm-sensors"
+      }
+    }
+  ],
+  "darwin": [
+    {
+      "id": "osx-cpu-temp",
+      "name": "osx-cpu-temp",
+      "binary": "osx-cpu-temp",
+      "purpose": "CPU temperature (Intel Mac)",
+      "affects": "temperature",
+      "condition": "intel",
+      "install": {
+        "brew": "brew install --formula osx-cpu-temp"
+      },
+      "url": "https://github.com/lavoiesl/osx-cpu-temp"
+    }
+  ]
+}

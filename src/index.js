@@ -62,7 +62,7 @@ const { getVersion } = require("./utils");
 const { CONFIG, getOpenClawDir } = require("./config");
 const { handleJobsRequest, isJobsRoute } = require("./jobs");
 const { runOpenClaw, runOpenClawAsync, extractJSON } = require("./openclaw");
-const { getSystemVitals, checkOptionalDeps } = require("./vitals");
+const { getSystemVitals, checkOptionalDeps, getOptionalDeps } = require("./vitals");
 const { checkAuth, getUnauthorizedPage } = require("./auth");
 const { loadPrivacySettings, savePrivacySettings } = require("./privacy");
 const {
@@ -433,8 +433,9 @@ const server = http.createServer((req, res) => {
     res.end(JSON.stringify(fullState, null, 2));
   } else if (pathname === "/api/vitals") {
     const vitals = getSystemVitals();
+    const optionalDeps = getOptionalDeps();
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ vitals }, null, 2));
+    res.end(JSON.stringify({ vitals, optionalDeps }, null, 2));
   } else if (pathname === "/api/capacity") {
     const capacity = state.getCapacity();
     res.writeHead(200, { "Content-Type": "application/json" });
