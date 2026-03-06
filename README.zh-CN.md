@@ -123,6 +123,21 @@ Command Center 会自动探测 OpenClaw 工作区：
 
 ---
 
+## 可选系统依赖
+
+Command Center 仅需 **Node.js** 即可运行。部分系统监控功能可通过安装可选依赖获得增强体验，缺少时仪表盘仍可正常运行，相关指标会显示为零或优雅降级。
+
+| 操作系统              | 软件包         | 用途                              | 安装方式                                               | 缺少时                        |
+| --------------------- | -------------- | --------------------------------- | ------------------------------------------------------ | ----------------------------- |
+| Linux                 | `sysstat`      | 磁盘 I/O（IOPS、吞吐量）          | `sudo apt install sysstat`                             | 磁盘统计显示为零              |
+| Linux                 | `lm-sensors`   | 额外温度传感器                    | `sudo apt install lm-sensors`                          | 使用 thermal_zone（通常可用） |
+| macOS (Intel)         | `osx-cpu-temp` | CPU 温度                          | [从源码编译](https://github.com/lavoiesl/osx-cpu-temp) | 回退至电池温度                |
+| macOS (Apple Silicon) | 免密 `sudo`    | 通过 `powermetrics` 获取 CPU 温度 | 在 sudoers 中配置                                      | 界面显示提示                  |
+
+Command Center 在启动时会一次性提示缺少的可选依赖。
+
+---
+
 ## 配置
 
 ### 环境变量

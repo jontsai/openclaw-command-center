@@ -332,8 +332,64 @@ function getSystemVitals() {
   };
 }
 
+/**
+ * Check for optional system dependencies and log hints once at startup.
+ * Does not throw — purely informational.
+ */
+async function checkOptionalDeps() {
+  const isLinux = process.platform === "linux";
+  const isMacOS = process.platform === "darwin";
+  const hints = [];
+
+  if (isLinux) {
+    const hasIostat = await runCmd("which iostat", { fallback: "" });
+    if (!hasIostat) {
+      hints.push(
+        'Install "sysstat" for disk I/O vitals (IOPS, throughput): sudo apt install sysstat',
+      );
+    }
+    const hasLmSensors = await runCmd("which sensors", { fallback: "" });
+    if (!hasLmSensors) {
+      hints.push(
+        'Install "lm-sensors" for additional temperature sensors: sudo apt install lm-sensors',
+      );
+    }
+  } else if (isMacOS) {
+    const home = require("os").homedir();
+    const chip = await runCmd("sysctl -n machdep.cpu.brand_string", { fallback: "" });
+    const isAppleSilicon = /apple/i.test(chip);
+
+    if (isAppleSilicon) {
+      const hasSudo = await runCmd("sudo -n true 2>/dev/null && echo ok", { fallback: "" });
+      if (!hasSudo) {
+        hints.push(
+          "Configure passwordless sudo for powermetrics to enable Apple Silicon CPU temperature",
+        );
+      }
+    } else {
+      const hasOsxCpuTemp = await runCmd(
+        `which osx-cpu-temp 2>/dev/null || test -x ${home}/bin/osx-cpu-temp && echo ok`,
+        { fallback: "" },
+      );
+      if (!hasOsxCpuTemp) {
+        hints.push(
+          "Install osx-cpu-temp for Intel Mac CPU temperature: https://github.com/lavoiesl/osx-cpu-temp",
+        );
+      }
+    }
+  }
+
+  if (hints.length > 0) {
+    console.log("[Startup] Optional dependencies for enhanced vitals:");
+    for (const hint of hints) {
+      console.log(`   💡 ${hint}`);
+    }
+  }
+}
+
 module.exports = {
   refreshVitalsAsync,
   getSystemVitals,
+  checkOptionalDeps,
   VITALS_CACHE_TTL,
 };

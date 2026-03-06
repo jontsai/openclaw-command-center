@@ -89,6 +89,49 @@ EOF
     echo "   Created: Makefile.local"
 fi
 
+# Check optional system dependencies
+echo ""
+echo "🔍 Checking optional system dependencies..."
+
+OS_TYPE="$(uname -s)"
+OPT_MISSING=0
+
+if [ "$OS_TYPE" = "Linux" ]; then
+    if command -v iostat &> /dev/null; then
+        echo "   ✅ sysstat (iostat) — disk I/O vitals"
+    else
+        echo "   💡 sysstat — install for disk I/O vitals: sudo apt install sysstat"
+        OPT_MISSING=$((OPT_MISSING + 1))
+    fi
+    if command -v sensors &> /dev/null; then
+        echo "   ✅ lm-sensors — temperature sensors"
+    else
+        echo "   💡 lm-sensors — install for temperature sensors: sudo apt install lm-sensors"
+        OPT_MISSING=$((OPT_MISSING + 1))
+    fi
+elif [ "$OS_TYPE" = "Darwin" ]; then
+    # Check for Apple Silicon vs Intel
+    CHIP="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "")"
+    if echo "$CHIP" | grep -qi "apple"; then
+        if sudo -n true 2>/dev/null; then
+            echo "   ✅ passwordless sudo — Apple Silicon CPU temperature"
+        else
+            echo "   💡 passwordless sudo — configure for CPU temperature via powermetrics"
+        fi
+    else
+        if command -v osx-cpu-temp &> /dev/null || [ -x "$HOME/bin/osx-cpu-temp" ]; then
+            echo "   ✅ osx-cpu-temp — Intel Mac CPU temperature"
+        else
+            echo "   💡 osx-cpu-temp — install for CPU temperature: https://github.com/lavoiesl/osx-cpu-temp"
+            OPT_MISSING=$((OPT_MISSING + 1))
+        fi
+    fi
+fi
+
+if [ "$OPT_MISSING" -eq 0 ]; then
+    echo "   All optional dependencies available!"
+fi
+
 echo ""
 echo "✅ Setup complete!"
 echo ""

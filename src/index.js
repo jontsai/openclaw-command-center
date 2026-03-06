@@ -62,7 +62,7 @@ const { getVersion } = require("./utils");
 const { CONFIG, getOpenClawDir } = require("./config");
 const { handleJobsRequest, isJobsRoute } = require("./jobs");
 const { runOpenClaw, runOpenClawAsync, extractJSON } = require("./openclaw");
-const { getSystemVitals } = require("./vitals");
+const { getSystemVitals, checkOptionalDeps } = require("./vitals");
 const { checkAuth, getUnauthorizedPage } = require("./auth");
 const { loadPrivacySettings, savePrivacySettings } = require("./privacy");
 const {
@@ -644,6 +644,8 @@ server.listen(PORT, () => {
     } catch (e) {
       console.log("[Startup] Cache warming error:", e.message);
     }
+    // Check for optional system dependencies (once at startup)
+    checkOptionalDeps();
   }, 100);
 
   // Background cache refresh

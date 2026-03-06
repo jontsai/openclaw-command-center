@@ -125,6 +125,21 @@ If you have `memory/` or `state/` directories, you're good to go.
 
 ---
 
+## Optional System Dependencies
+
+Command Center requires **only Node.js** to run. However, some system vitals features benefit from optional packages. Without them, the dashboard still works — those metrics simply show zeros or fall back gracefully.
+
+| OS                    | Package             | Purpose                            | Install                                                       | Without It                        |
+| --------------------- | ------------------- | ---------------------------------- | ------------------------------------------------------------- | --------------------------------- |
+| Linux                 | `sysstat`           | Disk I/O vitals (IOPS, throughput) | `sudo apt install sysstat`                                    | Disk stats show zeros             |
+| Linux                 | `lm-sensors`        | Additional temperature sensors     | `sudo apt install lm-sensors`                                 | Uses thermal_zone (usually works) |
+| macOS (Intel)         | `osx-cpu-temp`      | CPU temperature                    | [Build from source](https://github.com/lavoiesl/osx-cpu-temp) | Battery temp fallback             |
+| macOS (Apple Silicon) | passwordless `sudo` | CPU temperature via `powermetrics` | Configure in sudoers                                          | Shows note in UI                  |
+
+Command Center logs hints for missing optional dependencies once at startup.
+
+---
+
 ## Configuration
 
 ### Environment Variables

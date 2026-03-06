@@ -75,6 +75,40 @@ done
 
 echo ""
 
+# Optional dependency status
+echo "🔧 Optional System Dependencies:"
+
+OS_TYPE="$(uname -s)"
+if [[ "$OS_TYPE" == "Linux" ]]; then
+    if command -v iostat &> /dev/null; then
+        echo "   ✅ sysstat (iostat) — disk I/O vitals"
+    else
+        echo "   ⚠️  sysstat — not installed (disk I/O stats will show zeros)"
+    fi
+    if command -v sensors &> /dev/null; then
+        echo "   ✅ lm-sensors — temperature sensors"
+    else
+        echo "   ⚠️  lm-sensors — not installed (using thermal_zone fallback)"
+    fi
+elif [[ "$OS_TYPE" == "Darwin" ]]; then
+    CHIP="$(sysctl -n machdep.cpu.brand_string 2>/dev/null || echo "")"
+    if echo "$CHIP" | grep -qi "apple"; then
+        if sudo -n true 2>/dev/null; then
+            echo "   ✅ passwordless sudo — Apple Silicon CPU temperature"
+        else
+            echo "   ⚠️  passwordless sudo — not configured (CPU temperature unavailable)"
+        fi
+    else
+        if command -v osx-cpu-temp &> /dev/null || [[ -x "$HOME/bin/osx-cpu-temp" ]]; then
+            echo "   ✅ osx-cpu-temp — Intel Mac CPU temperature"
+        else
+            echo "   ⚠️  osx-cpu-temp — not installed (using battery temp fallback)"
+        fi
+    fi
+fi
+
+echo ""
+
 # Summary
 if [[ $FAILURES -eq 0 ]]; then
     echo "✅ All checks passed!"
