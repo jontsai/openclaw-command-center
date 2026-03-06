@@ -1,6 +1,7 @@
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
 const { formatBytes, formatTimeAgo } = require("./utils");
 
 /**
@@ -49,10 +50,10 @@ function createStateModule(deps) {
 
   // Get system status
   function getSystemStatus() {
-    const hostname = execSync("hostname", { encoding: "utf8" }).trim();
+    const hostname = os.hostname();
     let uptime = "\u2014";
     try {
-      const uptimeRaw = execSync("uptime", { encoding: "utf8" });
+      const uptimeRaw = execFileSync("uptime", [], { encoding: "utf8" });
       const match = uptimeRaw.match(/up\s+([^,]+)/);
       if (match) uptime = match[1].trim();
     } catch (e) {}

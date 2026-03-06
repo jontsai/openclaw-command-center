@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const { execSync, exec } = require("child_process");
+const { execFile } = require("child_process");
+const { getSafeEnv } = require("./openclaw");
 
 // Cache for LLM usage data (openclaw CLI is slow ~4-5s)
 let llmUsageCache = { data: null, timestamp: 0, refreshing: false };
@@ -12,10 +13,13 @@ function refreshLlmUsageAsync() {
   llmUsageCache.refreshing = true;
 
   const profile = process.env.OPENCLAW_PROFILE || "";
-  const profileFlag = profile ? ` --profile ${profile}` : "";
-  exec(
-    `openclaw${profileFlag} status --usage --json`,
-    { encoding: "utf8", timeout: 20000 },
+  const args = profile
+    ? ["--profile", profile, "status", "--usage", "--json"]
+    : ["status", "--usage", "--json"];
+  execFile(
+    "openclaw",
+    args,
+    { encoding: "utf8", timeout: 20000, env: getSafeEnv() },
     (err, stdout) => {
       llmUsageCache.refreshing = false;
       if (err) {
@@ -211,13 +215,18 @@ function getLlmUsage(statePath) {
 }
 
 function getRoutingStats(skillsPath, statePath, hours = 24) {
+  const safeHours = parseInt(hours, 10) || 24;
   try {
+    const { execFileSync } = require("child_process");
     const skillDir = path.join(skillsPath, "llm_routing");
-    const output = execSync(
-      `cd "${skillDir}" && python -m llm_routing stats --hours ${hours} --json 2>/dev/null`,
+    const output = execFileSync(
+      "python",
+      ["-m", "llm_routing", "stats", "--hours", String(safeHours), "--json"],
       {
         encoding: "utf8",
         timeout: 10000,
+        cwd: skillDir,
+        env: getSafeEnv(),
       },
     );
     return JSON.parse(output);

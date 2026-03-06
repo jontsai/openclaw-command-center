@@ -1,6 +1,20 @@
+const ALLOWED_ACTIONS = new Set([
+  "gateway-status",
+  "gateway-restart",
+  "sessions-list",
+  "cron-list",
+  "health-check",
+  "clear-stale-sessions",
+]);
+
 function executeAction(action, deps) {
   const { runOpenClaw, extractJSON, PORT } = deps;
   const results = { success: false, action, output: "", error: null };
+
+  if (!ALLOWED_ACTIONS.has(action)) {
+    results.error = `Unknown action: ${action}`;
+    return results;
+  }
 
   try {
     switch (action) {
@@ -51,8 +65,6 @@ function executeAction(action, deps) {
         results.success = true;
         break;
       }
-      default:
-        results.error = `Unknown action: ${action}`;
     }
   } catch (e) {
     results.error = e.message;
@@ -61,4 +73,4 @@ function executeAction(action, deps) {
   return results;
 }
 
-module.exports = { executeAction };
+module.exports = { executeAction, ALLOWED_ACTIONS };
