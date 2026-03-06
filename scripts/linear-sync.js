@@ -492,7 +492,7 @@ async function syncAllSessions() {
   const { execSync } = require("child_process");
 
   try {
-    const output = execSync("openclaw sessions list --json 2>/dev/null", {
+    const output = execSync("openclaw sessions --json 2>/dev/null", {
       encoding: "utf8",
       env: { ...process.env, NO_COLOR: "1" },
     });

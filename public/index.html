@@ -75,9 +75,12 @@
           <div class="stat-value" id="output-tokens">-</div>
           <div class="stat-label" data-i18n="stats.output">Output</div>
         </div>
-        <div class="stat" title="Sessions active within last 15 minutes">
+        <div
+          class="stat"
+          title="Sessions updated within the last 15 minutes (not necessarily actively running)"
+        >
           <div class="stat-value" id="active-sessions">-</div>
-          <div class="stat-label" data-i18n="stats.active15m">Active (15m)</div>
+          <div class="stat-label" data-i18n="stats.active15m">Recently active (15m)</div>
         </div>
         <div
           class="stat"
@@ -2605,9 +2608,13 @@
         }
 
         // User/sys/idle breakdown
-        $set("cpu-user", "textContent", vitals.cpu?.userPercent?.toFixed(1) + "%" || "-");
-        $set("cpu-sys", "textContent", vitals.cpu?.sysPercent?.toFixed(1) + "%" || "-");
-        $set("cpu-idle", "textContent", vitals.cpu?.idlePercent?.toFixed(1) + "%" || "-");
+        // Avoid showing "undefined%" when fields are absent.
+        const cpuUser = vitals.cpu?.userPercent;
+        const cpuSys = vitals.cpu?.sysPercent;
+        const cpuIdle = vitals.cpu?.idlePercent;
+        $set("cpu-user", "textContent", Number.isFinite(cpuUser) ? cpuUser.toFixed(1) + "%" : "-");
+        $set("cpu-sys", "textContent", Number.isFinite(cpuSys) ? cpuSys.toFixed(1) + "%" : "-");
+        $set("cpu-idle", "textContent", Number.isFinite(cpuIdle) ? cpuIdle.toFixed(1) + "%" : "-");
 
         const loadAvg = vitals.cpu?.loadAvg || [0, 0, 0];
         $set("cpu-load-1", "textContent", loadAvg[0]?.toFixed(2) || "-");

@@ -22,7 +22,7 @@ tmux rename-window -t "$SESSION:0" "dashboard"
 # +------------------+------------------+
 
 # Pane 0: Sessions (watch openclaw sessions)
-tmux send-keys -t "$SESSION:0" "watch -n 10 -c 'echo \"📡 ACTIVE SESSIONS\"; echo; openclaw sessions list 2>/dev/null || echo \"No sessions\"'" Enter
+tmux send-keys -t "$SESSION:0" "watch -n 10 -c 'echo \"📡 ACTIVE SESSIONS\"; echo; openclaw sessions 2>/dev/null || echo \"No sessions\"'" Enter
 
 # Split horizontally for pane 1: Cron Jobs
 tmux split-window -h -t "$SESSION:0" -c "$OPENCLAW_DIR"

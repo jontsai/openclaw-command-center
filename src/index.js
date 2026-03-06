@@ -207,7 +207,14 @@ function serveStatic(req, res) {
       res.end("Not found");
       return;
     }
-    res.writeHead(200, { "Content-Type": contentTypes[ext] || "text/plain" });
+    const headers = { "Content-Type": contentTypes[ext] || "text/plain" };
+
+    // Avoid stale dashboards (users frequently hard-refresh while iterating)
+    if ([".html", ".css", ".js", ".json"].includes(ext)) {
+      headers["Cache-Control"] = "no-store";
+    }
+
+    res.writeHead(200, headers);
     res.end(content);
   });
 }

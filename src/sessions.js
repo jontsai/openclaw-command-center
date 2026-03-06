@@ -263,7 +263,7 @@ function createSessionsModule(deps) {
     sessionsCache.refreshing = true;
 
     try {
-      const output = await runOpenClawAsync("sessions list --json 2>/dev/null");
+      const output = await runOpenClawAsync("sessions --json 2>/dev/null");
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);
@@ -312,7 +312,7 @@ function createSessionsModule(deps) {
 
     // For limited requests, can still use sync (fast enough)
     try {
-      const output = runOpenClaw("sessions list --json 2>/dev/null");
+      const output = runOpenClaw("sessions --json 2>/dev/null");
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);
@@ -365,7 +365,7 @@ function createSessionsModule(deps) {
   function getSessionDetail(sessionKey) {
     try {
       // Get basic session info
-      const listOutput = runOpenClaw("sessions list --json 2>/dev/null");
+      const listOutput = runOpenClaw("sessions --json 2>/dev/null");
       let sessionInfo = null;
       const jsonStr = extractJSON(listOutput);
       if (jsonStr) {

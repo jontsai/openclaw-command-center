@@ -131,9 +131,9 @@ function createStateModule(deps) {
       // Fall back to defaults
     }
 
-    // Try to get active counts from sessions list (preferred - has full session keys)
+    // Try to get active counts from sessions (preferred - has full session keys)
     try {
-      const output = runOpenClaw("sessions list --json 2>/dev/null");
+      const output = runOpenClaw("sessions --json 2>/dev/null");
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);
@@ -160,10 +160,7 @@ function createStateModule(deps) {
         return result;
       }
     } catch (e) {
-      console.error(
-        "Failed to get capacity from sessions list, falling back to filesystem:",
-        e.message,
-      );
+      console.error("Failed to get capacity from sessions, falling back to filesystem:", e.message);
     }
 
     // Count active sessions from filesystem (workaround for CLI returning styled text)
@@ -546,7 +543,7 @@ function createStateModule(deps) {
   function getSubagentStatus() {
     const subagents = [];
     try {
-      const output = runOpenClaw("sessions list --json 2>/dev/null");
+      const output = runOpenClaw("sessions --json 2>/dev/null");
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);

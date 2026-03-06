@@ -38,7 +38,7 @@ async function runOpenClawAsync(args) {
   try {
     const { stdout } = await execAsync(`openclaw${profileFlag} ${args}`, {
       encoding: "utf8",
-      timeout: 10000, // 10 second timeout for async
+      timeout: 20000, // 20s timeout: openclaw status/sessions can be slow under load
       env: { ...process.env, NO_COLOR: "1", TERM: "dumb" },
     });
     return stdout;

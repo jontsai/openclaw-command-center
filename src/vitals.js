@@ -39,8 +39,13 @@ async function refreshVitalsAsync() {
       ? "top -bn1 | head -3 | grep -E '^%?Cpu|^  ?CPU' || echo ''"
       : 'top -l 1 -n 0 2>/dev/null | grep "CPU usage" || echo ""';
 
+    // Linux: prefer mpstat (1s average) to avoid spiky single-frame top parsing.
+    const mpstatCmd = isLinux
+      ? "(command -v mpstat >/dev/null 2>&1 && mpstat 1 1 | tail -1 | sed 's/^Average: *//') || echo ''"
+      : "";
+
     // Run commands in parallel for speed
-    const [hostname, uptimeRaw, coresRaw, memTotalRaw, memInfoRaw, dfRaw, topOutput] =
+    const [hostname, uptimeRaw, coresRaw, memTotalRaw, memInfoRaw, dfRaw, topOutput, mpstatOutput] =
       await Promise.all([
         runCmd("hostname", { fallback: "unknown" }),
         runCmd("uptime", { fallback: "" }),
@@ -51,6 +56,7 @@ async function refreshVitalsAsync() {
           : runCmd("vm_stat", { fallback: "" }),
         runCmd("df -k ~ | tail -1", { fallback: "" }),
         runCmd(topCmd, { fallback: "" }),
+        isLinux ? runCmd(mpstatCmd, { fallback: "" }) : Promise.resolve(""),
       ]);
 
     vitals.hostname = hostname;
@@ -70,9 +76,27 @@ async function refreshVitalsAsync() {
     vitals.cpu.cores = parseInt(coresRaw, 10) || 1;
     vitals.cpu.usage = Math.min(100, Math.round((vitals.cpu.loadAvg[0] / vitals.cpu.cores) * 100));
 
-    // Parse CPU usage from top (platform-specific)
-    if (topOutput) {
-      if (isLinux) {
+    // CPU percent (platform-specific)
+    // Linux: prefer mpstat output (averaged over 1 second). Fallback to parsing top.
+    if (isLinux) {
+      // mpstat: ... %usr %nice %sys %iowait %irq %soft %steal %guest %gnice %idle
+      if (mpstatOutput) {
+        // After sed, mpstatOutput should look like:
+        // "all  7.69 0.00 2.05 ... 89.74" (CPU %usr %nice %sys ... %idle)
+        const parts = mpstatOutput.trim().split(/\s+/);
+        const user = parts.length > 1 ? parseFloat(parts[1]) : NaN;
+        const sys = parts.length > 3 ? parseFloat(parts[3]) : NaN;
+        const idle = parts.length ? parseFloat(parts[parts.length - 1]) : NaN;
+        if (!Number.isNaN(user)) vitals.cpu.userPercent = user;
+        if (!Number.isNaN(sys)) vitals.cpu.sysPercent = sys;
+        if (!Number.isNaN(idle)) {
+          vitals.cpu.idlePercent = idle;
+          vitals.cpu.usage = Math.max(0, Math.min(100, Math.round(100 - idle)));
+        }
+      }
+
+      if (topOutput && (vitals.cpu.idlePercent === null || vitals.cpu.idlePercent === undefined)) {
+        // Linux top: %Cpu(s):  5.9 us,  2.0 sy,  0.0 ni, 91.5 id,  0.5 wa, ...
         const userMatch = topOutput.match(/([\d.]+)\s*us/);
         const sysMatch = topOutput.match(/([\d.]+)\s*sy/);
         const idleMatch = topOutput.match(/([\d.]+)\s*id/);
@@ -82,16 +106,17 @@ async function refreshVitalsAsync() {
         if (vitals.cpu.userPercent !== null && vitals.cpu.sysPercent !== null) {
           vitals.cpu.usage = Math.round(vitals.cpu.userPercent + vitals.cpu.sysPercent);
         }
-      } else {
-        const userMatch = topOutput.match(/([\d.]+)%\s*user/);
-        const sysMatch = topOutput.match(/([\d.]+)%\s*sys/);
-        const idleMatch = topOutput.match(/([\d.]+)%\s*idle/);
-        vitals.cpu.userPercent = userMatch ? parseFloat(userMatch[1]) : null;
-        vitals.cpu.sysPercent = sysMatch ? parseFloat(sysMatch[1]) : null;
-        vitals.cpu.idlePercent = idleMatch ? parseFloat(idleMatch[1]) : null;
-        if (vitals.cpu.userPercent !== null && vitals.cpu.sysPercent !== null) {
-          vitals.cpu.usage = Math.round(vitals.cpu.userPercent + vitals.cpu.sysPercent);
-        }
+      }
+    } else if (topOutput) {
+      // macOS: CPU usage: 5.9% user, 2.0% sys, 91.5% idle
+      const userMatch = topOutput.match(/([\d.]+)%\s*user/);
+      const sysMatch = topOutput.match(/([\d.]+)%\s*sys/);
+      const idleMatch = topOutput.match(/([\d.]+)%\s*idle/);
+      vitals.cpu.userPercent = userMatch ? parseFloat(userMatch[1]) : null;
+      vitals.cpu.sysPercent = sysMatch ? parseFloat(sysMatch[1]) : null;
+      vitals.cpu.idlePercent = idleMatch ? parseFloat(idleMatch[1]) : null;
+      if (vitals.cpu.userPercent !== null && vitals.cpu.sysPercent !== null) {
+        vitals.cpu.usage = Math.round(vitals.cpu.userPercent + vitals.cpu.sysPercent);
       }
     }
 
@@ -139,9 +164,11 @@ async function refreshVitalsAsync() {
       vitals.memory.percent > 90 ? "critical" : vitals.memory.percent > 75 ? "warning" : "normal";
 
     // Secondary async calls (chip info, iostat)
+    // NOTE: iostat needs an explicit count, otherwise it runs forever.
+    // We sample 2 iterations and take the last line (or JSON on Linux).
     const iostatCmd = isLinux
       ? "timeout 5 iostat -d -o JSON 1 2 2>/dev/null || echo ''"
-      : "iostat -d -c 2 2>/dev/null | tail -1 || echo ''";
+      : "iostat -d -c 2 2 2>/dev/null | tail -1 || echo ''";
     const [perfCores, effCores, chip, iostatRaw] = await Promise.all([
       isMacOS
         ? runCmd("sysctl -n hw.perflevel0.logicalcpu 2>/dev/null || echo 0", { fallback: "0" })
