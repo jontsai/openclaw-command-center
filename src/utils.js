@@ -3,8 +3,15 @@
  */
 
 const { exec } = require("child_process");
+const path = require("path");
 const { promisify } = require("util");
 const execAsync = promisify(exec);
+
+const pkg = require(path.join(__dirname, "..", "package.json"));
+
+function getVersion() {
+  return pkg.version;
+}
 
 /**
  * Run a shell command with sensible defaults
@@ -62,6 +69,7 @@ function formatTokens(n) {
 }
 
 module.exports = {
+  getVersion,
   runCmd,
   formatBytes,
   formatTimeAgo,

@@ -1223,7 +1223,7 @@
                     border-radius: 12px;
                     font-size: 0.75rem;
                   "
-                  >v0.2.0</span
+                  id="app-version">v...</span
                 >
                 <span
                   style="
@@ -4509,6 +4509,14 @@
         console.log("[Privacy] Settings loaded from server");
 
         connectSSE();
+        // Populate version badge from server (single source of truth: package.json)
+        fetch("/api/about")
+          .then((r) => r.json())
+          .then((d) => {
+            const el = document.getElementById("app-version");
+            if (el && d.version) el.textContent = "v" + d.version;
+          })
+          .catch(() => {});
         // Fetch data after short delay to ensure DOM is ready
         // This fixes a race condition on initial page load
         setTimeout(fetchData, 100);

@@ -58,6 +58,7 @@ if (cliPort) {
 // ============================================================================
 // MODULE IMPORTS (after env vars are set)
 // ============================================================================
+const { getVersion } = require("./utils");
 const { CONFIG, getOpenClawDir } = require("./config");
 const { handleJobsRequest, isJobsRoute } = require("./jobs");
 const { runOpenClaw, runOpenClawAsync, extractJSON } = require("./openclaw");
@@ -415,7 +416,7 @@ const server = http.createServer((req, res) => {
       JSON.stringify(
         {
           name: "OpenClaw Command Center",
-          version: "0.1.0",
+          version: getVersion(),
           description: "A Starcraft-inspired dashboard for AI agent orchestration",
           license: "MIT",
           repository: "https://github.com/jontsai/openclaw-command-center",
