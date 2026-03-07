@@ -4252,6 +4252,22 @@
 
         pill.classList.remove("connected", "disconnected", "connecting");
         pill.classList.add(status);
+
+        // Update the data-i18n attribute so the i18n system doesn't overwrite our status.
+        // The i18n translateSubtree() re-applies data-i18n text, so we must keep the
+        // attribute in sync with the intended display state.
+        // Map status to i18n key, or remove data-i18n for custom messages
+        const i18nKeyMap = {
+          connected: "app.connected",
+          connecting: "app.connecting",
+          disconnected: "app.disconnected",
+        };
+        const i18nKey = i18nKeyMap[status];
+        if (i18nKey) {
+          statusText.setAttribute("data-i18n", i18nKey);
+        } else {
+          statusText.removeAttribute("data-i18n");
+        }
         statusText.textContent = message;
 
         // Update refresh bar mode indicator
@@ -4276,7 +4292,9 @@
         // Check for SSE support
         if (typeof EventSource === "undefined") {
           console.warn("[SSE] EventSource not supported, using polling fallback");
-          setConnectionStatus("connected", "Polling Mode");
+          setConnectionStatus("connected", i18nText("app.pollingMode", {}, "Polling Mode"));
+          // Override i18n key for polling mode specifically
+          document.getElementById("gateway-status")?.setAttribute("data-i18n", "app.pollingMode");
           startPolling();
           return;
         }

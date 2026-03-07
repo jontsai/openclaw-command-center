@@ -1,7 +1,11 @@
 {
   "app": {
     "title": "OpenClaw Command Center",
-    "connecting": "Connecting..."
+    "connecting": "Connecting...",
+    "connected": "🟢 Live",
+    "disconnected": "🔴 Disconnected",
+    "pollingMode": "Polling Mode",
+    "error": "🔴 Error"
   },
   "sidebar": {
     "title": "Command Center",

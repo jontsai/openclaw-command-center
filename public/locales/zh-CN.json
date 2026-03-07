@@ -1,7 +1,11 @@
 {
   "app": {
     "title": "OpenClaw 指挥中心",
-    "connecting": "连接中..."
+    "connecting": "连接中...",
+    "connected": "🟢 实时",
+    "disconnected": "🔴 已断开",
+    "pollingMode": "轮询模式",
+    "error": "🔴 错误"
   },
   "sidebar": {
     "title": "指挥中心",
