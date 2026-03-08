@@ -181,10 +181,12 @@ clawhub whoami
 git tag -a v<new-version> -m "v<new-version> — short description"
 git push origin --tags
 
-# 4. Publish (--registry flag required until upstream redirect is fixed)
-clawhub publish . --registry https://www.clawhub.ai \
-  --slug command-center --version <new-version> \
+# 4. Publish
+clawhub publish . --slug command-center --version <new-version> \
   --changelog "Description of what changed"
+
+# Or use the release script (handles tagging + publishing):
+./scripts/release.sh <new-version>
 ```
 
 ### Verifying a Publish

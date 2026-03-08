@@ -213,13 +213,15 @@ clawhub whoami   # verify
 3. **Publish:**
 
    ```bash
-   clawhub publish . --registry https://www.clawhub.ai \
-     --slug command-center --version <new-version> \
+   clawhub publish . --slug command-center --version <new-version> \
      --changelog "Description of changes"
    ```
 
-> **Note:** The `--registry` flag is required until the upstream `.well-known` redirect is fixed.
-> You can also set `export CLAWHUB_REGISTRY=https://www.clawhub.ai` to avoid passing it each time.
+   Or use the release script which handles tagging and publishing:
+
+   ```bash
+   ./scripts/release.sh <new-version>
+   ```
 
 ### Git Tags for Releases
 
