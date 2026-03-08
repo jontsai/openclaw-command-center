@@ -165,10 +165,14 @@ async function refreshVitalsAsync() {
 
     // Secondary async calls (chip info, iostat)
     // NOTE: iostat needs an explicit count, otherwise it runs forever.
-    // We sample 2 iterations and take the last line (or JSON on Linux).
-    const iostatCmd = isLinux
-      ? "timeout 5 iostat -d -o JSON 1 2 2>/dev/null || echo ''"
-      : "iostat -d -c 2 2 2>/dev/null | tail -1 || echo ''";
+    // IMPORTANT: Avoid shell pipelines (e.g. `| tail -1`) — when Node kills
+    // the shell on timeout, pipeline children like `iostat` survive as orphans.
+    // We wrap with timeout/gtimeout as a belt-and-suspenders safeguard on top of runCmd timeout.
+    const timeoutPrefix = isLinux
+      ? "timeout 5"
+      : "$(command -v gtimeout >/dev/null 2>&1 && echo gtimeout 5)";
+    const iostatArgs = isLinux ? "-d -o JSON 1 2" : "-d -c 2 2";
+    const iostatCmd = `${timeoutPrefix} iostat ${iostatArgs} 2>/dev/null || echo ''`;
     const [perfCores, effCores, chip, iostatRaw] = await Promise.all([
       isMacOS
         ? runCmd("sysctl -n hw.perflevel0.logicalcpu 2>/dev/null || echo 0", { fallback: "0" })
@@ -215,7 +219,10 @@ async function refreshVitalsAsync() {
         // JSON parse failed
       }
     } else {
-      const iostatParts = iostatRaw.split(/\s+/);
+      // iostat output has multiple lines (header + samples); take the last non-empty line
+      const iostatLines = iostatRaw.split("\n").filter((l) => l.trim());
+      const lastLine = iostatLines.length > 0 ? iostatLines[iostatLines.length - 1] : "";
+      const iostatParts = lastLine.split(/\s+/).filter(Boolean);
       if (iostatParts.length >= 3) {
         vitals.disk.kbPerTransfer = parseFloat(iostatParts[0]) || 0;
         vitals.disk.iops = parseFloat(iostatParts[1]) || 0;
