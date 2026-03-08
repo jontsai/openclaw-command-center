@@ -1,6 +1,6 @@
 {
   "name": "openclaw-command-center",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "🦞 AI agent command and control dashboard — Spawn more Overlords!",
   "main": "lib/server.js",
   "type": "commonjs",
