@@ -62,13 +62,19 @@ function createIntelModule(deps) {
         for (const line of lines) {
           const match = line.match(/(?:\*\*)?Agent(?:\*\*)?:\s*(.+)/i);
           if (match) {
-            agent = match[1].replace(/\*\*/g, "").replace(/\s*[|(].*$/, "").trim();
+            agent = match[1]
+              .replace(/\*\*/g, "")
+              .replace(/\s*[|(].*$/, "")
+              .trim();
             break;
           }
           // Also check for "Zpracoval:" (Czech variant)
           const matchCz = line.match(/(?:\*\*)?Zpracoval(?:\*\*)?:\s*(.+)/i);
           if (matchCz) {
-            agent = matchCz[1].replace(/\*\*/g, "").replace(/\s*[|(].*$/, "").trim();
+            agent = matchCz[1]
+              .replace(/\*\*/g, "")
+              .replace(/\s*[|(].*$/, "")
+              .trim();
             break;
           }
           // Also check for "Autor:" (Czech variant)

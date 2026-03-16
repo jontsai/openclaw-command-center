@@ -1965,9 +1965,15 @@ main {
   font-size: 0.7rem;
   flex-shrink: 0;
 }
-.intel-file-age.fresh { color: var(--green); }
-.intel-file-age.aging { color: var(--yellow); }
-.intel-file-age.stale { color: var(--red); }
+.intel-file-age.fresh {
+  color: var(--green);
+}
+.intel-file-age.aging {
+  color: var(--yellow);
+}
+.intel-file-age.stale {
+  color: var(--red);
+}
 .intel-freshness-dot {
   display: inline-block;
   width: 8px;
@@ -1975,9 +1981,15 @@ main {
   border-radius: 50%;
   margin-right: 6px;
 }
-.intel-freshness-dot.fresh { background: var(--green); }
-.intel-freshness-dot.aging { background: var(--yellow); }
-.intel-freshness-dot.stale { background: var(--red); }
+.intel-freshness-dot.fresh {
+  background: var(--green);
+}
+.intel-freshness-dot.aging {
+  background: var(--yellow);
+}
+.intel-freshness-dot.stale {
+  background: var(--red);
+}
 
 /* Pipeline Viewer Panel */
 .pipeline-card {

@@ -9,11 +9,7 @@ function createMonetizationModule(deps) {
   const { CONFIG } = deps;
 
   function getMonetizationStats() {
-    const trackerPath = path.join(
-      CONFIG.paths.workspace,
-      "intel",
-      "MONETIZATION-TRACKER.md",
-    );
+    const trackerPath = path.join(CONFIG.paths.workspace, "intel", "MONETIZATION-TRACKER.md");
 
     const result = {
       firms: [],
@@ -42,11 +38,7 @@ function createMonetizationModule(deps) {
       const line = lines[i].trim();
 
       // Detect table header
-      if (
-        line.startsWith("|") &&
-        line.includes("Firma") &&
-        !inTable
-      ) {
+      if (line.startsWith("|") && line.includes("Firma") && !inTable) {
         const cells = line
           .split("|")
           .map((c) => c.trim())

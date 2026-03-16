@@ -1166,12 +1166,27 @@
                 <div class="vital-header">
                   <span class="vital-label">👤 Agents</span>
                 </div>
-                <div id="intel-agents" style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted)">-</div>
+                <div
+                  id="intel-agents"
+                  style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted)"
+                >
+                  -
+                </div>
               </div>
             </div>
             <!-- File list -->
             <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border)">
-              <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px">Recent Files</div>
+              <div
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+              >
+                Recent Files
+              </div>
               <div id="intel-file-list" style="font-size: 0.8rem">
                 <em style="color: var(--text-muted)">Loading...</em>
               </div>
@@ -1221,11 +1236,16 @@
                 <div class="vital-header">
                   <span class="vital-label" style="color: var(--green)">💵 Revenue Active</span>
                 </div>
-                <div class="vital-value" id="monetization-revenue" style="color: var(--green)">0</div>
+                <div class="vital-value" id="monetization-revenue" style="color: var(--green)">
+                  0
+                </div>
               </div>
             </div>
             <!-- Firm cards -->
-            <div id="monetization-firms" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border)">
+            <div
+              id="monetization-firms"
+              style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border)"
+            >
               <em style="color: var(--text-muted); font-size: 0.8rem">Loading...</em>
             </div>
           </div>
@@ -3418,7 +3438,10 @@
           if (entries.length > 0) {
             agentsEl.innerHTML = entries
               .sort((a, b) => b[1] - a[1])
-              .map(([agent, count]) => `<span style="margin-right: 10px"><strong>${escapeHtml(agent)}</strong>: ${count}</span>`)
+              .map(
+                ([agent, count]) =>
+                  `<span style="margin-right: 10px"><strong>${escapeHtml(agent)}</strong>: ${count}</span>`,
+              )
               .join("");
           } else {
             agentsEl.textContent = "No agents assigned";
@@ -3432,15 +3455,18 @@
             listEl.innerHTML = '<em style="color: var(--text-muted)">No intel files found</em>';
             return;
           }
-          const filesHtml = intel.files.slice(0, 10).map(f => {
-            const ageText = formatRelativeTime(f.ageMs);
-            return `<div class="intel-file-row">
+          const filesHtml = intel.files
+            .slice(0, 10)
+            .map((f) => {
+              const ageText = formatRelativeTime(f.ageMs);
+              return `<div class="intel-file-row">
               <span class="intel-freshness-dot ${f.freshness}"></span>
               <span class="intel-file-name">${escapeHtml(f.name)}</span>
               <span class="intel-file-agent">${escapeHtml(f.agent)}</span>
               <span class="intel-file-age ${f.freshness}">${ageText}</span>
             </div>`;
-          }).join("");
+            })
+            .join("");
           smartUpdate(listEl, filesHtml);
         }
       }
@@ -3459,21 +3485,24 @@
         if (!listEl) return;
 
         if (pipelines.length === 0) {
-          listEl.innerHTML = '<em style="color: var(--text-muted)">No pipeline files found. Create *-PIPELINE.md or *-QUEUE.md in intel/</em>';
+          listEl.innerHTML =
+            '<em style="color: var(--text-muted)">No pipeline files found. Create *-PIPELINE.md or *-QUEUE.md in intel/</em>';
           return;
         }
 
-        const html = pipelines.map(p => {
-          const statusBadges = Object.entries(p.statusCounts)
-            .sort((a, b) => b[1] - a[1])
-            .map(([status, count]) => {
-              return `<span class="pipeline-status-badge"><span class="status-count">${count}</span> ${escapeHtml(status)}</span>`;
-            }).join("");
+        const html = pipelines
+          .map((p) => {
+            const statusBadges = Object.entries(p.statusCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(([status, count]) => {
+                return `<span class="pipeline-status-badge"><span class="status-count">${count}</span> ${escapeHtml(status)}</span>`;
+              })
+              .join("");
 
-          const modifiedDate = new Date(p.lastModified);
-          const modifiedText = formatRelativeTime(Date.now() - modifiedDate.getTime());
+            const modifiedDate = new Date(p.lastModified);
+            const modifiedText = formatRelativeTime(Date.now() - modifiedDate.getTime());
 
-          return `<div class="pipeline-card">
+            return `<div class="pipeline-card">
             <div class="pipeline-header">
               <span class="pipeline-name">${escapeHtml(p.name)}</span>
               <span class="pipeline-total">${p.totalItems} items</span>
@@ -3481,7 +3510,8 @@
             <div class="pipeline-statuses">${statusBadges || '<span style="color: var(--text-muted); font-size: 0.75rem">No status columns detected</span>'}</div>
             <div class="pipeline-last-modified">Updated ${modifiedText}</div>
           </div>`;
-        }).join("");
+          })
+          .join("");
 
         smartUpdate(listEl, html);
       }
@@ -3503,17 +3533,22 @@
 
         const firms = monetization.firms || [];
         if (firms.length === 0) {
-          firmsEl.innerHTML = '<em style="color: var(--text-muted)">No firms tracked. Create intel/MONETIZATION-TRACKER.md</em>';
+          firmsEl.innerHTML =
+            '<em style="color: var(--text-muted)">No firms tracked. Create intel/MONETIZATION-TRACKER.md</em>';
           return;
         }
 
-        const html = '<div class="monetization-grid">' + firms.map(f => {
-          const priorityClass = (f.priority || "").toUpperCase();
-          const blockerHtml = f.blocker && f.blocker !== "-"
-            ? `<div class="monetization-blocker">⚠ ${escapeHtml(f.blocker)}</div>`
-            : "";
+        const html =
+          '<div class="monetization-grid">' +
+          firms
+            .map((f) => {
+              const priorityClass = (f.priority || "").toUpperCase();
+              const blockerHtml =
+                f.blocker && f.blocker !== "-"
+                  ? `<div class="monetization-blocker">⚠ ${escapeHtml(f.blocker)}</div>`
+                  : "";
 
-          return `<div class="monetization-card">
+              return `<div class="monetization-card">
             <div class="monetization-card-header">
               <span class="monetization-firm-name">${escapeHtml(f.name)}</span>
               <span class="monetization-priority ${priorityClass}">${escapeHtml(f.priority || "?")}</span>
@@ -3522,7 +3557,9 @@
             <div class="monetization-detail"><strong>Next:</strong> ${escapeHtml(f.milestone || "-")}</div>
             ${blockerHtml}
           </div>`;
-        }).join("") + '</div>';
+            })
+            .join("") +
+          "</div>";
 
         smartUpdate(firmsEl, html);
       }

@@ -105,15 +105,11 @@ function createPipelineModule(deps) {
       const statusCounts = {};
       for (const row of rows) {
         // Try common status column names
-        const statusValue =
-          row.status || row.email_odesl_n_ || row.stav || "";
+        const statusValue = row.status || row.email_odesl_n_ || row.stav || "";
 
         if (statusValue) {
           // Normalize status values
-          const normalized = statusValue
-            .replace(/[*_]/g, "")
-            .trim()
-            .toUpperCase();
+          const normalized = statusValue.replace(/[*_]/g, "").trim().toUpperCase();
           if (normalized && normalized !== "-") {
             statusCounts[normalized] = (statusCounts[normalized] || 0) + 1;
           }
@@ -136,9 +132,7 @@ function createPipelineModule(deps) {
     }
 
     // Sort by last modified (newest first)
-    result.pipelines.sort(
-      (a, b) => new Date(b.lastModified) - new Date(a.lastModified),
-    );
+    result.pipelines.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified));
 
     return result;
   }

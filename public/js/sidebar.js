@@ -229,7 +229,9 @@
 
     // Update pipeline count
     if (data.pipeline) {
-      sidebarState.pipeline = Array.isArray(data.pipeline.pipelines) ? data.pipeline.pipelines.length : 0;
+      sidebarState.pipeline = Array.isArray(data.pipeline.pipelines)
+        ? data.pipeline.pipelines.length
+        : 0;
     }
 
     // Update monetization count
