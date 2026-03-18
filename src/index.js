@@ -70,6 +70,7 @@ const {
   saveOperators,
   getOperatorBySlackId,
   startOperatorsRefresh,
+  calculateOperatorStats,
 } = require("./operators");
 const { createSessionsModule } = require("./sessions");
 const { getCronJobs } = require("./cron");
@@ -145,6 +146,7 @@ const state = createStateModule({
   getSystemVitals,
   getCronJobs: () => getCronJobs(getOpenClawDir),
   loadOperators: () => loadOperators(DATA_DIR),
+  calculateOperatorStats,
   getLlmUsage: () => getLlmUsage(PATHS.state),
   getDailyTokenUsage: () => getDailyTokenUsage(getOpenClawDir),
   getTokenStats,
@@ -502,30 +504,12 @@ const server = http.createServer((req, res) => {
 
     if (method === "GET") {
       const allSessions = sessions.getSessions({ limit: null });
-      const operatorsWithStats = data.operators.map((op) => {
-        const userSessions = allSessions.filter(
-          (s) => s.originator?.userId === op.id || s.originator?.userId === op.metadata?.slackId,
-        );
-        return {
-          ...op,
-          stats: {
-            activeSessions: userSessions.filter((s) => s.active).length,
-            totalSessions: userSessions.length,
-            lastSeen:
-              userSessions.length > 0
-                ? new Date(
-                    Date.now() - Math.min(...userSessions.map((s) => s.minutesAgo)) * 60000,
-                  ).toISOString()
-                : op.lastSeen,
-          },
-        };
-      });
+      const operatorsWithStats = calculateOperatorStats(data, allSessions);
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(
         JSON.stringify(
           {
-            operators: operatorsWithStats,
-            roles: data.roles,
+            ...operatorsWithStats,
             timestamp: Date.now(),
           },
           null,

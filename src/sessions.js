@@ -80,21 +80,44 @@ function createSessionsModule(deps) {
   let sessionsCache = { sessions: [], timestamp: 0, refreshing: false };
   const SESSIONS_CACHE_TTL = 10000; // 10 seconds
 
+  /**
+   * Find transcript file for a session ID.
+   * Handles both plain (sessionId.jsonl) and topic-suffixed (sessionId-topic-XXX.jsonl) files.
+   * @param {string} sessionId - Session UUID
+   * @returns {string|null} - Full path to transcript file or null if not found
+   */
+  function findTranscriptPath(sessionId) {
+    if (!sessionId) return null;
+
+    const openclawDir = getOpenClawDir();
+    const sessionsDir = path.join(openclawDir, "agents", "main", "sessions");
+
+    // Try exact match first (most common case)
+    const exactPath = path.join(sessionsDir, `${sessionId}.jsonl`);
+    if (fs.existsSync(exactPath)) return exactPath;
+
+    // Search for topic-suffixed files (e.g., sessionId-topic-TIMESTAMP.jsonl)
+    try {
+      const files = fs.readdirSync(sessionsDir);
+      const prefix = `${sessionId}-`;
+      const match = files.find(
+        (f) => f.startsWith(prefix) && f.endsWith(".jsonl") && !f.includes(".deleted."),
+      );
+      if (match) return path.join(sessionsDir, match);
+    } catch (e) {
+      // Directory read failed
+    }
+
+    return null;
+  }
+
   // Extract session originator from transcript
   function getSessionOriginator(sessionId) {
     try {
       if (!sessionId) return null;
 
-      const openclawDir = getOpenClawDir();
-      const transcriptPath = path.join(
-        openclawDir,
-        "agents",
-        "main",
-        "sessions",
-        `${sessionId}.jsonl`,
-      );
-
-      if (!fs.existsSync(transcriptPath)) return null;
+      const transcriptPath = findTranscriptPath(sessionId);
+      if (!transcriptPath) return null;
 
       const content = fs.readFileSync(transcriptPath, "utf8");
       const lines = content.trim().split("\n");
@@ -119,13 +142,33 @@ function createSessionsModule(deps) {
           if (!text) continue;
 
           // Extract Slack user from message patterns:
-          // Example: "[Slack #channel +6m 2026-01-27 15:31 PST] username (USERID): message"
-          // Pattern: "username (USERID):" where USERID is the sender's Slack ID
+          // Format 1 (old): "[Slack #channel +6m 2026-01-27 15:31 PST] username (USERID): message"
+          // Format 2 (new): Conversation info JSON with "sender_id": "USERID" and "sender": "username"
           const slackUserMatch = text.match(/\]\s*([\w.-]+)\s*\(([A-Z0-9]+)\):/);
 
           if (slackUserMatch) {
             const username = slackUserMatch[1];
             const userId = slackUserMatch[2];
+
+            const operator = getOperatorBySlackId(userId);
+
+            return {
+              userId,
+              username,
+              displayName: operator?.name || username,
+              role: operator?.role || "user",
+              avatar: operator?.avatar || null,
+            };
+          }
+
+          // Try new format: Conversation info JSON block
+          // Look for "sender_id": "USERID" and "sender": "username"
+          const senderIdMatch = text.match(/"sender_id":\s*"([A-Z0-9]+)"/);
+          const senderMatch = text.match(/"sender":\s*"([^"]+)"/);
+
+          if (senderIdMatch) {
+            const userId = senderIdMatch[1];
+            const username = senderMatch ? senderMatch[1] : userId;
 
             const operator = getOperatorBySlackId(userId);
 
@@ -154,15 +197,8 @@ function createSessionsModule(deps) {
   function getSessionTopic(sessionId) {
     if (!sessionId) return null;
     try {
-      const openclawDir = getOpenClawDir();
-      const transcriptPath = path.join(
-        openclawDir,
-        "agents",
-        "main",
-        "sessions",
-        `${sessionId}.jsonl`,
-      );
-      if (!fs.existsSync(transcriptPath)) return null;
+      const transcriptPath = findTranscriptPath(sessionId);
+      if (!transcriptPath) return null;
 
       // Read first 50KB of transcript (enough for topic detection, fast)
       const fd = fs.openSync(transcriptPath, "r");
@@ -271,13 +307,16 @@ function createSessionsModule(deps) {
 
         // Map sessions (same logic as getSessions)
         const mapped = sessions.map((s) => mapSession(s));
+        const withOriginator = mapped.filter((s) => s.originator != null);
 
         sessionsCache = {
           sessions: mapped,
           timestamp: Date.now(),
           refreshing: false,
         };
-        console.log(`[Sessions Cache] Refreshed: ${mapped.length} sessions`);
+        console.log(
+          `[Sessions Cache] Refreshed: ${mapped.length} sessions (${withOriginator.length} with originator)`,
+        );
       }
     } catch (e) {
       console.error("[Sessions Cache] Refresh error:", e.message);
@@ -332,17 +371,10 @@ function createSessionsModule(deps) {
 
   // Read session transcript from JSONL file
   function readTranscript(sessionId) {
-    const openclawDir = getOpenClawDir();
-    const transcriptPath = path.join(
-      openclawDir,
-      "agents",
-      "main",
-      "sessions",
-      `${sessionId}.jsonl`,
-    );
+    const transcriptPath = findTranscriptPath(sessionId);
 
     try {
-      if (!fs.existsSync(transcriptPath)) return [];
+      if (!transcriptPath) return [];
       const content = fs.readFileSync(transcriptPath, "utf8");
       return content
         .trim()
@@ -574,6 +606,7 @@ function createSessionsModule(deps) {
   }
 
   return {
+    findTranscriptPath,
     getSessionOriginator,
     getSessionTopic,
     mapSession,

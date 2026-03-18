@@ -224,10 +224,41 @@ function startOperatorsRefresh(dataDir, getOpenClawDir) {
   setInterval(() => refreshOperatorsAsync(dataDir, getOpenClawDir), 5 * 60 * 1000); // Every 5 minutes
 }
 
+/**
+ * Calculate operator stats from sessions (single source of truth)
+ * @param {Object} operatorData - Result from loadOperators()
+ * @param {Array} allSessions - Array of session objects with originator field
+ * @returns {Object} - operatorData with stats added to each operator
+ */
+function calculateOperatorStats(operatorData, allSessions) {
+  const operatorsWithStats = operatorData.operators.map((op) => {
+    const userSessions = allSessions.filter((s) => {
+      const userId = s.originator?.userId;
+      if (!userId) return false; // Skip sessions without originator
+      return userId === op.id || userId === op.metadata?.slackId;
+    });
+    return {
+      ...op,
+      stats: {
+        activeSessions: userSessions.filter((s) => s.active).length,
+        totalSessions: userSessions.length,
+        lastSeen:
+          userSessions.length > 0
+            ? new Date(
+                Date.now() - Math.min(...userSessions.map((s) => s.minutesAgo)) * 60000,
+              ).toISOString()
+            : op.lastSeen,
+      },
+    };
+  });
+  return { ...operatorData, operators: operatorsWithStats };
+}
+
 module.exports = {
   loadOperators,
   saveOperators,
   getOperatorBySlackId,
   refreshOperatorsAsync,
   startOperatorsRefresh,
+  calculateOperatorStats,
 };
