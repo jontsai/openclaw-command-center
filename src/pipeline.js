@@ -104,7 +104,10 @@ function createPipelineModule(deps) {
       // Count statuses - look for "status" column or detect status-like values
       const statusCounts = {};
       for (const row of rows) {
-        // Try common status column names
+        // Try common status column names:
+        // "status" — English default
+        // "email_odesl_n_" — Czech "Email odesílání" (email sending status)
+        // "stav" — Czech for "status"
         const statusValue = row.status || row.email_odesl_n_ || row.stav || "";
 
         if (statusValue) {

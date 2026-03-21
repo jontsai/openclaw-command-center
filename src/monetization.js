@@ -37,8 +37,12 @@ function createMonetizationModule(deps) {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
 
-      // Detect table header
-      if (line.startsWith("|") && line.includes("Firma") && !inTable) {
+      // Detect table header — supports Czech ("Firma") and English ("Company", "Firm")
+      if (
+        line.startsWith("|") &&
+        (line.includes("Firma") || line.includes("Company") || line.includes("Firm")) &&
+        !inTable
+      ) {
         const cells = line
           .split("|")
           .map((c) => c.trim())
@@ -63,14 +67,31 @@ function createMonetizationModule(deps) {
 
         if (cells.length < 4) continue;
 
-        // Map cells to header positions
-        // Expected: | # | Firma | Revenue Status | Next Milestone | Blocker | Priority |
+        // Use parsed headers for column lookup (resilient to column reordering)
+        const colIdx = (name) => {
+          const idx = headers.findIndex((h) => h.toLowerCase().includes(name.toLowerCase()));
+          return idx >= 0 ? idx : -1;
+        };
+        const nameIdx =
+          colIdx("Firma") >= 0
+            ? colIdx("Firma")
+            : colIdx("Company") >= 0
+              ? colIdx("Company")
+              : colIdx("Firm");
+        const revenueIdx = colIdx("Revenue");
+        const milestoneIdx = colIdx("Milestone");
+        const blockerIdx = colIdx("Blocker");
+        const priorityIdx = colIdx("Priority");
+
         const firm = {
-          name: (cells[1] || "").replace(/\*\*/g, "").trim(),
-          revenue: (cells[2] || "").trim(),
-          milestone: (cells[3] || "").trim(),
-          blocker: (cells[4] || "").trim(),
-          priority: (cells[5] || "").replace(/\*\*/g, "").trim().toUpperCase(),
+          name: (nameIdx >= 0 ? cells[nameIdx] : cells[1] || "").replace(/\*\*/g, "").trim(),
+          revenue: (revenueIdx >= 0 ? cells[revenueIdx] : cells[2] || "").trim(),
+          milestone: (milestoneIdx >= 0 ? cells[milestoneIdx] : cells[3] || "").trim(),
+          blocker: (blockerIdx >= 0 ? cells[blockerIdx] : cells[4] || "").trim(),
+          priority: (priorityIdx >= 0 ? cells[priorityIdx] : cells[5] || "")
+            .replace(/\*\*/g, "")
+            .trim()
+            .toUpperCase(),
         };
 
         if (!firm.name || firm.name === "-") continue;

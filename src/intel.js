@@ -54,10 +54,14 @@ function createIntelModule(deps) {
       let agent = null;
       try {
         const fd = fs.openSync(filePath, "r");
-        const buffer = Buffer.alloc(1024);
-        const bytesRead = fs.readSync(fd, buffer, 0, 1024, 0);
-        fs.closeSync(fd);
-        const head = buffer.toString("utf8", 0, bytesRead);
+        let head;
+        try {
+          const buffer = Buffer.alloc(1024);
+          const bytesRead = fs.readSync(fd, buffer, 0, 1024, 0);
+          head = buffer.toString("utf8", 0, bytesRead);
+        } finally {
+          fs.closeSync(fd);
+        }
         const lines = head.split("\n").slice(0, 10);
         for (const line of lines) {
           const match = line.match(/(?:\*\*)?Agent(?:\*\*)?:\s*(.+)/i);
