@@ -84,13 +84,13 @@ textarea:focus-visible {
   transition: all 0.15s ease;
 }
 .btn-primary {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--green));
+  color: #061018;
+  border-color: rgba(130, 239, 255, 0.7);
 }
 .btn-primary:hover {
-  background: #4c9aed;
-  border-color: #4c9aed;
+  background: linear-gradient(135deg, #a3f6ff, #a7fac8);
+  border-color: rgba(130, 239, 255, 0.95);
 }
 .btn-secondary {
   background: var(--card-bg);
@@ -304,7 +304,6 @@ textarea:focus-visible {
   flex: 1;
   width: min(1540px, 100%);
   min-height: 100vh;
-  margin-left: 0;
   margin: 0 auto;
   padding-bottom: var(--content-inset);
 }
