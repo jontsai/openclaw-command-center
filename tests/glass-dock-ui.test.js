@@ -27,6 +27,26 @@ describe("glass dock UI shell", () => {
     assert.doesNotMatch(partial, /class="sidebar"/);
   });
 
+  it("keeps dock controls accessible when mobile labels are hidden", () => {
+    assert.match(dashboardCss, /\.dock-label\s*{\s*display:\s*none;/);
+
+    const dockControls =
+      partial.match(/<(?:a|button)[^>]*class="[^"]*\bdock-item\b[^"]*"[^>]*>/g) || [];
+
+    assert.ok(dockControls.length >= 7);
+    for (const control of dockControls) {
+      assert.match(control, /\baria-label="/);
+    }
+
+    assert.match(partial, /aria-label="System Vitals"/);
+    assert.match(partial, /aria-label="LLM Usage"/);
+    assert.match(partial, /aria-label="Sessions"/);
+    assert.match(partial, /aria-label="Cron Jobs"/);
+    assert.match(partial, /aria-label="Memory"/);
+    assert.match(partial, /aria-label="AI Jobs Dashboard"/);
+    assert.match(partial, /aria-label="More commands"/);
+  });
+
   it("defines the shared glass visual system and bottom dock layout", () => {
     assert.match(dashboardCss, /--glass-panel:/);
     assert.match(dashboardCss, /--dock-height:/);
@@ -43,6 +63,8 @@ describe("glass dock UI shell", () => {
     assert.match(indexHtml, /<script src="js\/sidebar\.js"><\/script>/);
     assert.match(jobsHtml, /<script src="\/js\/sidebar\.js"><\/script>/);
     assert.doesNotMatch(indexHtml, /id="mobile-menu-btn"/);
+    assert.doesNotMatch(indexHtml, /sidebarCollapsed/);
+    assert.doesNotMatch(indexHtml, /\.nav-item\[data-section\]/);
     assert.doesNotMatch(jobsHtml, /\.sidebar\s*{/);
   });
 

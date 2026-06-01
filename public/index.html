@@ -1673,7 +1673,6 @@
       let currentFilter = "all"; // Legacy, for backwards compat
       let sessionsData = [];
       let cronData = [];
-      let sidebarCollapsed = false;
       let paginationState = {
         page: 1,
         pageSize: 20,
@@ -1778,14 +1777,6 @@
           morphdom(targetEl, temp, { childrenOnly: true });
         }
       }
-
-      // Navigation
-      document.querySelectorAll(".nav-item[data-section]").forEach((item) => {
-        item.addEventListener("click", function (e) {
-          document.querySelectorAll(".nav-item").forEach((i) => i.classList.remove("active"));
-          this.classList.add("active");
-        });
-      });
 
       // Filter functions - Session filters
       function setSessionFilter(group, value) {
