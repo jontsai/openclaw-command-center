@@ -17,16 +17,8 @@
 
     <!-- Main Content -->
     <div class="main-wrapper" id="main-wrapper">
-      <header>
+      <header class="command-header">
         <div class="header-left">
-          <button
-            class="sidebar-toggle"
-            onclick="toggleSidebar()"
-            style="display: none"
-            id="mobile-menu-btn"
-          >
-            ☰
-          </button>
           <h1 class="page-title" data-i18n="app.title">OpenClaw Command Center</h1>
           <div
             id="lang-switcher"
@@ -1785,16 +1777,6 @@
           // Otherwise morph the container itself
           morphdom(targetEl, temp, { childrenOnly: true });
         }
-      }
-
-      // Sidebar toggle
-      function toggleSidebar() {
-        sidebarCollapsed = !sidebarCollapsed;
-        document.getElementById("sidebar").classList.toggle("collapsed", sidebarCollapsed);
-        document
-          .getElementById("main-wrapper")
-          .classList.toggle("sidebar-collapsed", sidebarCollapsed);
-        $set("sidebar-toggle-btn", "textContent", sidebarCollapsed ? "▶" : "◀");
       }
 
       // Navigation
@@ -4232,7 +4214,7 @@
         if (e.key === "Escape") closeDetail();
         if (e.key === "b" && (e.metaKey || e.ctrlKey)) {
           e.preventDefault();
-          toggleSidebar();
+          window.toggleCommandDockMore && window.toggleCommandDockMore();
         }
       });
 
