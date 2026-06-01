@@ -75,6 +75,41 @@
     return path === "/" || path === "/index.html";
   }
 
+  function getDockLinks() {
+    return document.querySelectorAll(".dock-item, .dock-menu-item");
+  }
+
+  function markActive(item, active) {
+    item.classList.toggle("active", active);
+    if (active) {
+      item.setAttribute("aria-current", item.dataset.page === "/jobs.html" ? "page" : "location");
+    } else {
+      item.removeAttribute("aria-current");
+    }
+  }
+
+  function closeCommandDockMore() {
+    const menu = document.getElementById("command-more-menu");
+    const toggle = document.getElementById("command-more-toggle");
+    if (menu) menu.hidden = true;
+    if (toggle) toggle.setAttribute("aria-expanded", "false");
+  }
+
+  window.closeCommandDockMore = closeCommandDockMore;
+
+  window.toggleCommandDockMore = function () {
+    const menu = document.getElementById("command-more-menu");
+    const toggle = document.getElementById("command-more-toggle");
+    if (!menu || !toggle) return;
+    const nextOpen = menu.hidden;
+    menu.hidden = !nextOpen;
+    toggle.setAttribute("aria-expanded", nextOpen ? "true" : "false");
+  };
+
+  window.toggleSidebar = function () {
+    window.toggleCommandDockMore();
+  };
+
   /**
    * Set the active nav item based on current URL
    */
@@ -82,25 +117,22 @@
     const currentPath = window.location.pathname;
     const currentHash = window.location.hash;
 
-    document.querySelectorAll(".nav-item").forEach((item) => {
-      item.classList.remove("active");
-
+    getDockLinks().forEach((item) => {
       const itemPage = item.dataset.page;
       const itemHref = item.getAttribute("href");
+      let active = false;
 
-      // Check if this nav item matches the current page
       if (itemPage === "/" && isMainPage()) {
-        // For main page sections
-        if (currentHash && itemHref && itemHref === currentHash) {
-          item.classList.add("active");
+        if (currentHash && itemHref === currentHash) {
+          active = true;
         } else if (!currentHash && item.dataset.section === "vitals") {
-          // Default to vitals on main page with no hash
-          item.classList.add("active");
+          active = true;
         }
       } else if (itemHref === currentPath) {
-        // Exact page match (like /jobs.html)
-        item.classList.add("active");
+        active = true;
       }
+
+      markActive(item, active);
     });
   }
 
@@ -110,26 +142,36 @@
    * - Hash links on other pages: navigate to main page with hash
    */
   function setupNavigation() {
-    document.querySelectorAll(".nav-item[data-section]").forEach((item) => {
+    document.querySelectorAll("[data-section]").forEach((item) => {
       item.addEventListener("click", (e) => {
         const section = item.dataset.section;
         const targetHash = `#${section}-section`;
 
         if (isMainPage()) {
-          // On main page: smooth scroll to section
           e.preventDefault();
           const target = document.querySelector(targetHash);
           if (target) {
-            target.scrollIntoView({ behavior: "smooth" });
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
             history.pushState(null, "", targetHash);
             setActiveNavItem();
+            closeCommandDockMore();
           }
         } else {
-          // On other page: navigate to main page with hash
           e.preventDefault();
           window.location.href = "/" + targetHash;
         }
       });
+    });
+
+    document.addEventListener("click", (event) => {
+      const dock = document.getElementById("command-dock");
+      if (dock && !dock.contains(event.target)) {
+        closeCommandDockMore();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeCommandDockMore();
     });
   }
 
@@ -281,42 +323,6 @@
     }
   }
 
-  /**
-   * Toggle sidebar collapsed state
-   */
-  window.toggleSidebar = function () {
-    const sidebar = document.getElementById("sidebar");
-    const mainWrapper = document.getElementById("main-wrapper");
-
-    if (sidebar) {
-      sidebar.classList.toggle("collapsed");
-    }
-    if (mainWrapper) {
-      mainWrapper.classList.toggle("sidebar-collapsed");
-    }
-
-    // Save preference
-    const collapsed = sidebar?.classList.contains("collapsed");
-    try {
-      localStorage.setItem("sidebar-collapsed", collapsed ? "true" : "false");
-    } catch (e) {}
-  };
-
-  /**
-   * Restore sidebar collapsed state from localStorage
-   */
-  function restoreSidebarState() {
-    try {
-      const collapsed = localStorage.getItem("sidebar-collapsed") === "true";
-      if (collapsed) {
-        const sidebar = document.getElementById("sidebar");
-        const mainWrapper = document.getElementById("main-wrapper");
-        if (sidebar) sidebar.classList.add("collapsed");
-        if (mainWrapper) mainWrapper.classList.add("sidebar-collapsed");
-      }
-    } catch (e) {}
-  }
-
   // Fetch jobs count separately (since it's a different API)
   async function fetchJobsCount() {
     try {
@@ -332,7 +338,6 @@
   // Initialize on DOM ready
   function init() {
     loadSidebar().then(() => {
-      restoreSidebarState();
       setupNavigation();
       fetchJobsCount();
     });
