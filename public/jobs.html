@@ -4,246 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="jobs.pageTitle">AI Jobs - OpenClaw Command Center</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
     <style>
-      :root {
-        --bg: #0d1117;
-        --card-bg: #161b22;
-        --card-hover: #1c2128;
-        --border: #30363d;
-        --text: #c9d1d9;
-        --text-muted: #8b949e;
-        --accent: #58a6ff;
-        --green: #3fb950;
-        --yellow: #d29922;
-        --red: #f85149;
-        --purple: #a371f7;
-        --orange: #db6d28;
-        --sidebar-width: 220px;
-      }
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background: var(--bg);
-        color: var(--text);
-        min-height: 100vh;
-        display: flex;
-      }
-
-      /* Sidebar */
-      .sidebar {
-        width: var(--sidebar-width);
-        background: var(--card-bg);
-        border-right: 1px solid var(--border);
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        display: flex;
-        flex-direction: column;
-        z-index: 60;
-        transition: transform 0.2s ease;
-      }
-      .sidebar.collapsed {
-        width: 56px;
-      }
-      .sidebar.collapsed .sidebar-title,
-      .sidebar.collapsed .nav-section-title,
-      .sidebar.collapsed .nav-item span:not(.nav-icon),
-      .sidebar.collapsed .nav-badge,
-      .sidebar.collapsed .sidebar-footer {
-        display: none;
-      }
-      .sidebar.collapsed .sidebar-header {
-        justify-content: center;
-        padding: 16px 8px;
-      }
-      .sidebar.collapsed .sidebar-toggle {
-        margin-left: 0;
-      }
-      .sidebar.collapsed .nav-item {
-        justify-content: center;
-        padding: 12px;
-      }
-      .sidebar.collapsed .nav-icon {
-        margin: 0;
-        font-size: 1.2rem;
-      }
-      .sidebar.collapsed .nav-item::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        background: var(--card-bg);
-        border: 1px solid var(--border);
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.8rem;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.15s;
-        margin-left: 8px;
-        z-index: 100;
-      }
-      .sidebar.collapsed .nav-item:hover::after {
-        opacity: 1;
-      }
-      .sidebar-header {
-        padding: 16px;
-        border-bottom: 1px solid var(--border);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .sidebar-logo {
-        font-size: 1.3rem;
-      }
-      .sidebar-title {
-        font-size: 0.9rem;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-      .sidebar-toggle {
-        margin-left: auto;
-        background: none;
-        border: none;
-        color: var(--text-muted);
-        cursor: pointer;
-        padding: 6px;
-        border-radius: 6px;
-        font-size: 1rem;
-      }
-      .sidebar-toggle:hover {
-        background: var(--bg);
-        color: var(--text);
-      }
-
-      .sidebar-nav {
-        flex: 1;
-        padding: 12px 8px;
-        overflow-y: auto;
-      }
-      .nav-section {
-        margin-bottom: 16px;
-      }
-      .nav-section-title {
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        padding: 8px 12px 4px;
-        letter-spacing: 0.5px;
-      }
-      .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 12px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        transition: all 0.15s;
-        text-decoration: none;
-        position: relative;
-      }
-      .nav-item:hover {
-        background: var(--bg);
-        color: var(--text);
-      }
-      .nav-item.active {
-        background: rgba(88, 166, 255, 0.15);
-        color: var(--accent);
-      }
-      .nav-icon {
-        font-size: 1rem;
-        width: 20px;
-        text-align: center;
-      }
-      .nav-badge {
-        margin-left: auto;
-        background: var(--border);
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 0.7rem;
-      }
-      .nav-item.active .nav-badge {
-        background: rgba(88, 166, 255, 0.3);
-      }
-
-      .sidebar-footer {
-        padding: 12px;
-        border-top: 1px solid var(--border);
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        text-align: center;
-      }
-
-      /* Main Content Area */
-      .main-wrapper {
-        flex: 1;
-        margin-left: var(--sidebar-width);
-        transition: margin-left 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-      }
-      .main-wrapper.sidebar-collapsed {
-        margin-left: 56px;
-      }
-
-      /* Header */
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 16px 24px;
-        border-bottom: 1px solid var(--border);
-        background: var(--card-bg);
-        position: sticky;
-        top: 0;
-        z-index: 50;
-      }
-      .header-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-      }
-      .page-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-      }
       .header-actions {
         display: flex;
         gap: 8px;
-      }
-
-      /* Stats Bar */
-      .stats-bar {
-        display: flex;
-        gap: 12px;
-        padding: 16px 24px;
-        background: var(--card-bg);
-        border-bottom: 1px solid var(--border);
-        overflow-x: auto;
-      }
-      .stat {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 12px 20px;
-        background: var(--bg);
-        border-radius: 8px;
-        min-width: 100px;
-      }
-      .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--accent);
       }
       .stat-value.green {
         color: var(--green);
@@ -253,43 +18,6 @@
       }
       .stat-value.red {
         color: var(--red);
-      }
-      .stat-label {
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        margin-top: 4px;
-      }
-
-      /* Main Content */
-      main {
-        padding: 24px;
-        flex: 1;
-      }
-
-      /* Section */
-      .section {
-        margin-bottom: 32px;
-      }
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-      }
-      .section-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .section-count {
-        background: var(--border);
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 0.75rem;
       }
 
       /* Filters */
@@ -834,23 +562,9 @@
       }
 
       /* Responsive */
-      @media (max-width: 1024px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-        .sidebar.visible {
-          transform: translateX(0);
-        }
-        .main-wrapper {
-          margin-left: 0;
-        }
-      }
       @media (max-width: 768px) {
         .jobs-grid {
           grid-template-columns: 1fr;
-        }
-        .stats-bar {
-          flex-wrap: wrap;
         }
         .modal {
           width: 95%;
@@ -868,7 +582,7 @@
 
     <!-- Main Content -->
     <div class="main-wrapper" id="main-wrapper">
-      <header>
+      <header class="command-header jobs-command-header">
         <div class="header-left">
           <h1 class="page-title" data-i18n="jobs.dashboard">🤖 AI Jobs Dashboard</h1>
         </div>
