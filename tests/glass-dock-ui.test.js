@@ -33,7 +33,7 @@ describe("glass dock UI shell", () => {
     assert.match(dashboardCss, /backdrop-filter: blur/);
     assert.match(dashboardCss, /\.command-dock/);
     assert.match(dashboardCss, /\.command-more-menu/);
-    assert.match(dashboardCss, /\.main-wrapper\s*{[^}]*margin-left:\s*0/s);
+    assert.match(dashboardCss, /\.main-wrapper\s*{[^}]*margin:\s*0 auto/s);
     assert.doesNotMatch(dashboardCss, /--sidebar-width/);
   });
 
