@@ -1,167 +1,143 @@
-<!-- Shared Sidebar Partial -->
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <span class="sidebar-logo">🦞</span>
-    <span class="sidebar-title" data-i18n="sidebar.title">Command Center</span>
-    <button
-      class="sidebar-toggle"
-      id="sidebar-toggle-btn"
-      onclick="toggleSidebar()"
-      title="Toggle sidebar"
+<!-- Shared Command Dock Partial -->
+<nav class="command-dock" id="command-dock" aria-label="Command navigation">
+  <a class="dock-brand" href="/" data-page="/" aria-label="OpenClaw Command Center">
+    <span class="dock-brand-mark">OC</span>
+    <span class="dock-brand-text" data-i18n="sidebar.title">Command Center</span>
+  </a>
+
+  <div class="dock-links" role="list">
+    <a
+      href="#vitals-section"
+      class="dock-item"
+      data-section="vitals"
+      data-page="/"
+      data-tooltip="System Vitals"
+      role="listitem"
     >
-      ◀
-    </button>
+      <span class="dock-icon" aria-hidden="true">Vitals</span>
+      <span class="dock-label" data-i18n="sidebar.systemVitals">Vitals</span>
+    </a>
+    <a
+      href="#llm-section"
+      class="dock-item"
+      data-section="llm"
+      data-page="/"
+      data-tooltip="LLM Usage"
+      role="listitem"
+    >
+      <span class="dock-icon" aria-hidden="true">LLM</span>
+      <span class="dock-label" data-i18n="sidebar.llmUsage">LLM</span>
+    </a>
+    <a
+      href="#sessions-section"
+      class="dock-item"
+      data-section="sessions"
+      data-page="/"
+      data-tooltip="Sessions"
+      role="listitem"
+    >
+      <span class="dock-icon" aria-hidden="true">Sess</span>
+      <span class="dock-label" data-i18n="sidebar.sessions">Sessions</span>
+      <span class="dock-badge" id="nav-session-count">-</span>
+    </a>
+    <a
+      href="#cron-section"
+      class="dock-item"
+      data-section="cron"
+      data-page="/"
+      data-tooltip="Cron Jobs"
+      role="listitem"
+    >
+      <span class="dock-icon" aria-hidden="true">Cron</span>
+      <span class="dock-label" data-i18n="sidebar.cronJobs">Cron</span>
+      <span class="dock-badge" id="nav-cron-count">-</span>
+    </a>
+    <a
+      href="#memory-section"
+      class="dock-item"
+      data-section="memory"
+      data-page="/"
+      data-tooltip="Memory"
+      role="listitem"
+    >
+      <span class="dock-icon" aria-hidden="true">Mem</span>
+      <span class="dock-label" data-i18n="sidebar.memory">Memory</span>
+      <span class="dock-badge" id="nav-memory-count">-</span>
+    </a>
+    <a
+      href="/jobs.html"
+      class="dock-item"
+      data-page="/jobs.html"
+      data-tooltip="AI Jobs Dashboard"
+      role="listitem"
+    >
+      <span class="dock-icon" aria-hidden="true">Jobs</span>
+      <span class="dock-label" data-i18n="sidebar.aiJobs">AI Jobs</span>
+      <span class="dock-badge" id="nav-jobs-count">-</span>
+    </a>
   </div>
-  <div class="sidebar-nav">
-    <div class="nav-section">
-      <div class="nav-section-title" data-i18n="sidebar.navigation">Navigation</div>
-      <a
-        href="#vitals-section"
-        class="nav-item"
-        data-section="vitals"
-        data-page="/"
-        data-tooltip="System Vitals"
-      >
-        <span class="nav-icon">🖥️</span>
-        <span data-i18n="sidebar.systemVitals">System Vitals</span>
-      </a>
-      <a
-        href="#llm-section"
-        class="nav-item"
-        data-section="llm"
-        data-page="/"
-        data-tooltip="LLM Fuel Gauges"
-      >
-        <span class="nav-icon">⛽</span>
-        <span data-i18n="sidebar.llmUsage">LLM Usage</span>
-      </a>
-      <a
-        href="#sessions-section"
-        class="nav-item"
-        data-section="sessions"
-        data-page="/"
-        data-tooltip="Sessions"
-      >
-        <span class="nav-icon">📡</span>
-        <span data-i18n="sidebar.sessions">Sessions</span>
-        <span class="nav-badge" id="nav-session-count">-</span>
-      </a>
-      <a
-        href="#cron-section"
-        class="nav-item"
-        data-section="cron"
-        data-page="/"
-        data-tooltip="Cron Jobs"
-      >
-        <span class="nav-icon">⏰</span>
-        <span data-i18n="sidebar.cronJobs">Cron Jobs</span>
-        <span class="nav-badge" id="nav-cron-count">-</span>
-      </a>
-      <a href="/jobs.html" class="nav-item" data-page="/jobs.html" data-tooltip="AI Jobs Dashboard">
-        <span class="nav-icon">🤖</span>
-        <span data-i18n="sidebar.aiJobs">AI Jobs</span>
-        <span class="nav-badge" id="nav-jobs-count">-</span>
-      </a>
-      <a
-        href="#memory-section"
-        class="nav-item"
-        data-section="memory"
-        data-page="/"
-        data-tooltip="Memory"
-      >
-        <span class="nav-icon">🧠</span>
-        <span data-i18n="sidebar.memory">Memory</span>
-        <span class="nav-badge" id="nav-memory-count">-</span>
-      </a>
-      <a
-        href="#cerebro-section"
-        class="nav-item"
-        data-section="cerebro"
-        data-page="/"
-        data-tooltip="Cerebro"
-      >
-        <span class="nav-icon">🔮</span>
+
+  <div class="dock-more">
+    <button
+      class="dock-item dock-more-toggle"
+      id="command-more-toggle"
+      type="button"
+      aria-haspopup="true"
+      aria-expanded="false"
+      aria-controls="command-more-menu"
+      onclick="toggleCommandDockMore()"
+    >
+      <span class="dock-icon" aria-hidden="true">More</span>
+      <span class="dock-label">More</span>
+    </button>
+    <div class="command-more-menu" id="command-more-menu" hidden>
+      <a href="#cerebro-section" class="dock-menu-item" data-section="cerebro" data-page="/">
         <span data-i18n="sidebar.cerebro">Cerebro</span>
-        <span class="nav-badge" id="nav-cerebro-count">-</span>
+        <span class="dock-badge" id="nav-cerebro-count">-</span>
       </a>
-      <a
-        href="#operators-section"
-        class="nav-item"
-        data-section="operators"
-        data-page="/"
-        data-tooltip="Operators"
-      >
-        <span class="nav-icon">👥</span>
+      <a href="#operators-section" class="dock-menu-item" data-section="operators" data-page="/">
         <span data-i18n="sidebar.operators">Operators</span>
-        <span class="nav-badge" id="nav-operator-count">-</span>
+        <span class="dock-badge" id="nav-operator-count">-</span>
       </a>
-    </div>
-    <div class="nav-section">
-      <div class="nav-section-title" data-i18n="sidebar.settings">Settings</div>
-      <a
-        href="#"
-        class="nav-item"
-        onclick="
-          window.openPrivacyModal && openPrivacyModal();
-          return false;
-        "
-        data-tooltip="Privacy Settings"
+      <button
+        type="button"
+        class="dock-menu-item"
+        onclick="window.openPrivacyModal && openPrivacyModal(); closeCommandDockMore();"
       >
-        <span class="nav-icon">🔒</span>
         <span data-i18n="sidebar.privacy">Privacy</span>
-      </a>
-      <a
-        href="#about-section"
-        class="nav-item"
-        data-section="about"
-        data-page="/"
-        data-tooltip="About"
-      >
-        <span class="nav-icon">ℹ️</span>
+      </button>
+      <a href="#about-section" class="dock-menu-item" data-section="about" data-page="/">
         <span data-i18n="sidebar.about">About</span>
       </a>
-    </div>
-    <div class="nav-section">
-      <div class="nav-section-title" data-i18n="sidebar.quickStats">Quick Stats</div>
-      <div class="nav-item" style="cursor: default" data-tooltip="Total tokens (24h)">
-        <span class="nav-icon">🎫</span>
-        <span data-i18n="sidebar.tokens">Tokens</span>
-        <span class="nav-badge" id="nav-tokens">-</span>
-      </div>
-      <div
-        class="nav-item"
-        style="cursor: pointer"
-        onclick="window.openCostModal && openCostModal()"
-        data-tooltip="Click for breakdown"
+      <button
+        type="button"
+        class="dock-menu-item"
+        onclick="window.openCostModal && openCostModal(); closeCommandDockMore();"
       >
-        <span class="nav-icon">💰</span>
         <span data-i18n="sidebar.estDaily">Est. Daily</span>
-        <span class="nav-badge" id="nav-cost">-</span>
+        <span class="dock-badge" id="nav-cost">-</span>
+      </button>
+      <div class="dock-menu-readout">
+        <span data-i18n="sidebar.tokens">Tokens</span>
+        <strong id="nav-tokens">-</strong>
       </div>
-      <div
-        class="nav-item"
-        style="cursor: pointer"
-        onclick="window.openCostModal && openCostModal()"
-        data-tooltip="Projected monthly cost"
-      >
-        <span class="nav-icon">📅</span>
+      <div class="dock-menu-readout">
         <span data-i18n="sidebar.estMonthly">Est. Monthly</span>
-        <span class="nav-badge" id="nav-monthly-cost">-</span>
+        <strong id="nav-monthly-cost">-</strong>
       </div>
-      <div class="nav-item" style="cursor: default" data-tooltip="Average tokens per session">
-        <span class="nav-icon">📊</span>
+      <div class="dock-menu-readout">
         <span data-i18n="sidebar.avgTokSess">Avg Tok/Sess</span>
-        <span class="nav-badge" id="nav-avg-tokens">-</span>
+        <strong id="nav-avg-tokens">-</strong>
       </div>
-      <div class="nav-item" style="cursor: default" data-tooltip="Average cost per session">
-        <span class="nav-icon">💵</span>
+      <div class="dock-menu-readout">
         <span data-i18n="sidebar.avgCostSess">Avg $/Sess</span>
-        <span class="nav-badge" id="nav-avg-cost">-</span>
+        <strong id="nav-avg-cost">-</strong>
       </div>
     </div>
   </div>
-  <div class="sidebar-footer">
-    <span data-i18n="sidebar.autoRefresh">Auto-refresh: 30s</span><br />
+
+  <div class="dock-sync" title="Live refresh status">
+    <span class="dock-sync-dot" aria-hidden="true"></span>
     <span id="sidebar-updated">-</span>
   </div>
 </nav>
