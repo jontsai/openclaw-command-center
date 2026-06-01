@@ -1,7 +1,7 @@
 # Floating Glass Dock Redesign Design
 
 Date: 2026-06-01
-Status: Pending written-spec review
+Status: Approved for implementation planning
 
 ## Summary
 
