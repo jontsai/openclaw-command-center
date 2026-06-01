@@ -142,7 +142,7 @@
    * - Hash links on other pages: navigate to main page with hash
    */
   function setupNavigation() {
-    document.querySelectorAll("[data-section]").forEach((item) => {
+    document.querySelectorAll("#command-dock [data-section]").forEach((item) => {
       item.addEventListener("click", (e) => {
         const section = item.dataset.section;
         const targetHash = `#${section}-section`;
