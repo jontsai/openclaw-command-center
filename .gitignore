@@ -71,6 +71,7 @@ Thumbs.db
 
 # Debug
 .debug/
+.superpowers/
 
 # TypeScript
 *.tsbuildinfo
