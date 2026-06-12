@@ -42,7 +42,7 @@
     "node": ">=18.0.0"
   },
   "devDependencies": {
-    "esbuild": "^0.27.3",
+    "esbuild": "^0.28.1",
     "eslint": "^8.56.0",
     "prettier": "^3.2.4"
   }
