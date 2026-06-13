@@ -250,6 +250,14 @@ function loadConfig() {
       theme: fileConfig.branding?.theme || "default",
     },
 
+    // Fleet / sibling agent monitoring
+    fleet: {
+      agents: (fileConfig.fleet?.agents || []).map((agent) => ({
+        ...agent,
+        workspace: expandPath(agent.workspace),
+      })),
+    },
+
     // Integrations
     integrations: {
       linear: {

@@ -83,6 +83,7 @@ const {
   refreshTokenUsageAsync,
 } = require("./tokens");
 const { getLlmUsage, getRoutingStats, startLlmUsageRefresh } = require("./llm-usage");
+const { getFleetAgents } = require("./fleet");
 const { executeAction } = require("./actions");
 const { migrateDataDir } = require("./data");
 const { createStateModule } = require("./state");
@@ -151,6 +152,7 @@ const state = createStateModule({
   getDailyTokenUsage: () => getDailyTokenUsage(getOpenClawDir),
   getTokenStats,
   getCerebroTopics: (opts) => getCerebroTopics(PATHS.cerebro, opts),
+  getFleetAgents,
   runOpenClaw,
   extractJSON,
   readTranscript: (sessionId) => sessions.readTranscript(sessionId),
@@ -498,6 +500,10 @@ const server = http.createServer((req, res) => {
     const cron = getCronJobs(getOpenClawDir);
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ cron }, null, 2));
+  } else if (pathname === "/api/fleet") {
+    const fleet = getFleetAgents(CONFIG);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ fleet }, null, 2));
   } else if (pathname === "/api/operators") {
     const method = req.method;
     const data = loadOperators(DATA_DIR);

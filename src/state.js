@@ -19,6 +19,7 @@ const { formatBytes, formatTimeAgo } = require("./utils");
  * @param {function} deps.getDailyTokenUsage - function from tokens module
  * @param {function} deps.getTokenStats - function from tokens module
  * @param {function} deps.getCerebroTopics - function from cerebro module
+ * @param {function} deps.getFleetAgents - function from fleet module
  * @param {function} deps.getMemoryStats - function (defined in this module, uses CONFIG.paths)
  * @param {function} deps.runOpenClaw - function from openclaw module
  * @param {function} deps.extractJSON - function from openclaw module
@@ -37,6 +38,7 @@ function createStateModule(deps) {
     getDailyTokenUsage,
     getTokenStats,
     getCerebroTopics,
+    getFleetAgents,
     runOpenClaw,
     extractJSON,
     readTranscript,
@@ -370,6 +372,7 @@ function createStateModule(deps) {
     let cron = [];
     let memory = {};
     let cerebro = {};
+    let fleet = [];
     let subagents = [];
 
     // Get ALL sessions first for accurate statusCounts, then slice for display
@@ -441,6 +444,11 @@ function createStateModule(deps) {
     } catch (e) {
       console.error("[State] cerebro:", e.message);
     }
+    try {
+      fleet = getFleetAgents ? getFleetAgents(CONFIG) : [];
+    } catch (e) {
+      console.error("[State] fleet:", e.message);
+    }
     // Derive subagents from allSessions (no extra CLI call needed)
     // Configurable retention: SUBAGENT_RETENTION_HOURS env var (default 12h)
     try {
@@ -477,6 +485,7 @@ function createStateModule(deps) {
       cron,
       memory,
       cerebro,
+      fleet,
       subagents,
       pagination: {
         page: 1,
