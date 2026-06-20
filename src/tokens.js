@@ -23,12 +23,21 @@ function emptyUsageBucket() {
 }
 
 // Async token usage refresh - runs in background, doesn't block
+function getTokenSessionsDir(getOpenClawDir) {
+  if (process.env.OPENCLAW_SESSIONS_DIR) {
+    return process.env.OPENCLAW_SESSIONS_DIR.replace(/^~/, process.env.HOME || "");
+  }
+
+  const agentId = process.env.OPENCLAW_AGENT_ID || "main";
+  return path.join(getOpenClawDir(), "agents", agentId, "sessions");
+}
+
 async function refreshTokenUsageAsync(getOpenClawDir) {
   if (tokenUsageCache.refreshing) return;
   tokenUsageCache.refreshing = true;
 
   try {
-    const sessionsDir = path.join(getOpenClawDir(), "agents", "main", "sessions");
+    const sessionsDir = getTokenSessionsDir(getOpenClawDir);
     const files = await fs.promises.readdir(sessionsDir);
     const jsonlFiles = files.filter((f) => f.endsWith(".jsonl"));
 
