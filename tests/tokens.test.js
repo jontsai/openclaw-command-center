@@ -1,6 +1,11 @@
 const { describe, it } = require("node:test");
 const assert = require("node:assert");
-const { TOKEN_RATES, emptyUsageBucket, calculateCostForBucket } = require("../src/tokens");
+const {
+  TOKEN_RATES,
+  emptyUsageBucket,
+  collectTokenUsageEvents,
+  calculateCostForBucket,
+} = require("../src/tokens");
 
 describe("tokens module", () => {
   describe("TOKEN_RATES", () => {
@@ -38,6 +43,45 @@ describe("tokens module", () => {
       assert.notStrictEqual(a, b);
       a.input = 100;
       assert.strictEqual(b.input, 0);
+    });
+  });
+
+  describe("collectTokenUsageEvents()", () => {
+    it("extracts usage events from recent JSONL entries", () => {
+      const now = Date.now();
+      const timestamp = new Date(now).toISOString();
+      const content = [
+        JSON.stringify({
+          timestamp,
+          message: {
+            usage: {
+              input: 100,
+              output: 20,
+              cacheRead: 10,
+              cacheWrite: 5,
+              cost: { total: 0.01 },
+            },
+          },
+        }),
+        "not-json",
+        JSON.stringify({
+          timestamp: new Date(now - 10_000).toISOString(),
+          message: {},
+        }),
+      ].join("\n");
+
+      const events = collectTokenUsageEvents(content, now - 60_000);
+
+      assert.deepStrictEqual(events, [
+        {
+          time: Date.parse(timestamp),
+          input: 100,
+          output: 20,
+          cacheRead: 10,
+          cacheWrite: 5,
+          cost: 0.01,
+        },
+      ]);
     });
   });
 

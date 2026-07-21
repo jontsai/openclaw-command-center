@@ -634,7 +634,7 @@ server.listen(PORT, () => {
   }, 100);
 
   // Background cache refresh
-  const SESSIONS_CACHE_TTL = 10000;
+  const SESSIONS_CACHE_TTL = sessions.SESSIONS_CACHE_TTL || 60000;
   setInterval(() => sessions.refreshSessionsCache(), SESSIONS_CACHE_TTL);
 });
 
