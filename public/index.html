@@ -1130,6 +1130,127 @@
           </div>
         </div>
 
+        <!-- Intel Pipeline Section -->
+        <div class="section" id="intel-section">
+          <div class="section-header">
+            <div class="section-title">
+              📋 Intel Pipeline
+              <span class="section-count" id="intel-count">0</span>
+            </div>
+          </div>
+          <div class="vitals-panel">
+            <div class="vitals-grid">
+              <!-- Fresh -->
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label" style="color: var(--green)">🟢 Fresh (&lt;6h)</span>
+                </div>
+                <div class="vital-value" id="intel-fresh-count" style="color: var(--green)">0</div>
+              </div>
+              <!-- Aging -->
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label" style="color: var(--yellow)">🟡 Aging (6-24h)</span>
+                </div>
+                <div class="vital-value" id="intel-aging-count" style="color: var(--yellow)">0</div>
+              </div>
+              <!-- Stale -->
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label" style="color: var(--red)">🔴 Stale (&gt;24h)</span>
+                </div>
+                <div class="vital-value" id="intel-stale-count" style="color: var(--red)">0</div>
+              </div>
+              <!-- Agent Assignments -->
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label">👤 Agents</span>
+                </div>
+                <div
+                  id="intel-agents"
+                  style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted)"
+                >
+                  -
+                </div>
+              </div>
+            </div>
+            <!-- File list -->
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border)">
+              <div
+                style="
+                  font-size: 0.75rem;
+                  color: var(--text-muted);
+                  margin-bottom: 8px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                "
+              >
+                Recent Files
+              </div>
+              <div id="intel-file-list" style="font-size: 0.8rem">
+                <em style="color: var(--text-muted)">Loading...</em>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline Viewer Section -->
+        <div class="section" id="pipeline-section">
+          <div class="section-header">
+            <div class="section-title">
+              🔄 Pipelines
+              <span class="section-count" id="pipeline-count">0</span>
+            </div>
+          </div>
+          <div class="vitals-panel">
+            <div id="pipeline-list">
+              <em style="color: var(--text-muted); font-size: 0.8rem">Loading...</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monetization Tracker Section -->
+        <div class="section" id="monetization-section">
+          <div class="section-header">
+            <div class="section-title">
+              💰 Monetization
+              <span class="section-count" id="monetization-count">0 firms</span>
+            </div>
+          </div>
+          <div class="vitals-panel">
+            <div class="vitals-grid">
+              <!-- Summary cards -->
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label">📊 Total Firms</span>
+                </div>
+                <div class="vital-value" id="monetization-total">0</div>
+              </div>
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label" style="color: var(--red)">🔥 High Priority</span>
+                </div>
+                <div class="vital-value" id="monetization-high" style="color: var(--red)">0</div>
+              </div>
+              <div class="vital-card">
+                <div class="vital-header">
+                  <span class="vital-label" style="color: var(--green)">💵 Revenue Active</span>
+                </div>
+                <div class="vital-value" id="monetization-revenue" style="color: var(--green)">
+                  0
+                </div>
+              </div>
+            </div>
+            <!-- Firm cards -->
+            <div
+              id="monetization-firms"
+              style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border)"
+            >
+              <em style="color: var(--text-muted); font-size: 0.8rem">Loading...</em>
+            </div>
+          </div>
+        </div>
+
         <!-- Operators Section -->
         <div class="section" id="operators-section">
           <div class="section-header">
@@ -2092,6 +2213,9 @@
         if (state.memory) renderMemory(state.memory);
         if (state.cerebro) renderCerebro(state.cerebro);
         if (state.subagents) renderSubagents(state.subagents);
+        if (state.intel) renderIntel(state.intel);
+        if (state.pipeline) renderPipeline(state.pipeline);
+        if (state.monetization) renderMonetization(state.monetization);
       }
 
       // Legacy fallback - multiple API calls (used if /api/state fails)
@@ -3294,6 +3418,160 @@
       }
 
       // Detail panel
+
+      // ============================================================================
+      // INTEL PIPELINE RENDERER
+      // ============================================================================
+      function renderIntel(intel) {
+        if (!intel) return;
+
+        $set("intel-count", "textContent", intel.totalFiles || 0);
+        $set("nav-intel-count", "textContent", intel.totalFiles || 0);
+        $set("intel-fresh-count", "textContent", intel.freshCount || 0);
+        $set("intel-aging-count", "textContent", intel.agingCount || 0);
+        $set("intel-stale-count", "textContent", intel.staleCount || 0);
+
+        // Agent assignments
+        const agentsEl = document.getElementById("intel-agents");
+        if (agentsEl && intel.assignments) {
+          const entries = Object.entries(intel.assignments);
+          if (entries.length > 0) {
+            agentsEl.innerHTML = entries
+              .sort((a, b) => b[1] - a[1])
+              .map(
+                ([agent, count]) =>
+                  `<span style="margin-right: 10px"><strong>${escapeHtml(agent)}</strong>: ${count}</span>`,
+              )
+              .join("");
+          } else {
+            agentsEl.textContent = "No agents assigned";
+          }
+        }
+
+        // File list (show up to 10)
+        const listEl = document.getElementById("intel-file-list");
+        if (listEl && intel.files) {
+          if (intel.files.length === 0) {
+            listEl.innerHTML = '<em style="color: var(--text-muted)">No intel files found</em>';
+            return;
+          }
+          const filesHtml = intel.files
+            .slice(0, 10)
+            .map((f) => {
+              const ageText = formatRelativeTime(f.ageMs);
+              return `<div class="intel-file-row">
+              <span class="intel-freshness-dot ${f.freshness}"></span>
+              <span class="intel-file-name">${escapeHtml(f.name)}</span>
+              <span class="intel-file-agent">${escapeHtml(f.agent)}</span>
+              <span class="intel-file-age ${f.freshness}">${ageText}</span>
+            </div>`;
+            })
+            .join("");
+          smartUpdate(listEl, filesHtml);
+        }
+      }
+
+      // ============================================================================
+      // PIPELINE VIEWER RENDERER
+      // ============================================================================
+      function renderPipeline(pipeline) {
+        if (!pipeline) return;
+
+        const pipelines = pipeline.pipelines || [];
+        $set("pipeline-count", "textContent", pipelines.length);
+        $set("nav-pipeline-count", "textContent", pipelines.length);
+
+        const listEl = document.getElementById("pipeline-list");
+        if (!listEl) return;
+
+        if (pipelines.length === 0) {
+          listEl.innerHTML =
+            '<em style="color: var(--text-muted)">No pipeline files found. Create *-PIPELINE.md or *-QUEUE.md in intel/</em>';
+          return;
+        }
+
+        const html = pipelines
+          .map((p) => {
+            const statusBadges = Object.entries(p.statusCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(([status, count]) => {
+                return `<span class="pipeline-status-badge"><span class="status-count">${count}</span> ${escapeHtml(status)}</span>`;
+              })
+              .join("");
+
+            const modifiedDate = new Date(p.lastModified);
+            const modifiedText = formatRelativeTime(Date.now() - modifiedDate.getTime());
+
+            return `<div class="pipeline-card">
+            <div class="pipeline-header">
+              <span class="pipeline-name">${escapeHtml(p.name)}</span>
+              <span class="pipeline-total">${p.totalItems} items</span>
+            </div>
+            <div class="pipeline-statuses">${statusBadges || '<span style="color: var(--text-muted); font-size: 0.75rem">No status columns detected</span>'}</div>
+            <div class="pipeline-last-modified">Updated ${modifiedText}</div>
+          </div>`;
+          })
+          .join("");
+
+        smartUpdate(listEl, html);
+      }
+
+      // ============================================================================
+      // MONETIZATION TRACKER RENDERER
+      // ============================================================================
+      function renderMonetization(monetization) {
+        if (!monetization) return;
+
+        $set("monetization-count", "textContent", (monetization.totalFirms || 0) + " firms");
+        $set("nav-monetization-count", "textContent", monetization.totalFirms || 0);
+        $set("monetization-total", "textContent", monetization.totalFirms || 0);
+        $set("monetization-high", "textContent", monetization.highPriority || 0);
+        $set("monetization-revenue", "textContent", monetization.revenueFirms || 0);
+
+        const firmsEl = document.getElementById("monetization-firms");
+        if (!firmsEl) return;
+
+        const firms = monetization.firms || [];
+        if (firms.length === 0) {
+          firmsEl.innerHTML =
+            '<em style="color: var(--text-muted)">No firms tracked. Create intel/MONETIZATION-TRACKER.md</em>';
+          return;
+        }
+
+        const html =
+          '<div class="monetization-grid">' +
+          firms
+            .map((f) => {
+              const priorityClass = (f.priority || "").toUpperCase();
+              const blockerHtml =
+                f.blocker && f.blocker !== "-"
+                  ? `<div class="monetization-blocker">⚠ ${escapeHtml(f.blocker)}</div>`
+                  : "";
+
+              return `<div class="monetization-card">
+            <div class="monetization-card-header">
+              <span class="monetization-firm-name">${escapeHtml(f.name)}</span>
+              <span class="monetization-priority ${priorityClass}">${escapeHtml(f.priority || "?")}</span>
+            </div>
+            <div class="monetization-detail"><strong>Revenue:</strong> ${escapeHtml(f.revenue || "-")}</div>
+            <div class="monetization-detail"><strong>Next:</strong> ${escapeHtml(f.milestone || "-")}</div>
+            ${blockerHtml}
+          </div>`;
+            })
+            .join("") +
+          "</div>";
+
+        smartUpdate(firmsEl, html);
+      }
+
+      // Helper: format relative time from milliseconds
+      function formatRelativeTime(ms) {
+        if (ms < 60000) return "just now";
+        if (ms < 3600000) return Math.round(ms / 60000) + "m ago";
+        if (ms < 86400000) return Math.round(ms / 3600000) + "h ago";
+        return Math.round(ms / 86400000) + "d ago";
+      }
+
       function openDetail(sessionKey, label) {
         document.getElementById("detail-title").textContent = label;
         document.getElementById("detail-panel").classList.remove("hidden");

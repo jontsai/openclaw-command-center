@@ -86,6 +86,9 @@ const { getLlmUsage, getRoutingStats, startLlmUsageRefresh } = require("./llm-us
 const { executeAction } = require("./actions");
 const { migrateDataDir } = require("./data");
 const { createStateModule } = require("./state");
+const { createIntelModule } = require("./intel");
+const { createPipelineModule } = require("./pipeline");
+const { createMonetizationModule } = require("./monetization");
 
 // ============================================================================
 // CONFIGURATION
@@ -138,6 +141,11 @@ const sessions = createSessionsModule({
   extractJSON,
 });
 
+// Intel, Pipeline, Monetization modules
+const intelModule = createIntelModule({ CONFIG });
+const pipelineModule = createPipelineModule({ CONFIG });
+const monetizationModule = createMonetizationModule({ CONFIG });
+
 // State module (factory pattern)
 const state = createStateModule({
   CONFIG,
@@ -154,6 +162,9 @@ const state = createStateModule({
   runOpenClaw,
   extractJSON,
   readTranscript: (sessionId) => sessions.readTranscript(sessionId),
+  getIntelStats: () => intelModule.getIntelStats(),
+  getPipelineStats: () => pipelineModule.getPipelineStats(),
+  getMonetizationStats: () => monetizationModule.getMonetizationStats(),
 });
 
 // ============================================================================

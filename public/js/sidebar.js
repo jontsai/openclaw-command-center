@@ -21,6 +21,9 @@
     monthlyCost: "-",
     avgTokens: "-",
     avgCost: "-",
+    intel: 0,
+    pipeline: 0,
+    monetization: 0,
     lastUpdated: null,
   };
 
@@ -219,6 +222,23 @@
       sidebarState.cerebro = data.cerebro.topicCount || data.cerebro.totalTopics || 0;
     }
 
+    // Update intel count
+    if (data.intel) {
+      sidebarState.intel = data.intel.totalFiles || 0;
+    }
+
+    // Update pipeline count
+    if (data.pipeline) {
+      sidebarState.pipeline = Array.isArray(data.pipeline.pipelines)
+        ? data.pipeline.pipelines.length
+        : 0;
+    }
+
+    // Update monetization count
+    if (data.monetization) {
+      sidebarState.monetization = data.monetization.totalFirms || 0;
+    }
+
     // Update operators count
     if (data.operators) {
       sidebarState.operators = Array.isArray(data.operators.operators)
@@ -254,6 +274,9 @@
       "nav-memory-count": sidebarState.memory,
       "nav-cerebro-count": sidebarState.cerebro,
       "nav-operator-count": sidebarState.operators,
+      "nav-intel-count": sidebarState.intel,
+      "nav-pipeline-count": sidebarState.pipeline,
+      "nav-monetization-count": sidebarState.monetization,
       "nav-tokens": sidebarState.tokens,
       "nav-cost": sidebarState.cost,
       "nav-monthly-cost": sidebarState.monthlyCost,

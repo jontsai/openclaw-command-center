@@ -23,6 +23,9 @@ const { formatBytes, formatTimeAgo } = require("./utils");
  * @param {function} deps.runOpenClaw - function from openclaw module
  * @param {function} deps.extractJSON - function from openclaw module
  * @param {function} deps.readTranscript - function from sessions module
+ * @param {function} deps.getIntelStats - function from intel module
+ * @param {function} deps.getPipelineStats - function from pipeline module
+ * @param {function} deps.getMonetizationStats - function from monetization module
  */
 function createStateModule(deps) {
   const {
@@ -40,6 +43,9 @@ function createStateModule(deps) {
     runOpenClaw,
     extractJSON,
     readTranscript,
+    getIntelStats,
+    getPipelineStats,
+    getMonetizationStats,
   } = deps;
 
   const PATHS = CONFIG.paths;
@@ -371,6 +377,9 @@ function createStateModule(deps) {
     let memory = {};
     let cerebro = {};
     let subagents = [];
+    let intel = {};
+    let pipeline = {};
+    let monetization = {};
 
     // Get ALL sessions first for accurate statusCounts, then slice for display
     let allSessions = [];
@@ -466,6 +475,21 @@ function createStateModule(deps) {
       console.error("[State] subagents:", e.message);
     }
 
+    try {
+      intel = getIntelStats();
+    } catch (e) {
+      console.error("[State] intel:", e.message);
+    }
+    try {
+      pipeline = getPipelineStats();
+    } catch (e) {
+      console.error("[State] pipeline:", e.message);
+    }
+    try {
+      monetization = getMonetizationStats();
+    } catch (e) {
+      console.error("[State] monetization:", e.message);
+    }
     cachedState = {
       vitals,
       sessions,
@@ -478,6 +502,9 @@ function createStateModule(deps) {
       memory,
       cerebro,
       subagents,
+      intel,
+      pipeline,
+      monetization,
       pagination: {
         page: 1,
         pageSize: 20,

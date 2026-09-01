@@ -1934,3 +1934,179 @@ main {
   background: var(--card-hover);
   border-color: var(--accent);
 }
+
+/* Intel Pipeline Panel */
+.intel-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.intel-file-row:last-child {
+  border-bottom: none;
+}
+.intel-file-name {
+  font-weight: 500;
+  color: var(--text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intel-file-agent {
+  color: var(--accent);
+  font-size: 0.75rem;
+  margin: 0 12px;
+  flex-shrink: 0;
+}
+.intel-file-age {
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+.intel-file-age.fresh {
+  color: var(--green);
+}
+.intel-file-age.aging {
+  color: var(--yellow);
+}
+.intel-file-age.stale {
+  color: var(--red);
+}
+.intel-freshness-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.intel-freshness-dot.fresh {
+  background: var(--green);
+}
+.intel-freshness-dot.aging {
+  background: var(--yellow);
+}
+.intel-freshness-dot.stale {
+  background: var(--red);
+}
+
+/* Pipeline Viewer Panel */
+.pipeline-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.pipeline-card:last-child {
+  margin-bottom: 0;
+}
+.pipeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.pipeline-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.pipeline-total {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--card-bg);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.pipeline-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pipeline-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(88, 166, 255, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(88, 166, 255, 0.2);
+}
+.pipeline-status-badge .status-count {
+  font-weight: 700;
+}
+.pipeline-last-modified {
+  margin-top: 8px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Monetization Tracker Panel */
+.monetization-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.monetization-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  transition: border-color 0.2s ease;
+}
+.monetization-card:hover {
+  border-color: var(--accent);
+}
+.monetization-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.monetization-firm-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.monetization-priority {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.monetization-priority.HIGH {
+  background: rgba(248, 81, 73, 0.15);
+  color: var(--red);
+}
+.monetization-priority.MEDIUM {
+  background: rgba(210, 153, 34, 0.15);
+  color: var(--yellow);
+}
+.monetization-priority.LOW {
+  background: rgba(63, 185, 80, 0.15);
+  color: var(--green);
+}
+.monetization-detail {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.monetization-detail strong {
+  color: var(--text);
+  font-weight: 500;
+}
+.monetization-blocker {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(248, 81, 73, 0.08);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--red);
+}
