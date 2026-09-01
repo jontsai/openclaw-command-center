@@ -12,7 +12,8 @@ const TOKEN_RATES = {
 
 // Token usage cache with async background refresh
 let tokenUsageCache = { data: null, timestamp: 0, refreshing: false };
-const TOKEN_USAGE_CACHE_TTL = 30000; // 30 seconds
+const TOKEN_USAGE_CACHE_TTL = 300000; // 5 minutes
+let tokenUsageFileCache = new Map();
 
 // Reference to background refresh interval (set by startTokenUsageRefresh)
 let refreshInterval = null;
@@ -20,6 +21,42 @@ let refreshInterval = null;
 // Create empty usage bucket
 function emptyUsageBucket() {
   return { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, cost: 0, requests: 0 };
+}
+
+function addUsageToBucket(bucket, usage) {
+  bucket.input += usage.input;
+  bucket.output += usage.output;
+  bucket.cacheRead += usage.cacheRead;
+  bucket.cacheWrite += usage.cacheWrite;
+  bucket.cost += usage.cost;
+  bucket.requests++;
+}
+
+function collectTokenUsageEvents(content, sevenDaysAgo) {
+  const events = [];
+  const lines = content.trim().split("\n");
+
+  for (const line of lines) {
+    if (!line) continue;
+    try {
+      const entry = JSON.parse(line);
+      const entryTime = entry.timestamp ? new Date(entry.timestamp).getTime() : 0;
+      if (entryTime < sevenDaysAgo || !entry.message?.usage) continue;
+      const u = entry.message.usage;
+      events.push({
+        time: entryTime,
+        input: u.input || 0,
+        output: u.output || 0,
+        cacheRead: u.cacheRead || 0,
+        cacheWrite: u.cacheWrite || 0,
+        cost: u.cost?.total || 0,
+      });
+    } catch (e) {
+      // Skip invalid lines
+    }
+  }
+
+  return events;
 }
 
 // Async token usage refresh - runs in background, doesn't block
@@ -42,7 +79,9 @@ async function refreshTokenUsageAsync(getOpenClawDir) {
     const usage3d = emptyUsageBucket();
     const usage7d = emptyUsageBucket();
 
-    // Process files in batches to avoid overwhelming the system
+    // Process files in batches to avoid overwhelming the system. Cache parsed usage
+    // events by file mtime/size so routine refreshes do not re-parse every JSONL line.
+    const seenFiles = new Set();
     const batchSize = 50;
     for (let i = 0; i < jsonlFiles.length; i += batchSize) {
       const batch = jsonlFiles.slice(i, i + batchSize);
@@ -50,68 +89,49 @@ async function refreshTokenUsageAsync(getOpenClawDir) {
       await Promise.all(
         batch.map(async (file) => {
           const filePath = path.join(sessionsDir, file);
+          seenFiles.add(filePath);
+
           try {
             const stat = await fs.promises.stat(filePath);
             // Skip files not modified in the last 7 days
-            if (stat.mtimeMs < sevenDaysAgo) return;
+            if (stat.mtimeMs < sevenDaysAgo) {
+              tokenUsageFileCache.delete(filePath);
+              return;
+            }
 
-            const content = await fs.promises.readFile(filePath, "utf8");
-            const lines = content.trim().split("\n");
+            const cached = tokenUsageFileCache.get(filePath);
+            let events = cached?.events;
 
-            for (const line of lines) {
-              if (!line) continue;
-              try {
-                const entry = JSON.parse(line);
-                const entryTime = entry.timestamp ? new Date(entry.timestamp).getTime() : 0;
+            if (!cached || cached.mtimeMs !== stat.mtimeMs || cached.size !== stat.size) {
+              const content = await fs.promises.readFile(filePath, "utf8");
+              events = collectTokenUsageEvents(content, sevenDaysAgo);
+              tokenUsageFileCache.set(filePath, {
+                mtimeMs: stat.mtimeMs,
+                size: stat.size,
+                events,
+              });
+            }
 
-                // Skip entries older than 7 days
-                if (entryTime < sevenDaysAgo) continue;
-
-                if (entry.message?.usage) {
-                  const u = entry.message.usage;
-                  const input = u.input || 0;
-                  const output = u.output || 0;
-                  const cacheRead = u.cacheRead || 0;
-                  const cacheWrite = u.cacheWrite || 0;
-                  const cost = u.cost?.total || 0;
-
-                  // Add to appropriate buckets (cumulative - 24h is subset of 3d is subset of 7d)
-                  if (entryTime >= oneDayAgo) {
-                    usage24h.input += input;
-                    usage24h.output += output;
-                    usage24h.cacheRead += cacheRead;
-                    usage24h.cacheWrite += cacheWrite;
-                    usage24h.cost += cost;
-                    usage24h.requests++;
-                  }
-                  if (entryTime >= threeDaysAgo) {
-                    usage3d.input += input;
-                    usage3d.output += output;
-                    usage3d.cacheRead += cacheRead;
-                    usage3d.cacheWrite += cacheWrite;
-                    usage3d.cost += cost;
-                    usage3d.requests++;
-                  }
-                  // Always add to 7d (already filtered above)
-                  usage7d.input += input;
-                  usage7d.output += output;
-                  usage7d.cacheRead += cacheRead;
-                  usage7d.cacheWrite += cacheWrite;
-                  usage7d.cost += cost;
-                  usage7d.requests++;
-                }
-              } catch (e) {
-                // Skip invalid lines
-              }
+            for (const event of events) {
+              // Re-apply moving windows on every refresh without re-parsing JSON.
+              if (event.time < sevenDaysAgo) continue;
+              if (event.time >= oneDayAgo) addUsageToBucket(usage24h, event);
+              if (event.time >= threeDaysAgo) addUsageToBucket(usage3d, event);
+              addUsageToBucket(usage7d, event);
             }
           } catch (e) {
             // Skip unreadable files
+            tokenUsageFileCache.delete(filePath);
           }
         }),
       );
 
       // Yield to event loop between batches
       await new Promise((resolve) => setImmediate(resolve));
+    }
+
+    for (const filePath of tokenUsageFileCache.keys()) {
+      if (!seenFiles.has(filePath)) tokenUsageFileCache.delete(filePath);
     }
 
     // Helper to finalize bucket with computed fields
@@ -448,6 +468,7 @@ function startTokenUsageRefresh(getOpenClawDir) {
 module.exports = {
   TOKEN_RATES,
   emptyUsageBucket,
+  collectTokenUsageEvents,
   refreshTokenUsageAsync,
   getDailyTokenUsage,
   calculateCostForBucket,
