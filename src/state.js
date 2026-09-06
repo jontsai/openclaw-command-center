@@ -108,8 +108,34 @@ function createStateModule(deps) {
     return activities.reverse();
   }
 
+  function countActiveSessionsForCapacity(result, sessions) {
+    const fiveMinMs = 5 * 60 * 1000;
+
+    for (const s of sessions) {
+      // Only count sessions active in last 5 minutes.
+      // OpenClaw CLI sessions use ageMs/key; dashboard-mapped sessions use minutesAgo/sessionKey.
+      const ageMs = typeof s.ageMs === "number" ? s.ageMs : (s.minutesAgo || 0) * 60 * 1000;
+      if (ageMs > fiveMinMs) continue;
+
+      const key = s.key || s.sessionKey || "";
+      // Session key patterns:
+      //   agent:main:slack:... = main (human-initiated)
+      //   agent:main:telegram:... = main
+      //   agent:main:discord:... = main
+      //   agent:main:subagent:... = subagent (spawned task)
+      //   agent:main:cron:... = cron job (count as subagent)
+      if (key.includes(":subagent:") || key.includes(":cron:")) {
+        result.subagent.active++;
+      } else {
+        result.main.active++;
+      }
+    }
+
+    return result;
+  }
+
   // Get capacity info from gateway config and active sessions
-  function getCapacity() {
+  function getCapacity(preloadedSessions = null) {
     const result = {
       main: { active: 0, max: 12 },
       subagent: { active: 0, max: 24 },
@@ -134,33 +160,19 @@ function createStateModule(deps) {
       // Fall back to defaults
     }
 
+    // Reuse session data that getFullState already loaded so every dashboard state refresh
+    // does not invoke another `openclaw sessions --json` scan over large transcript dirs.
+    if (Array.isArray(preloadedSessions)) {
+      return countActiveSessionsForCapacity(result, preloadedSessions);
+    }
+
     // Try to get active counts from sessions (preferred - has full session keys)
     try {
       const output = runOpenClaw("sessions --json 2>/dev/null");
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);
-        const sessions = data.sessions || [];
-        const fiveMinMs = 5 * 60 * 1000;
-
-        for (const s of sessions) {
-          // Only count sessions active in last 5 minutes
-          if (s.ageMs > fiveMinMs) continue;
-
-          const key = s.key || "";
-          // Session key patterns:
-          //   agent:main:slack:... = main (human-initiated)
-          //   agent:main:telegram:... = main
-          //   agent:main:discord:... = main
-          //   agent:main:subagent:... = subagent (spawned task)
-          //   agent:main:cron:... = cron job (count as subagent)
-          if (key.includes(":subagent:") || key.includes(":cron:")) {
-            result.subagent.active++;
-          } else {
-            result.main.active++;
-          }
-        }
-        return result;
+        return countActiveSessionsForCapacity(result, data.sessions || []);
       }
     } catch (e) {
       console.error("Failed to get capacity from sessions, falling back to filesystem:", e.message);
@@ -388,9 +400,10 @@ function createStateModule(deps) {
     } catch (e) {
       console.error("[State] vitals:", e.message);
     }
-    // Use filesystem-based capacity (no CLI calls, won't block)
+    // Reuse the session list already loaded above; otherwise this refresh performs a second
+    // expensive OpenClaw sessions scan and can stall the dashboard on large installations.
     try {
-      capacity = getCapacity();
+      capacity = getCapacity(allSessions);
     } catch (e) {
       console.error("[State] capacity:", e.message);
     }

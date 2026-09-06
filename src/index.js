@@ -633,8 +633,9 @@ server.listen(PORT, () => {
     checkOptionalDeps();
   }, 100);
 
-  // Background cache refresh
-  const SESSIONS_CACHE_TTL = 10000;
+  // Background cache refresh. Keep this in sync with sessions.js; scanning transcript
+  // directories can be expensive on long-lived OpenClaw installs.
+  const SESSIONS_CACHE_TTL = 60000;
   setInterval(() => sessions.refreshSessionsCache(), SESSIONS_CACHE_TTL);
 });
 
@@ -644,7 +645,7 @@ setInterval(() => {
   if (sseClients.size > 0 && !sseRefreshing) {
     sseRefreshing = true;
     try {
-      const fullState = state.refreshState();
+      const fullState = state.getFullState();
       broadcastSSE("update", fullState);
       broadcastSSE("heartbeat", { clients: sseClients.size, timestamp: Date.now() });
     } catch (e) {

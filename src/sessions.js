@@ -78,7 +78,7 @@ function createSessionsModule(deps) {
 
   // SESSION CACHE - Async refresh to avoid blocking
   let sessionsCache = { sessions: [], timestamp: 0, refreshing: false };
-  const SESSIONS_CACHE_TTL = 10000; // 10 seconds
+  const SESSIONS_CACHE_TTL = 60000; // 60 seconds - avoid rescanning large transcript dirs constantly
 
   /**
    * Find transcript file for a session ID.
