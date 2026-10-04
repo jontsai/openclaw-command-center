@@ -10,7 +10,9 @@ function createModule(overrides = {}) {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "state-test-"));
   fs.writeFileSync(
     path.join(tmpDir, "openclaw.json"),
-    JSON.stringify({ agents: { defaults: { maxConcurrent: 12, subagents: { maxConcurrent: 24 } } } }),
+    JSON.stringify({
+      agents: { defaults: { maxConcurrent: 12, subagents: { maxConcurrent: 24 } } },
+    }),
   );
 
   return createStateModule({
