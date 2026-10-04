@@ -33,7 +33,7 @@
     const normalized = normalizeLocale(locale);
     if (loadedMessages.has(normalized)) return loadedMessages.get(normalized);
 
-    const response = await fetch(`/locales/${normalized}.json`, { cache: "no-cache" });
+    const response = await fetch(`locales/${normalized}.json`, { cache: "no-cache" });
     if (!response.ok) throw new Error(`Failed to load locale: ${normalized}`);
     const data = await response.json();
     loadedMessages.set(normalized, data || {});

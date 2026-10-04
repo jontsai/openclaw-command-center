@@ -44,7 +44,7 @@ function connectSSE() {
 
   updateConnectionStatus("connecting");
 
-  eventSource = new EventSource("/api/events");
+  eventSource = new EventSource("api/events");
 
   eventSource.onopen = () => {
     console.log("[SSE] Connected");
@@ -281,7 +281,7 @@ function startPolling() {
 
 async function fetchState() {
   try {
-    const response = await fetch("/api/state");
+    const response = await fetch("api/state");
     const data = await response.json();
     handleStateUpdate(data);
   } catch (e) {
