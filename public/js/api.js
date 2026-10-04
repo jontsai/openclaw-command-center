@@ -15,7 +15,7 @@ const SSE_MAX_RECONNECT_DELAY = 30000;
  * @returns {Promise<Object>} Dashboard state
  */
 export async function fetchState() {
-  const response = await fetch("/api/state");
+  const response = await fetch("api/state");
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
 }
@@ -36,7 +36,7 @@ export function connectSSE(onUpdate, onStatusChange) {
   onStatusChange?.("connecting", "Connecting...");
 
   try {
-    eventSource = new EventSource("/api/events");
+    eventSource = new EventSource("api/events");
 
     eventSource.onopen = function () {
       console.log("[SSE] Connected");

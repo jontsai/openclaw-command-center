@@ -2058,7 +2058,7 @@
       async function fetchSessions(page = 1) {
         // Build URL with status filter
         const statusFilter = sessionFilters.status;
-        let url = `/api/sessions?page=${page}&pageSize=${paginationState.pageSize}`;
+        let url = `api/sessions?page=${page}&pageSize=${paginationState.pageSize}`;
         if (statusFilter && statusFilter !== "all") {
           url += `&status=${statusFilter}`;
         }
@@ -2156,7 +2156,7 @@
       // Unified state fetch - single API call for all dashboard data
       async function fetchData() {
         try {
-          const response = await fetch("/api/state");
+          const response = await fetch("api/state");
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const state = await response.json();
           renderFullState(state);
@@ -2202,28 +2202,28 @@
 
         // Fire off all requests in parallel
         const promises = [
-          fetch("/api/vitals")
+          fetch("api/vitals")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/sessions")
+          fetch("api/sessions")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/operators")
+          fetch("api/operators")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/llm-usage")
+          fetch("api/llm-usage")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/cron")
+          fetch("api/cron")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/memory")
+          fetch("api/memory")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/cerebro")
+          fetch("api/cerebro")
             .then((r) => r.json())
             .catch(() => null),
-          fetch("/api/subagents")
+          fetch("api/subagents")
             .then((r) => r.json())
             .catch(() => null),
         ];
@@ -2582,7 +2582,7 @@
       // Refresh operators data
       async function refreshOperators() {
         try {
-          const res = await fetch("/api/operators");
+          const res = await fetch("api/operators");
           const data = await res.json();
           renderOperators(data);
         } catch (e) {
@@ -3159,7 +3159,7 @@
 
       async function fetchRoutingStats() {
         try {
-          const res = await fetch("/api/routing-stats?hours=24");
+          const res = await fetch("api/routing-stats?hours=24");
           const data = await res.json();
           renderRoutingStats(data);
         } catch (e) {
@@ -3216,7 +3216,7 @@
 
       async function fetchLlmUsage() {
         try {
-          const res = await fetch("/api/llm-usage");
+          const res = await fetch("api/llm-usage");
           const data = await res.json();
           renderLlmUsage(data);
           // Also fetch detailed routing stats
@@ -3622,7 +3622,7 @@
 
         // Fetch cost breakdown data
         try {
-          const res = await fetch("/api/cost-breakdown");
+          const res = await fetch("api/cost-breakdown");
           const data = await res.json();
           cachedCostData = data;
           renderCostBreakdown(data);
@@ -3671,7 +3671,7 @@
 
         try {
           // Fetch operator data from API
-          const res = await fetch("/api/operators");
+          const res = await fetch("api/operators");
           const data = await res.json();
 
           // Find the operator by ID or name
@@ -3799,7 +3799,7 @@
       // Load privacy settings from server (called on page load)
       async function loadPrivacyFromServer() {
         try {
-          const res = await fetch("/api/privacy");
+          const res = await fetch("api/privacy");
           if (res.ok) {
             const settings = await res.json();
             privacySettingsCache = settings;
@@ -3843,7 +3843,7 @@
         if (privacySaveTimeout) clearTimeout(privacySaveTimeout);
         privacySaveTimeout = setTimeout(async () => {
           try {
-            const res = await fetch("/api/privacy", {
+            const res = await fetch("api/privacy", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(privacySettingsCache),
@@ -4333,7 +4333,7 @@
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
         try {
-          const res = await fetch(`/api/session?key=${encodeURIComponent(key)}`, {
+          const res = await fetch(`api/session?key=${encodeURIComponent(key)}`, {
             signal: controller.signal,
           });
           clearTimeout(timeoutId);
@@ -4407,6 +4407,17 @@
           document.getElementById("detail-summary"),
           data.summary || "<em>No summary</em>",
         );
+
+        // Missing storage is unknown, not evidence of no messages or action items.
+        if (data.transcriptAvailable === false) {
+          for (const id of ["links", "attention", "facts", "tools", "messages"]) {
+            smartUpdate(
+              document.getElementById(`detail-${id}`),
+              '<em style="color: var(--text-muted)">Transcript unavailable</em>',
+            );
+          }
+          return;
+        }
 
         // Links/References
         const allText = (data.messages || []).map((m) => m.text).join(" ");
@@ -4592,7 +4603,7 @@
         setConnectionStatus("connecting", i18nText("app.connecting", {}, "Connecting..."));
 
         try {
-          eventSource = new EventSource("/api/events");
+          eventSource = new EventSource("api/events");
 
           eventSource.onopen = function () {
             console.log("[SSE] Connected");
@@ -4708,7 +4719,7 @@
       // Update topic status API call
       async function updateTopicStatus(topicId, status) {
         try {
-          const res = await fetch(`/api/cerebro/topic/${encodeURIComponent(topicId)}/status`, {
+          const res = await fetch(`api/cerebro/topic/${encodeURIComponent(topicId)}/status`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status }),
@@ -4799,7 +4810,7 @@
       // Quick Actions
       async function runHealthCheck() {
         try {
-          const response = await fetch("/api/action?action=health-check");
+          const response = await fetch("api/action?action=health-check");
           const data = await response.json();
 
           if (data.success) {
@@ -4814,7 +4825,7 @@
 
       async function getGatewayStatus() {
         try {
-          const response = await fetch("/api/action?action=gateway-status");
+          const response = await fetch("api/action?action=gateway-status");
           const data = await response.json();
 
           if (data.success) {
@@ -4829,7 +4840,7 @@
 
       async function pruneStalesSessions() {
         try {
-          const response = await fetch("/api/action?action=prune-stale");
+          const response = await fetch("api/action?action=prune-stale");
           const data = await response.json();
 
           if (data.success) {
@@ -4867,7 +4878,7 @@
 
         connectSSE();
         // Populate version badge from server (single source of truth: package.json)
-        fetch("/api/about")
+        fetch("api/about")
           .then((r) => r.json())
           .then((d) => {
             const el = document.getElementById("app-version");
@@ -4875,7 +4886,7 @@
           })
           .catch(() => {});
         // Fetch optional dependency status (once)
-        fetch("/api/vitals")
+        fetch("api/vitals")
           .then((r) => r.json())
           .then((d) => {
             if (d.optionalDeps) optionalDeps = d.optionalDeps;

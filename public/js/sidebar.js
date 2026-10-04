@@ -37,7 +37,7 @@
    */
   async function loadSidebar() {
     try {
-      const response = await fetch("/partials/sidebar.html");
+      const response = await fetch("partials/sidebar.html");
       if (!response.ok) throw new Error("Failed to load sidebar");
 
       const html = await response.text();
@@ -75,7 +75,7 @@
    */
   function isMainPage() {
     const path = window.location.pathname;
-    return path === "/" || path === "/index.html";
+    return path.endsWith("/") || path.endsWith("/index.html");
   }
 
   /**
@@ -100,7 +100,11 @@
           // Default to vitals on main page with no hash
           item.classList.add("active");
         }
-      } else if (itemHref === currentPath) {
+      } else if (
+        itemHref &&
+        !itemHref.startsWith("#") &&
+        new URL(itemHref, window.location.href).pathname === currentPath
+      ) {
         // Exact page match (like /jobs.html)
         item.classList.add("active");
       }
@@ -130,7 +134,7 @@
         } else {
           // On other page: navigate to main page with hash
           e.preventDefault();
-          window.location.href = "/" + targetHash;
+          window.location.href = "./" + targetHash;
         }
       });
     });
@@ -145,7 +149,7 @@
       return;
     }
 
-    eventSource = new EventSource("/api/events");
+    eventSource = new EventSource("api/events");
 
     eventSource.onopen = () => {
       console.log("[Sidebar SSE] Connected");
@@ -182,7 +186,7 @@
    */
   async function fetchSidebarState() {
     try {
-      const response = await fetch("/api/state");
+      const response = await fetch("api/state");
       const data = await response.json();
       handleStateUpdate(data);
     } catch (error) {
@@ -343,7 +347,7 @@
   // Fetch jobs count separately (since it's a different API)
   async function fetchJobsCount() {
     try {
-      const response = await fetch("/api/jobs");
+      const response = await fetch("api/jobs");
       const data = await response.json();
       sidebarState.jobs = data.jobs?.length || 0;
       updateBadges();

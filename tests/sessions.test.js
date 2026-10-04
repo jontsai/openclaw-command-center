@@ -73,4 +73,23 @@ describe("sessions module", () => {
 
     assert.strictEqual(sessions.findTranscriptPath(SESSION_ID), null);
   });
+  it("distinguishes missing transcripts from a valid empty transcript", () => {
+    const key = "agent:main:example";
+    const sessions = createSessionsModule({
+      getOpenClawDir: () => tmpDir,
+      getOperatorBySlackId: () => null,
+      runOpenClaw: () =>
+        JSON.stringify({ sessions: [{ key, sessionId: SESSION_ID, totalTokens: 123 }] }),
+      runOpenClawAsync: async () => "",
+      extractJSON: (value) => value,
+    });
+    const missing = sessions.getSessionDetail(key);
+    assert.strictEqual(missing.transcriptAvailable, false);
+    assert.strictEqual(missing.tokens, 123);
+    assert.match(missing.summary, /Transcript unavailable/);
+    fs.writeFileSync(path.join(sessionsDir, `${SESSION_ID}.jsonl`), "");
+    const empty = sessions.getSessionDetail(key);
+    assert.strictEqual(empty.transcriptAvailable, true);
+    assert.strictEqual(empty.summary, "No activity yet.");
+  });
 });

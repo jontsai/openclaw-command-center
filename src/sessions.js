@@ -444,13 +444,14 @@ function createSessionsModule(deps) {
   }
 
   // Read session transcript from JSONL file
-  function readTranscript(sessionId) {
+  function readTranscript(sessionId, { withStatus = false } = {}) {
+    const result = (entries, available) => (withStatus ? { entries, available } : entries);
     const transcriptPath = findTranscriptPath(sessionId);
 
     try {
-      if (!transcriptPath) return [];
+      if (!transcriptPath) return result([], false);
       const content = fs.readFileSync(transcriptPath, "utf8");
-      return content
+      const entries = content
         .trim()
         .split("\n")
         .map((line) => {
@@ -461,9 +462,10 @@ function createSessionsModule(deps) {
           }
         })
         .filter(Boolean);
+      return result(entries, !content.trim() || entries.length > 0);
     } catch (e) {
       console.error("Failed to read transcript:", e.message);
-      return [];
+      return result([], false);
     }
   }
 
@@ -484,7 +486,10 @@ function createSessionsModule(deps) {
       }
 
       // Read transcript directly from JSONL file
-      const transcript = readTranscript(sessionInfo.sessionId);
+      const { entries: transcript, available: transcriptAvailable } = readTranscript(
+        sessionInfo.sessionId,
+        { withStatus: true },
+      );
       let messages = [];
       let tools = {};
       let facts = [];
@@ -583,7 +588,9 @@ function createSessionsModule(deps) {
       });
 
       // Generate summary from recent messages
-      let summary = "No activity yet.";
+      let summary = transcriptAvailable
+        ? "No activity yet."
+        : "Transcript unavailable — session metadata only.";
       const userMessages = messages.filter((m) => m.role === "user");
       const assistantMessages = messages.filter((m) => m.role === "assistant");
       let topics = [];
@@ -649,6 +656,7 @@ function createSessionsModule(deps) {
 
       return {
         key: sessionKey,
+        transcriptAvailable,
         kind: sessionInfo.kind,
         channel: channelDisplay,
         groupChannel: sessionInfo.groupChannel || channelDisplay,
