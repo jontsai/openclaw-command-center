@@ -149,7 +149,7 @@
       return;
     }
 
-    eventSource = new EventSource("api/events");
+    eventSource = window.DashboardEvents.connect();
 
     eventSource.onopen = () => {
       console.log("[Sidebar SSE] Connected");

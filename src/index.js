@@ -238,7 +238,7 @@ function serveStatic(req, res) {
 // ============================================================================
 function handleApi(req, res) {
   const sessionsList = sessions.getSessions();
-  const capacity = state.getCapacity();
+  const capacity = state.getCapacity(sessions.getSessions({ limit: null }));
   const tokenStats = getTokenStats(sessionsList, capacity, CONFIG);
 
   const data = {
@@ -258,7 +258,7 @@ function handleApi(req, res) {
 // ============================================================================
 // HTTP SERVER
 // ============================================================================
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
 
@@ -310,7 +310,7 @@ const server = http.createServer((req, res) => {
       res.end(JSON.stringify({ error: "Missing session key" }));
       return;
     }
-    const detail = sessions.getSessionDetail(sessionKey);
+    const detail = await sessions.getSessionDetailAsync(sessionKey);
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(detail, null, 2));
   } else if (pathname === "/api/cerebro") {
@@ -450,7 +450,7 @@ const server = http.createServer((req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ vitals, optionalDeps }, null, 2));
   } else if (pathname === "/api/capacity") {
-    const capacity = state.getCapacity();
+    const capacity = state.getCapacity(sessions.getSessions({ limit: null }));
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify(capacity, null, 2));
   } else if (pathname === "/api/sessions") {
@@ -481,8 +481,8 @@ const server = http.createServer((req, res) => {
     const offset = (page - 1) * pageSize;
     const displaySessions = filteredSessions.slice(offset, offset + pageSize);
 
-    const tokenStats = getTokenStats(allSessions, state.getCapacity(), CONFIG);
-    const capacity = state.getCapacity();
+    const tokenStats = getTokenStats(allSessions, state.getCapacity(allSessions), CONFIG);
+    const capacity = state.getCapacity(sessions.getSessions({ limit: null }));
 
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(

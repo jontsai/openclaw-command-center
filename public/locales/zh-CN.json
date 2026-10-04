@@ -39,7 +39,8 @@
     "estCost24h": "预估成本（24小时）📊",
     "estMonthlySavings": "预估月节省",
     "main": "主会话",
-    "subagents": "子代理"
+    "subagents": "子代理",
+    "estApiCost": "估算 API 费用"
   },
   "quickActions": {
     "title": "⚡ 快捷操作",
@@ -308,7 +309,46 @@
       "remaining": "剩余",
       "resets in": "后重置",
       "resets": "重置",
-      "Avg latency": "平均延迟"
+      "Avg latency": "平均延迟",
+      "Today (UTC)": "今天（UTC）",
+      "Unavailable": "不可用",
+      "Usage unavailable": "用量不可用",
+      "24h": "24 小时",
+      "(provisional)": "（暂定）",
+      "Loading cost data…": "正在加载费用数据…",
+      "Cost request timed out. Close and reopen to retry.": "费用请求超时。请关闭后重新打开以重试。",
+      "Cost data unavailable. Close and reopen to retry.": "费用数据不可用。请关闭后重新打开以重试。",
+      "Cost data unavailable": "费用数据不可用",
+      "Input tokens": "输入令牌",
+      "Output tokens": "输出令牌",
+      "Cache read": "缓存读取",
+      "Cache write": "缓存写入",
+      "API requests": "API 请求",
+      "Input cost": "输入费用",
+      "Output cost": "输出费用",
+      "Cache read cost": "缓存读取费用",
+      "Cache write cost": "缓存写入费用",
+      "API equivalent": "API 等价费用",
+      "API equivalent (provisional)": "API 等价费用（暂定）",
+      "Usage unavailable; not a zero-cost reading.": "用量不可用，并不表示费用为零。",
+      "Some usage has no recorded price; total cost is unavailable.": "部分用量未记录价格，无法计算总费用。",
+      "Provisional snapshot — OpenClaw is refreshing its usage records.": "暂定快照 — OpenClaw 正在刷新用量记录。",
+      "Recorded per-model API-equivalent costs from OpenClaw; not subscription charges.": "OpenClaw 记录的各模型 API 等价费用，并非订阅账单。",
+      "Pricing unavailable": "价格不可用",
+      "No single rate is applied across different models.": "不同模型不会统一套用同一费率。",
+      "Subscription savings are not inferred from usage or account quota.": "不会根据用量或账户配额推算订阅节省金额。",
+      "Savings unavailable": "节省金额不可用",
+      "3-day average": "3 天日均费用",
+      "7-day average": "7 天日均费用",
+      "Calendar-day averages include the current partial day; they are not a monthly bill forecast.": "自然日日均值包含尚未结束的当天，不代表月度账单预测。",
+      "Current sessions — lifetime token totals, not this reporting window.": "当前会话的累计令牌数，并非本统计时段的用量。",
+      "Session totals": "会话总计",
+      "Input + output tokens; cached tokens are shown in the cost breakdown.": "输入与输出令牌之和；缓存令牌显示在费用明细中。",
+      "Input + output tokens in the reported cost window": "费用统计时段内的输入与输出令牌之和",
+      "Monthly bill projection unavailable without billing data": "缺少账单数据，无法预测月度账单",
+      "Recent messages only; metadata totals cover the session.": "仅显示最近消息；元数据总计涵盖整个会话。",
+      "Session catalog is loading; retry shortly.": "正在加载会话目录，请稍后重试。",
+      "Session catalog unavailable; retry shortly.": "会话目录不可用，请稍后重试。"
     },
     "patterns": [
       {
@@ -517,5 +557,13 @@
     "statusSuccess": "成功",
     "statusFailed": "失败",
     "statusRunning": "运行中"
+  },
+  "cost": {
+    "title": "💰 费用明细",
+    "tokenUsage": "📊 令牌用量",
+    "pricingBasis": "💵 计价依据",
+    "calculation": "🧮 费用计算",
+    "billing": "✨ 账单与近期日均费用",
+    "sessions": "🔥 当前会话（累计令牌数）"
   }
 }

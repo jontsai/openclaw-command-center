@@ -157,6 +157,7 @@ Before submitting, ensure:
 - [ ] Tests pass locally (`npm test`)
 - [ ] Lint passes (`npm run lint`)
 - [ ] Documentation updated if needed
+- [ ] UI changes preserve `data-i18n` and related hooks, update every supported locale, and pass language-switch checks with the affected panel open and after live updates (see [AGENTS.md](AGENTS.md#-preserve-internationalization))
 - [ ] Commit messages follow convention
 - [ ] PR description explains the change
 

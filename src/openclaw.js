@@ -38,6 +38,7 @@ function getSafeEnv() {
 function buildArgs(args) {
   const profile = process.env.OPENCLAW_PROFILE || "";
   const profileArgs = profile ? ["--profile", profile] : [];
+  if (Array.isArray(args)) return [...profileArgs, ...args];
   // Strip shell redirections (e.g. "2>&1", "2>/dev/null") — not needed with execFile
   const cleanArgs = args
     .replace(/\s*2>&1\s*/g, " ")
@@ -73,11 +74,11 @@ function runOpenClaw(args) {
  * @param {string} args - Command arguments
  * @returns {Promise<string|null>} - Command output or null on error
  */
-async function runOpenClawAsync(args) {
+async function runOpenClawAsync(args, { timeout = 20000 } = {}) {
   try {
     const { stdout } = await execFileAsync("openclaw", buildArgs(args), {
       encoding: "utf8",
-      timeout: 20000,
+      timeout,
       maxBuffer: CLI_MAX_BUFFER,
       env: getSafeEnv(),
     });
