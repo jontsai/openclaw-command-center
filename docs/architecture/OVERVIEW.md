@@ -6,6 +6,12 @@
 
 OpenClaw Command Center is a real-time dashboard for monitoring and managing AI assistant orchestration. It provides visibility into sessions, token usage, costs, scheduled jobs, and system health.
 
+## Core and agent-specific features
+
+See [Core monitoring and Spacesuit flavors](core-and-flavors.md) for the target
+ownership boundary and phased extraction. Existing built-in domain panels remain
+in place until the extension host and migration are implemented.
+
 ## Core Architecture Principles
 
 ### 1. **DRY (Don't Repeat Yourself)**
