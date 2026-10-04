@@ -362,40 +362,18 @@
               <div class="utilization-icon openai">⚡</div>
               <div>
                 <div class="utilization-title">Codex (OpenAI)</div>
-                <div class="utilization-subtitle">ChatGPT Plus</div>
+                <div class="utilization-subtitle" id="codex-plan">Plan unavailable</div>
               </div>
             </div>
-            <div>
-              <div class="quota-stats">
-                <span>5-Hour Usage</span>
-                <span><span class="quota-value" id="codex-5h-pct">0%</span> used</span>
-              </div>
-              <div class="quota-bar">
-                <div class="quota-bar-fill low" id="codex-5h-bar" style="width: 0%"></div>
-              </div>
-            </div>
-            <div style="margin-top: 8px">
-              <div class="quota-stats">
-                <span>Daily Usage</span>
-                <span><span class="quota-value" id="codex-day-pct">0%</span> used</span>
-              </div>
-              <div class="quota-bar">
-                <div class="quota-bar-fill low" id="codex-day-bar" style="width: 0%"></div>
-              </div>
-            </div>
+            <div id="codex-windows"><span class="quota-value">N/A</span> — Usage unavailable</div>
             <div
-              style="
-                margin-top: 16px;
-                padding-top: 12px;
-                border-top: 1px solid var(--border);
-                font-size: 0.75rem;
-                color: var(--text-muted);
-              "
+              id="codex-status"
+              style="margin-top: 12px; font-size: 0.75rem; color: var(--text-muted)"
             >
-              <div style="display: flex; justify-content: space-between">
-                <span>Tasks Today</span>
-                <span id="codex-tasks">0</span>
-              </div>
+              Waiting for usage data
+            </div>
+            <div style="margin-top: 8px; font-size: 0.75rem; color: var(--text-muted)">
+              Account quota · not token totals
             </div>
           </div>
         </div>
@@ -2931,14 +2909,63 @@
         return el;
       }
 
+      function renderCodexUsage(codex) {
+        $set("codex-plan", "textContent", codex?.plan || "Plan unavailable");
+        const container = document.getElementById("codex-windows");
+        if (!container) return;
+        const stale = codex?.status === "stale";
+        const windows = codex?.windows || [];
+        container.innerHTML = windows.length
+          ? windows
+              .map((window) => {
+                const known =
+                  !stale &&
+                  codex?.status !== "error" &&
+                  typeof window.usedPercent === "number" &&
+                  Number.isFinite(window.usedPercent) &&
+                  window.usedPercent >= 0 &&
+                  window.usedPercent <= 100;
+                const percent = known ? Math.round(window.usedPercent) : null;
+                const reset = Number.isFinite(window.resetAt)
+                  ? new Date(window.resetAt).toLocaleString()
+                  : null;
+                const color =
+                  percent === null
+                    ? "gray"
+                    : percent < 50
+                      ? "low"
+                      : percent < 80
+                        ? "medium"
+                        : "high";
+                return `<div style="margin-top: 8px"><div class="quota-stats"><span>${escapeHtml(window.label)} usage</span><span class="quota-value">${percent === null ? "N/A" : percent + "% used"}</span></div><div class="quota-bar"><div class="quota-bar-fill ${color}" style="width: ${percent ?? 0}%"></div></div>${reset ? `<div style="font-size: 0.7rem; color: var(--text-muted)">Resets ${escapeHtml(reset)}</div>` : ""}</div>`;
+              })
+              .join("")
+          : '<span class="quota-value">N/A</span> — Usage unavailable';
+        const observed = codex?.lastSynced ? new Date(codex.lastSynced) : null;
+        $set(
+          "codex-status",
+          "textContent",
+          stale
+            ? "Stale — waiting for a fresh reading"
+            : codex?.status === "error"
+              ? "Provider usage unavailable"
+              : codex?.status === "available" && observed && Number.isFinite(observed.getTime())
+                ? "Updated " + observed.toLocaleTimeString()
+                : "Usage unavailable",
+        );
+      }
+
       function renderLlmUsage(data) {
         // Wrap in try-catch to prevent crashes from blocking other renders
         try {
+          renderCodexUsage(data?.codex);
           // Handle auth errors - show clear error state instead of 0%
           if (data?.errorType === "auth" || data?.claude?.session?.error) {
-            const errorMsg = "⚠️ Auth Error";
-            const clickableError =
-              '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>';
+            const authError = data?.errorType === "auth";
+            const errorMsg = authError ? "⚠️ Auth Error" : "Usage unavailable";
+            const clickableError = authError
+              ? '<a href="#" onclick="openAuthModal(); return false;" style="color:#f59e0b; text-decoration: underline; cursor: pointer;">Auth Error - Click to Fix</a>'
+              : "Usage unavailable";
 
             // Session card
             $set("claude-session-pct", "innerHTML", '<span style="color:#f59e0b">N/A</span>');
@@ -2977,22 +3004,6 @@
               compactWeekBar.className = "quota-bar-fill gray";
             }
 
-            // Compact cards - Codex (show 0% but with gray bars since we don't track Codex via API)
-            const codex5hEl = document.getElementById("codex-5h-pct");
-            const codex5hBar = document.getElementById("codex-5h-bar");
-            const codexDayEl = document.getElementById("codex-day-pct");
-            const codexDayBar = document.getElementById("codex-day-bar");
-            if (codex5hEl) codex5hEl.textContent = "0%";
-            if (codex5hBar) {
-              codex5hBar.style.width = "0%";
-              codex5hBar.className = "quota-bar-fill low";
-            }
-            if (codexDayEl) codexDayEl.textContent = "0%";
-            if (codexDayBar) {
-              codexDayBar.style.width = "0%";
-              codexDayBar.className = "quota-bar-fill low";
-            }
-            $set("codex-tasks", "textContent", "0 total");
             $set("llm-sync-time", "textContent", errorMsg);
 
             // Still render routing data if available
@@ -3007,7 +3018,6 @@
               );
 
               // Task routing counts
-              $set("codex-tasks", "textContent", total + " total");
               $set("claude-task-count", "textContent", ct);
               $set("codex-task-count", "textContent", cx);
             }
@@ -3123,7 +3133,6 @@
           const totalTasks = data.routing?.total || 0;
           const claudeTasks = data.routing?.claudeTasks || 0;
           const codexTasks = data.routing?.codexTasks || 0;
-          $set("codex-tasks", "textContent", totalTasks + " total");
           $set("claude-task-count", "textContent", claudeTasks);
           $set("codex-task-count", "textContent", codexTasks);
 
@@ -4784,25 +4793,6 @@
           // Color coding
           sessionBar.className = `quota-bar-fill ${sessionPct < 50 ? "low" : sessionPct < 80 ? "medium" : "high"}`;
           weekBar.className = `quota-bar-fill ${weekPct < 50 ? "low" : weekPct < 80 ? "medium" : "high"}`;
-        }
-
-        // Codex quotas
-        if (quotaData.codex) {
-          const h5Pct = Math.round((quotaData.codex.usage5h || 0) * 100);
-          const dayPct = Math.round((quotaData.codex.usageDay || 0) * 100);
-
-          document.getElementById("codex-5h-pct").textContent = `${h5Pct}%`;
-          document.getElementById("codex-day-pct").textContent = `${dayPct}%`;
-          document.getElementById("codex-tasks").textContent = quotaData.codex.tasksToday || 0;
-
-          const h5Bar = document.getElementById("codex-5h-bar");
-          const dayBar = document.getElementById("codex-day-bar");
-
-          h5Bar.style.width = `${h5Pct}%`;
-          dayBar.style.width = `${dayPct}%`;
-
-          h5Bar.className = `quota-bar-fill ${h5Pct < 50 ? "low" : h5Pct < 80 ? "medium" : "high"}`;
-          dayBar.className = `quota-bar-fill ${dayPct < 50 ? "low" : dayPct < 80 ? "medium" : "high"}`;
         }
       }
 
