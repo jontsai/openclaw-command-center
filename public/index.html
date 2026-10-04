@@ -66,7 +66,10 @@
       <div class="stats-bar">
         <div class="stat">
           <div class="stat-value" id="total-tokens">-</div>
-          <div class="stat-label" id="token-period-label">Tokens</div>
+          <div class="stat-label">
+            <span data-i18n="stats.totalTokens">Total Tokens</span> ·
+            <span id="token-period-label">-</span>
+          </div>
         </div>
         <div class="stat">
           <div class="stat-value" id="input-tokens">-</div>
@@ -90,7 +93,10 @@
           style="cursor: pointer"
         >
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label" id="cost-period-label">Est. API Cost 📊</div>
+          <div class="stat-label">
+            <span data-i18n="stats.estApiCost">Est. API Cost</span> ·
+            <span id="cost-period-label">-</span> <span id="cost-provisional-label"></span>
+          </div>
         </div>
         <div
           class="stat"
@@ -1570,31 +1576,34 @@
     <div id="cost-modal-overlay" class="detail-overlay hidden" onclick="closeCostModal()"></div>
     <div id="cost-modal" class="detail-panel hidden" style="max-width: 500px">
       <div class="detail-header">
-        <h2 id="cost-modal-title">💰 Cost Breakdown</h2>
+        <h2>
+          <span data-i18n="cost.title">💰 Cost Breakdown</span> ·
+          <span id="cost-modal-title">-</span>
+        </h2>
         <button class="close-btn" onclick="closeCostModal()">✕</button>
       </div>
       <div class="detail-content" id="cost-modal-content">
         <div class="detail-section">
-          <h3>📊 Token Usage</h3>
+          <h3 data-i18n="cost.tokenUsage">📊 Token Usage</h3>
           <div class="detail-box" id="cost-tokens"></div>
         </div>
         <div class="detail-section">
-          <h3>💵 Pricing Basis</h3>
+          <h3 data-i18n="cost.pricingBasis">💵 Pricing Basis</h3>
           <div class="detail-box" id="cost-rates"></div>
         </div>
         <div class="detail-section">
-          <h3>🧮 Calculation</h3>
+          <h3 data-i18n="cost.calculation">🧮 Calculation</h3>
           <div class="detail-box" id="cost-calculation"></div>
         </div>
         <div
           class="detail-section"
           style="background: rgba(63, 185, 80, 0.1); border-radius: 8px; padding: 16px"
         >
-          <h3>✨ Billing &amp; Recent Averages</h3>
+          <h3 data-i18n="cost.billing">✨ Billing &amp; Recent Averages</h3>
           <div class="detail-box" id="cost-savings"></div>
         </div>
         <div class="detail-section">
-          <h3>🔥 Current Sessions (Lifetime Tokens)</h3>
+          <h3 data-i18n="cost.sessions">🔥 Current Sessions (Lifetime Tokens)</h3>
           <div class="detail-box" id="cost-top-sessions" style="font-size: 0.85rem"></div>
         </div>
       </div>
@@ -2635,7 +2644,7 @@
         currentTokenStats = stats; // Store for window switching
 
         $set("total-tokens", "textContent", stats.total || "0");
-        $set("token-period-label", "textContent", `Tokens · ${stats.costPeriod || "Unavailable"}`);
+        $set("token-period-label", "textContent", stats.costPeriod || "Unavailable");
         $set(
           "total-tokens",
           "title",
@@ -2645,11 +2654,8 @@
         $set("input-tokens", "textContent", stats.input || "0");
         $set("output-tokens", "textContent", stats.output || "0");
         $set("est-cost", "textContent", stats.estCost || "N/A");
-        $set(
-          "cost-period-label",
-          "textContent",
-          `Est. API Cost · ${stats.costPeriod || "Unavailable"}${stats.costRefreshing ? " · provisional" : ""}`,
-        );
+        $set("cost-period-label", "textContent", stats.costPeriod || "Unavailable");
+        $set("cost-provisional-label", "textContent", stats.costRefreshing ? "(provisional)" : "");
         $set("nav-tokens", "textContent", stats.total || "0");
         $set("nav-cost", "textContent", stats.estCost || "$0.00");
         $set("nav-monthly-cost", "textContent", stats.estMonthlyCost || "-");
@@ -4270,8 +4276,7 @@
         const money = (n) => (Number.isFinite(n) ? `$${formatCurrency(n, 4)}` : "N/A");
         const row = (label, value) =>
           `<div class="detail-row"><span class="detail-label">${escapeHtml(label)}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
-        document.getElementById("cost-modal-title").textContent =
-          `💰 Cost Breakdown · ${data.period}`;
+        document.getElementById("cost-modal-title").textContent = data.period || "Unavailable";
         const note =
           data.status === "unavailable"
             ? "Usage unavailable; not a zero-cost reading."

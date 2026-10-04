@@ -142,6 +142,10 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - JSDoc comments for public functions
 - Meaningful variable names (thematic names encouraged!)
 
+## 🌐 Preserve Internationalization
+
+UI fixes and refactors must preserve `data-i18n` and related localization hooks. If wording changes meaning, replace the key deliberately and update every supported locale; do not remove localization to make dynamic rendering easier. Keep translated labels separate from runtime values so updates cannot overwrite their hooks. Localize new loading, error, tooltip, and dynamic text through the existing i18n mechanisms. Verify English → Chinese → English switching with the affected panel open and after live updates, and retain regression coverage for the hooks.
+
 ## 📦 ClawHub Skill Workflow
 
 This project is distributed as a ClawHub skill. After changes are merged to `main`, they need to be published to the registry so users can install/update via `clawhub install command-center`.
