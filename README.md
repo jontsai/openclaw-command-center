@@ -18,6 +18,16 @@ English | [简体中文](README.zh-CN.md)
 
 ---
 
+## Core monitoring and agent flavors
+
+Command Center owns universal OpenClaw monitoring; Spacesuit owns optional
+per-agent flavors and domain extensions. Flavors customize workflows and panels
+without forking the dashboard or making core monitoring depend on a flavor.
+
+See the [architecture and migration plan](docs/architecture/core-and-flavors.md). This is the
+planned boundary; flavor installation and the extension runtime are not yet
+implemented. Existing dashboard and workspace behavior is unchanged.
+
 ## Why Command Center?
 
 Your AI agents are running 24/7. You need to know what they're doing.

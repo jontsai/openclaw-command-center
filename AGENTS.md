@@ -342,3 +342,14 @@ When handing off to another AI or ending a session:
 ---
 
 _"Awaken, my child, and embrace the glory that is your birthright."_
+
+## Core monitoring versus agent flavors
+
+Command Center owns generic OpenClaw monitoring and extension-host infrastructure.
+Spacesuit owns optional per-agent flavors and domain extensions. Do not add new
+agent-specific business rules, workspace file conventions or panels to Command
+Center core. Keep public flavor packages generic and private bindings in the
+workspace. Preserve localization, profile isolation and core-only operation.
+
+Read [the core/flavor boundary](docs/architecture/core-and-flavors.md) before adding panels or collectors.
+The runtime migration is planned, not implemented by this documentation.
