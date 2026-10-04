@@ -6,6 +6,11 @@ const { execFileSync, execFile } = require("child_process");
 const { promisify } = require("util");
 const execFileAsync = promisify(execFile);
 
+// Match the dashboard's agents/main transcript store and avoid the CLI's
+// default page limit when calculating totals or looking up older sessions.
+const SESSION_LIST_COMMAND = "sessions --agent main --limit all";
+const CLI_MAX_BUFFER = 16 * 1024 * 1024;
+
 /**
  * Build a minimal env for child processes.
  * Avoids leaking secrets (API keys, cloud creds) to shell subprocesses.
@@ -52,6 +57,7 @@ function runOpenClaw(args) {
     const result = execFileSync("openclaw", buildArgs(args), {
       encoding: "utf8",
       timeout: 3000,
+      maxBuffer: CLI_MAX_BUFFER,
       env: getSafeEnv(),
       stdio: ["pipe", "pipe", "pipe"],
     });
@@ -72,6 +78,7 @@ async function runOpenClawAsync(args) {
     const { stdout } = await execFileAsync("openclaw", buildArgs(args), {
       encoding: "utf8",
       timeout: 20000,
+      maxBuffer: CLI_MAX_BUFFER,
       env: getSafeEnv(),
     });
     return stdout;
@@ -98,4 +105,5 @@ module.exports = {
   runOpenClawAsync,
   extractJSON,
   getSafeEnv,
+  SESSION_LIST_COMMAND,
 };

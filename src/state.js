@@ -1,3 +1,4 @@
+const { SESSION_LIST_COMMAND } = require("./openclaw");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -136,7 +137,7 @@ function createStateModule(deps) {
 
     // Try to get active counts from sessions (preferred - has full session keys)
     try {
-      const output = runOpenClaw("sessions --json 2>/dev/null");
+      const output = runOpenClaw(`${SESSION_LIST_COMMAND} --json`);
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);
@@ -528,7 +529,7 @@ function createStateModule(deps) {
   function getSubagentStatus() {
     const subagents = [];
     try {
-      const output = runOpenClaw("sessions --json 2>/dev/null");
+      const output = runOpenClaw(`${SESSION_LIST_COMMAND} --json`);
       const jsonStr = extractJSON(output);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);

@@ -1,3 +1,4 @@
+const { SESSION_LIST_COMMAND } = require("./openclaw");
 const ALLOWED_ACTIONS = new Set([
   "gateway-status",
   "gateway-restart",
@@ -28,7 +29,7 @@ function executeAction(action, deps) {
         results.note = "Dashboard cannot restart gateway for safety";
         break;
       case "sessions-list":
-        results.output = runOpenClaw("sessions 2>&1") || "No sessions";
+        results.output = runOpenClaw(SESSION_LIST_COMMAND) || "No sessions";
         results.success = true;
         break;
       case "cron-list":
@@ -37,7 +38,7 @@ function executeAction(action, deps) {
         break;
       case "health-check": {
         const gateway = runOpenClaw("gateway status 2>&1");
-        const sessions = runOpenClaw("sessions --json 2>&1");
+        const sessions = runOpenClaw(`${SESSION_LIST_COMMAND} --json`);
         let sessionCount = 0;
         try {
           const data = JSON.parse(sessions);
@@ -52,7 +53,7 @@ function executeAction(action, deps) {
         break;
       }
       case "clear-stale-sessions": {
-        const staleOutput = runOpenClaw("sessions --json 2>&1");
+        const staleOutput = runOpenClaw(`${SESSION_LIST_COMMAND} --json`);
         let staleCount = 0;
         try {
           const staleJson = extractJSON(staleOutput);
