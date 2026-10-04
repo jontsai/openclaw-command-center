@@ -2146,3 +2146,96 @@ main {
   height: 8px;
   border-radius: 2px;
 }
+
+/* Generic, read-only extension primitives. Domain styles belong to Spacesuit. */
+[data-legacy-panel][hidden] {
+  display: none;
+}
+.extension-note {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+}
+.extension-warning {
+  color: var(--yellow);
+}
+.extension-card {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: 16px;
+  min-width: 0;
+}
+.extension-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.extension-header h3,
+.extension-panel-title {
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+.extension-status {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.extension-status-ready {
+  color: var(--green);
+}
+.extension-status-stale {
+  color: var(--yellow);
+}
+.extension-status-error {
+  color: var(--red);
+}
+.extension-panel {
+  margin: 16px 0;
+  min-width: 0;
+}
+.extension-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+.extension-metric dt {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.extension-metric dd {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+  overflow-wrap: anywhere;
+}
+.extension-table-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.extension-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.8rem;
+}
+.extension-table th,
+.extension-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  overflow-wrap: anywhere;
+  max-width: 300px;
+}
+.extension-table th {
+  color: var(--text-muted);
+}
+.extension-table caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.extension-table {
+  min-width: 480px;
+}

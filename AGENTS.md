@@ -352,4 +352,16 @@ Center core. Keep public flavor packages generic and private bindings in the
 workspace. Preserve localization, profile isolation and core-only operation.
 
 Read [the core/flavor boundary](docs/architecture/core-and-flavors.md) before adding panels or collectors.
-The runtime migration is planned, not implemented by this documentation.
+The first read-only host is implemented in `src/extensions.js`; see
+[extension API v1](docs/architecture/extension-api-v1.md). Preserve explicit core-only
+operation, legacy compatibility, independent snapshot failures and locale hooks.
+Command Center must work standalone; Spacesuit is highly recommended but has no
+human–agent graphical interaction surface without Command Center. Do not describe
+workspace scaffolding as an independent dashboard or promise a chat composer.
+
+## Localization preservation
+
+Preserve `data-i18n` hooks and existing translations in UI changes. Localize new
+static and dynamic labels in English and Chinese, including unavailable/error
+states. Keep raw business data separate from localized labels; never infer its
+translation. Verify language switching while new panels are open.

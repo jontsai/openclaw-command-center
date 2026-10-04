@@ -18,15 +18,23 @@ English | [简体中文](README.zh-CN.md)
 
 ---
 
-## Core monitoring and agent flavors
+## Standalone monitoring, recommended companion
 
-Command Center owns universal OpenClaw monitoring; Spacesuit owns optional
-per-agent flavors and domain extensions. Flavors customize workflows and panels
-without forking the dashboard or making core monitoring depend on a flavor.
+**Command Center works out of the box without Spacesuit.** It owns OpenClaw
+sessions, health, jobs, usage and the common dashboard. For a minimal core-only
+view, run `COMMAND_CENTER_MODE=core npm start`.
 
-See the [architecture and migration plan](docs/architecture/core-and-flavors.md). This is the
-planned boundary; flavor installation and the extension runtime are not yet
-implemented. Existing dashboard and workspace behavior is unchanged.
+**Spacesuit is the highly recommended companion** for per-agent flavors, domain
+panels and workflows. Spacesuit can scaffold a workspace and collect data by itself,
+but it has **no graphical human–agent interaction surface of its own**; Command
+Center provides the dashboard and supported controls. The extension system does
+not add a chat composer.
+
+The [read-only extension API](docs/architecture/extension-api-v1.md) loads explicit,
+profile-bound Spacesuit snapshots through the existing state feed. Legacy built-in
+domain panels remain the default compatibility mode until you select a flavor or
+core-only mode; existing panels and data are not silently removed. See the
+[ownership and migration plan](docs/architecture/core-and-flavors.md).
 
 ## Why Command Center?
 

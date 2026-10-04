@@ -1,6 +1,7 @@
 # Core monitoring and Spacesuit flavors
 
-Status: ownership decision recorded; extension API and migration proposed, not implemented.
+Status: read-only host v1 implemented; final legacy removal remains planned.
+See [extension API v1](extension-api-v1.md) for the executable contract and current limits.
 
 ## Decision
 
@@ -9,13 +10,15 @@ OpenClaw Spacesuit owns agent flavors: optional domain workflows, data collector
 panel definitions, translations, and workspace conventions. A flavor composes
 extensions; it is not a fork of Command Center or a separate OpenClaw runtime.
 
-Command Center must work without Spacesuit. Spacesuit must remain useful without
-Command Center. Installing either package must not implicitly start the other.
+Command Center works standalone. Spacesuit is its highly recommended companion;
+it can scaffold/collect independently but has no graphical human–agent interaction
+surface without Command Center. Installing either package must not implicitly
+start the other or imply that a chat composer exists.
 
 ## Why this boundary
 
 The current `src/index.js` creates Intel, Pipeline, and Monetization modules and
-passes their collectors into `src/state.js`. Shared state refreshes invoke all
+passes their collectors into `src/state.js`. Legacy-mode state refreshes invoke all
 three, even though their `intel/` files and business semantics are not universal
 OpenClaw capabilities. Hiding the panels alone would leave this coupling intact.
 
@@ -47,11 +50,13 @@ interpretation can add a namespaced extension panel; it must not replace the cor
 session endpoint or make it depend on a flavor. Existing session-detail errors are
 reliability bugs, not justification for moving session monitoring into Spacesuit.
 
-## Proposed extension contract (v1 design, not an available API)
+## Original design and implemented v1 contract
 
-Command Center owns the eventual versioned manifest schema and normalized panel
-payload. Spacesuit authors packages against it. No manifest file path, endpoint or
-CLI installation flag is stable until the implementing PR establishes it.
+Command Center owns the versioned selection and normalized snapshot contract.
+Spacesuit owns its package manifests and authors snapshots against that contract.
+[Extension API v1](extension-api-v1.md) establishes the actual paths, environment
+mode, inline bilingual labels, validation limits and compatibility behavior.
+The following requirements remain the direction for further migration.
 
 Required concepts:
 
@@ -84,9 +89,9 @@ work. Use document-relative routing so root and reverse-proxy prefixes both work
 
 ## Migration sequence
 
-1. Land the ownership documentation in both repositories independently of cost,
-   session-detail and localization fixes. This document changes no runtime behavior.
-2. Implement a versioned, validated read-only extension host with synthetic data;
+1. Completed: land the ownership documentation in both repositories independently of cost,
+   session-detail and localization fixes. The documentation-only change altered no runtime behavior.
+2. Implemented in v1: a versioned, validated read-only extension host with synthetic data;
    prove core-only mode. Add independent cached snapshot reads, not synchronous
    domain collectors to the core request path.
 3. Move Intel, Pipeline and Monetization implementations, tests, panel definitions
@@ -100,7 +105,9 @@ work. Use document-relative routing so root and reverse-proxy prefixes both work
 6. Remove core's legacy domain collectors only after feature parity, a documented
    compatibility window and an explicit migration choice for existing users.
 
-New installations will default to core-only after the extension host exists.
+The initial host retains legacy mode by default for compatibility; explicit core
+mode is fully standalone. A default change for fresh installations is deferred
+until a reliable migration distinction exists.
 Existing installations must retain legacy panels during migration or explicitly
 opt into the new configuration; do not silently remove panels or infer selection
 from the mere presence of files. Disabling a flavor stops its collection/rendering

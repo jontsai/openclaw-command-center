@@ -517,5 +517,28 @@
     "statusSuccess": "成功",
     "statusFailed": "失败",
     "statusRunning": "运行中"
+  },
+  "extensions": {
+    "title": "配套扩展",
+    "learn": "了解 Spacesuit ↗",
+    "companion": "Command Center 可独立运行。强烈推荐搭配 Spacesuit，为代理提供定制方案和工作流。",
+    "core": "仅核心监控。未启用领域数据采集器。",
+    "legacy": "为保持兼容，现有可选面板仍然启用。Spacesuit 定制方案可以替换这些面板，而不影响核心监控。",
+    "active": "Spacesuit 扩展——采集的数据快照，独立于核心监控。",
+    "loading": "正在加载扩展配置…",
+    "configurationError": "无法加载扩展配置。核心监控仍然可用。",
+    "none": "尚未选择扩展。核心监控仍然可用。",
+    "empty": "暂无记录。",
+    "observed": "采集时间：",
+    "staleNote": "此快照已过期；以下数值不是当前数据。",
+    "unavailableNote": "此扩展暂无可用的当前数据。核心监控不受影响。",
+    "status": {
+      "loading": "加载中",
+      "ready": "当前",
+      "stale": "已过期",
+      "unavailable": "不可用",
+      "error": "错误",
+      "disabled": "已停用"
+    }
   }
 }

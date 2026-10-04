@@ -29,6 +29,7 @@ const { formatBytes, formatTimeAgo } = require("./utils");
  * @param {function} deps.getMonetizationStats - function from monetization module
  */
 function createStateModule(deps) {
+  const legacyExtensions = { schemaVersion: 1, mode: "legacy", items: [] };
   const {
     CONFIG,
     getOpenClawDir,
@@ -47,6 +48,7 @@ function createStateModule(deps) {
     getIntelStats,
     getPipelineStats,
     getMonetizationStats,
+    getExtensions = () => legacyExtensions,
   } = deps;
 
   const PATHS = CONFIG.paths;
@@ -372,9 +374,15 @@ function createStateModule(deps) {
   // Unified state for dashboard (single source of truth)
   function getFullState() {
     const now = Date.now();
+    const extensions = getExtensions();
 
     // Return cached state if fresh
-    if (cachedState && now - lastStateUpdate < STATE_CACHE_TTL) {
+    if (
+      cachedState &&
+      cachedState.extensions.mode === extensions.mode &&
+      now - lastStateUpdate < STATE_CACHE_TTL
+    ) {
+      if (cachedState.extensions !== extensions) cachedState = { ...cachedState, extensions };
       return cachedState;
     }
 
@@ -489,20 +497,22 @@ function createStateModule(deps) {
       console.error("[State] subagents:", e.message);
     }
 
-    try {
-      intel = getIntelStats();
-    } catch (e) {
-      console.error("[State] intel:", e.message);
-    }
-    try {
-      pipeline = getPipelineStats();
-    } catch (e) {
-      console.error("[State] pipeline:", e.message);
-    }
-    try {
-      monetization = getMonetizationStats();
-    } catch (e) {
-      console.error("[State] monetization:", e.message);
+    if (extensions.mode === "legacy") {
+      try {
+        intel = getIntelStats();
+      } catch (e) {
+        console.error("[State] intel:", e.message);
+      }
+      try {
+        pipeline = getPipelineStats();
+      } catch (e) {
+        console.error("[State] pipeline:", e.message);
+      }
+      try {
+        monetization = getMonetizationStats();
+      } catch (e) {
+        console.error("[State] monetization:", e.message);
+      }
     }
     cachedState = {
       vitals,
@@ -516,9 +526,8 @@ function createStateModule(deps) {
       memory,
       cerebro,
       subagents,
-      intel,
-      pipeline,
-      monetization,
+      ...(extensions.mode === "legacy" ? { intel, pipeline, monetization } : {}),
+      extensions,
       pagination: {
         page: 1,
         pageSize: 20,

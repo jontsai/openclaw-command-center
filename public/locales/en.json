@@ -107,5 +107,28 @@
     "statusSuccess": "Success",
     "statusFailed": "Failed",
     "statusRunning": "Running"
+  },
+  "extensions": {
+    "title": "Companion extensions",
+    "learn": "About Spacesuit ↗",
+    "companion": "Command Center works on its own. Spacesuit is its highly recommended companion for agent flavors and workflows.",
+    "core": "Core monitoring only. No domain collectors are enabled.",
+    "legacy": "Built-in optional panels remain enabled for compatibility. A Spacesuit flavor can replace them without changing core monitoring.",
+    "active": "Spacesuit extensions — collected snapshots, independent of core monitoring.",
+    "loading": "Loading extension selection…",
+    "configurationError": "Extension selection could not be loaded. Core monitoring remains available.",
+    "none": "No extensions selected. Core monitoring is still available.",
+    "empty": "No records.",
+    "observed": "Observed: ",
+    "staleNote": "This snapshot is old; values below are not current.",
+    "unavailableNote": "No current data is available for this extension. Core monitoring is unaffected.",
+    "status": {
+      "loading": "Loading",
+      "ready": "Current",
+      "stale": "Stale",
+      "unavailable": "Unavailable",
+      "error": "Error",
+      "disabled": "Disabled"
+    }
   }
 }

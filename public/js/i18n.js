@@ -168,6 +168,8 @@
       if (!parent) continue;
       if (SKIP_TAGS.has(parent.tagName)) continue;
       if (parent.hasAttribute("data-i18n")) continue;
+      // Structured extension content owns its labels; never translate business data heuristically.
+      if (parent.closest("[data-i18n-skip]")) continue;
       const translated = translateTextValue(textNode.nodeValue || "");
       if (translated !== textNode.nodeValue) {
         textNode.nodeValue = translated;
@@ -304,7 +306,12 @@
             mutation.addedNodes.forEach((addedNode) => {
               if (addedNode.nodeType === Node.TEXT_NODE) {
                 const parent = addedNode.parentElement;
-                if (parent && !SKIP_TAGS.has(parent.tagName)) {
+                if (
+                  parent &&
+                  !SKIP_TAGS.has(parent.tagName) &&
+                  !parent.closest("[data-i18n-skip]") &&
+                  !parent.hasAttribute("data-i18n")
+                ) {
                   const translated = translateTextValue(addedNode.nodeValue || "");
                   if (translated !== addedNode.nodeValue) addedNode.nodeValue = translated;
                 }
@@ -319,7 +326,12 @@
           if (mutation.type === "characterData" && mutation.target?.nodeType === Node.TEXT_NODE) {
             const textNode = mutation.target;
             const parent = textNode.parentElement;
-            if (parent && !SKIP_TAGS.has(parent.tagName)) {
+            if (
+              parent &&
+              !SKIP_TAGS.has(parent.tagName) &&
+              !parent.closest("[data-i18n-skip]") &&
+              !parent.hasAttribute("data-i18n")
+            ) {
               const translated = translateTextValue(textNode.nodeValue || "");
               if (translated !== textNode.nodeValue) textNode.nodeValue = translated;
             }
