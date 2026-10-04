@@ -156,7 +156,11 @@
     </div>
     <div class="nav-section">
       <div class="nav-section-title" data-i18n="sidebar.quickStats">Quick Stats</div>
-      <div class="nav-item" style="cursor: default" data-tooltip="Total tokens (24h)">
+      <div
+        class="nav-item"
+        style="cursor: default"
+        data-tooltip="Input + output tokens in the reported cost window"
+      >
         <span class="nav-icon">🎫</span>
         <span data-i18n="sidebar.tokens">Tokens</span>
         <span class="nav-badge" id="nav-tokens">-</span>
@@ -175,7 +179,7 @@
         class="nav-item"
         style="cursor: pointer"
         onclick="window.openCostModal && openCostModal()"
-        data-tooltip="Projected monthly cost"
+        data-tooltip="Monthly bill projection unavailable without billing data"
       >
         <span class="nav-icon">📅</span>
         <span data-i18n="sidebar.estMonthly">Est. Monthly</span>

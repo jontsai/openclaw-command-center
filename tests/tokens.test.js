@@ -80,6 +80,7 @@ describe("tokens module", () => {
           cacheRead: 10,
           cacheWrite: 5,
           cost: 0.01,
+          costKnown: true,
         },
       ]);
     });

@@ -14,6 +14,8 @@ for (const base of ["http://example.local/", "http://example.local/fleet/agent/"
     const key = "agent:main:chat:channel:test:thread:123?x=1#part";
     const data = { key, transcriptAvailable: false, tokens: 123 };
     const context = {
+      detailController: null,
+      detailGeneration: 0,
       AbortController: globalThis.AbortController,
       setTimeout,
       clearTimeout,
@@ -46,6 +48,7 @@ test("transcript-unavailable detail preserves overview but avoids false empty cl
     return elements.get(id);
   };
   const context = {
+    escapeHtml: (value) => String(value),
     document: { getElementById: element },
     smartUpdate: (el, html) => {
       el.innerHTML = html;

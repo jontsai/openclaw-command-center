@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { formatNumber, formatTokens } = require("./utils");
+const { usageReportCache } = require("./usage-report");
 
 // Claude Opus 4 pricing (per 1M tokens)
 const TOKEN_RATES = {
@@ -30,6 +31,8 @@ function addUsageToBucket(bucket, usage) {
   bucket.cacheWrite += usage.cacheWrite;
   bucket.cost += usage.cost;
   bucket.requests++;
+  bucket.missingCostEntries =
+    (bucket.missingCostEntries || 0) + (usage.costKnown === false ? 1 : 0);
 }
 
 function collectTokenUsageEvents(content, sevenDaysAgo) {
@@ -49,7 +52,8 @@ function collectTokenUsageEvents(content, sevenDaysAgo) {
         output: u.output || 0,
         cacheRead: u.cacheRead || 0,
         cacheWrite: u.cacheWrite || 0,
-        cost: u.cost?.total || 0,
+        cost: Number.isFinite(u.cost?.total) ? u.cost.total : 0,
+        costKnown: Number.isFinite(u.cost?.total),
       });
     } catch (e) {
       // Skip invalid lines
@@ -81,6 +85,7 @@ async function refreshTokenUsageAsync(getOpenClawDir) {
 
     // Process files in batches to avoid overwhelming the system. Cache parsed usage
     // events by file mtime/size so routine refreshes do not re-parse every JSONL line.
+    let unreadableFiles = 0;
     const seenFiles = new Set();
     const batchSize = 50;
     for (let i = 0; i < jsonlFiles.length; i += batchSize) {
@@ -120,7 +125,8 @@ async function refreshTokenUsageAsync(getOpenClawDir) {
               addUsageToBucket(usage7d, event);
             }
           } catch (e) {
-            // Skip unreadable files
+            // A partial scan is not a measured zero.
+            unreadableFiles++;
             tokenUsageFileCache.delete(filePath);
           }
         }),
@@ -142,6 +148,10 @@ async function refreshTokenUsageAsync(getOpenClawDir) {
     });
 
     const result = {
+      available: jsonlFiles.length > 0 && unreadableFiles === 0,
+      source: "legacy-jsonl",
+      period: "24h",
+      updatedAt: Date.now(),
       // Primary (24h) for backward compatibility
       ...finalizeBucket(usage24h),
       // All three windows
@@ -164,6 +174,8 @@ async function refreshTokenUsageAsync(getOpenClawDir) {
 
 // Returns cached token usage, triggers async refresh if stale
 function getDailyTokenUsage(getOpenClawDir) {
+  const modern = usageReportCache.get();
+  if (modern) return modern;
   const now = Date.now();
   const isStale = now - tokenUsageCache.timestamp > TOKEN_USAGE_CACHE_TTL;
 
@@ -173,6 +185,9 @@ function getDailyTokenUsage(getOpenClawDir) {
   }
 
   const emptyResult = {
+    available: false,
+    source: "unavailable",
+    period: "Usage unavailable",
     input: 0,
     output: 0,
     cacheRead: 0,
@@ -216,7 +231,13 @@ function getDailyTokenUsage(getOpenClawDir) {
   };
 
   // Always return cache (may be stale or null on cold start)
-  return tokenUsageCache.data || emptyResult;
+  return tokenUsageCache.data
+    ? {
+        ...tokenUsageCache.data,
+        available: tokenUsageCache.data.available && now - tokenUsageCache.timestamp < 900000,
+        stale: now - tokenUsageCache.timestamp >= 900000,
+      }
+    : emptyResult;
 }
 
 // Calculate cost for a usage bucket
@@ -234,92 +255,61 @@ function calculateCostForBucket(bucket, rates = TOKEN_RATES) {
   };
 }
 
-// Get detailed cost breakdown for the modal
-function getCostBreakdown(config, getSessions, getOpenClawDir) {
-  const usage = getDailyTokenUsage(getOpenClawDir);
-  if (!usage) {
-    return { error: "Failed to get usage data" };
-  }
-
-  // Calculate costs for 24h (primary display)
-  const costs = calculateCostForBucket(usage);
-
-  // Get plan info from config
-  const planCost = config.billing?.claudePlanCost || 200;
-  const planName = config.billing?.claudePlanName || "Claude Code Max";
-
-  // Calculate moving averages for each window
-  const windowConfigs = {
-    "24h": { days: 1, label: "24h" },
-    "3d": { days: 3, label: "3dma" },
-    "7d": { days: 7, label: "7dma" },
-  };
-
+// Recorded costs are model-aware API equivalents, not a subscription bill.
+function buildCostBreakdown(usage, topSessions = []) {
+  const available = usage?.available === true;
+  const missing = usage?.missingCostEntries || 0;
+  const costKnown = available && missing === 0 && Number.isFinite(usage.cost);
+  const num = (key) => (available && Number.isFinite(usage[key]) ? usage[key] : null);
   const windows = {};
-  for (const [key, windowConfig] of Object.entries(windowConfigs)) {
-    const bucket = usage.windows?.[key] || usage;
-    const bucketCosts = calculateCostForBucket(bucket);
-    const dailyAvg = bucketCosts.totalCost / windowConfig.days;
-    const monthlyProjected = dailyAvg * 30;
-    const monthlySavings = monthlyProjected - planCost;
-
+  for (const [key, days] of [
+    ["24h", 1],
+    ["3d", 3],
+    ["7d", 7],
+  ]) {
+    const bucket = usage?.windows?.[key];
+    const complete =
+      available && bucket && !(bucket.missingCostEntries > 0) && Number.isFinite(bucket.cost);
     windows[key] = {
-      label: windowConfig.label,
-      days: windowConfig.days,
-      totalCost: bucketCosts.totalCost,
-      dailyAvg,
-      monthlyProjected,
-      monthlySavings,
-      savingsPercent:
-        monthlySavings > 0 ? Math.round((monthlySavings / monthlyProjected) * 100) : 0,
-      requests: bucket.requests,
-      tokens: {
-        input: bucket.input,
-        output: bucket.output,
-        cacheRead: bucket.cacheRead,
-        cacheWrite: bucket.cacheWrite,
-      },
+      label: key === "24h" ? usage?.period : `${days}-day average`,
+      totalCost: complete ? bucket.cost : null,
+      dailyAvg: complete ? bucket.cost / days : null,
     };
   }
-
   return {
-    // Raw token counts (24h for backward compatibility)
-    inputTokens: usage.input,
-    outputTokens: usage.output,
-    cacheRead: usage.cacheRead,
-    cacheWrite: usage.cacheWrite,
-    requests: usage.requests,
-
-    // Pricing rates
-    rates: {
-      input: TOKEN_RATES.input.toFixed(2),
-      output: TOKEN_RATES.output.toFixed(2),
-      cacheRead: TOKEN_RATES.cacheRead.toFixed(2),
-      cacheWrite: TOKEN_RATES.cacheWrite.toFixed(2),
-    },
-
-    // Cost calculation breakdown (24h)
+    status: available ? (missing ? "partial" : "available") : "unavailable",
+    period: usage?.period || "Usage unavailable",
+    source: usage?.source || "unavailable",
+    updatedAt: usage?.updatedAt || null,
+    refreshing: usage?.refreshing || false,
+    stale: usage?.stale || false,
+    missingCostEntries: missing,
+    inputTokens: num("input"),
+    outputTokens: num("output"),
+    cacheRead: num("cacheRead"),
+    cacheWrite: num("cacheWrite"),
+    requests: num("requests"),
+    totalCost: costKnown ? usage.cost : null,
+    recordedCost: num("cost"),
     calculation: {
-      inputCost: costs.inputCost,
-      outputCost: costs.outputCost,
-      cacheReadCost: costs.cacheReadCost,
-      cacheWriteCost: costs.cacheWriteCost,
+      inputCost: costKnown ? num("inputCost") : null,
+      outputCost: costKnown ? num("outputCost") : null,
+      cacheReadCost: costKnown ? num("cacheReadCost") : null,
+      cacheWriteCost: costKnown ? num("cacheWriteCost") : null,
     },
-
-    // Totals (24h for backward compatibility)
-    totalCost: costs.totalCost,
-    planCost,
-    planName,
-
-    // Period
-    period: "24 hours",
-
-    // Multi-window data for moving averages
+    pricingBasis:
+      "Recorded per-model API-equivalent costs from OpenClaw; not subscription charges.",
+    savingsReason: "Subscription savings are not inferred from usage or account quota.",
     windows,
-
-    // Top sessions by tokens
-    topSessions: getTopSessionsByTokens(5, getSessions),
+    topSessions,
+    topSessionsScope: "Current sessions — lifetime token totals, not this reporting window.",
   };
+}
+function getCostBreakdown(config, getSessions, getOpenClawDir) {
+  return buildCostBreakdown(
+    getDailyTokenUsage(getOpenClawDir),
+    getTopSessionsByTokens(5, getSessions),
+  );
 }
 
 // Get top sessions sorted by token usage
@@ -343,7 +333,7 @@ function getTopSessionsByTokens(limit = 5, getSessions) {
 }
 
 // Calculate aggregate token stats
-function getTokenStats(sessions, capacity, config = {}) {
+function getTokenStats(sessions, capacity) {
   // Use capacity data if provided, otherwise compute from sessions
   let activeMainCount = capacity?.main?.active ?? 0;
   let activeSubagentCount = capacity?.subagent?.active ?? 0;
@@ -368,83 +358,47 @@ function getTokenStats(sessions, capacity, config = {}) {
     });
   }
 
-  // Get accurate usage from JSONL files (includes all windows)
   const usage = getDailyTokenUsage();
-  const totalInput = usage?.input || 0;
-  const totalOutput = usage?.output || 0;
-  const total = totalInput + totalOutput;
-
-  // Calculate cost using shared helper
-  const costs = calculateCostForBucket(usage);
-  const estCost = costs.totalCost;
-
-  // Calculate savings vs plan cost (compare monthly to monthly)
-  const planCost = config?.billing?.claudePlanCost ?? 200;
-  const planName = config?.billing?.claudePlanName ?? "Claude Code Max";
-  const monthlyApiCost = estCost * 30; // Project daily to monthly
-  const monthlySavings = monthlyApiCost - planCost;
-  const savingsPositive = monthlySavings > 0;
-
-  // Calculate per-session averages
-  const sessionCount = sessions?.length || 1;
-  const avgTokensPerSession = Math.round(total / sessionCount);
-  const avgCostPerSession = estCost / sessionCount;
-
-  // Calculate savings for all windows (24h, 3dma, 7dma)
-  const windowConfigs = {
-    "24h": { days: 1, label: "24h" },
-    "3dma": { days: 3, label: "3dma" },
-    "7dma": { days: 7, label: "7dma" },
-  };
-
-  const savingsWindows = {};
-  for (const [key, windowConfig] of Object.entries(windowConfigs)) {
-    // Map '3dma' -> '3d' for bucket lookup
-    const bucketKey = key.replace("dma", "d").replace("24h", "24h");
-    const bucket = usage.windows?.[bucketKey === "24h" ? "24h" : bucketKey] || usage;
-    const bucketCosts = calculateCostForBucket(bucket);
-    const dailyAvg = bucketCosts.totalCost / windowConfig.days;
-    const monthlyProjected = dailyAvg * 30;
-    const windowSavings = monthlyProjected - planCost;
-    const windowSavingsPositive = windowSavings > 0;
-
-    savingsWindows[key] = {
-      label: windowConfig.label,
-      estCost: `$${formatNumber(dailyAvg)}`,
-      estMonthlyCost: `$${Math.round(monthlyProjected).toLocaleString()}`,
-      estSavings: windowSavingsPositive ? `$${formatNumber(windowSavings)}/mo` : null,
-      savingsPercent: windowSavingsPositive
-        ? Math.round((windowSavings / monthlyProjected) * 100)
-        : 0,
-      requests: bucket.requests,
-    };
-  }
-
+  const report = buildCostBreakdown(usage);
+  const known = usage?.available === true;
+  const total = known ? usage.input + usage.output : null;
+  const money = (value) => (Number.isFinite(value) ? `$${formatNumber(value)}` : "N/A");
   return {
-    total: formatTokens(total),
-    input: formatTokens(totalInput),
-    output: formatTokens(totalOutput),
-    cacheRead: formatTokens(usage?.cacheRead || 0),
-    cacheWrite: formatTokens(usage?.cacheWrite || 0),
-    requests: usage?.requests || 0,
+    total: known ? formatTokens(total) : "N/A",
+    input: known ? formatTokens(usage.input) : "N/A",
+    output: known ? formatTokens(usage.output) : "N/A",
+    cacheRead: known ? formatTokens(usage.cacheRead) : "N/A",
+    cacheWrite: known ? formatTokens(usage.cacheWrite) : "N/A",
+    requests: known ? usage.requests : null,
     activeCount,
     activeMainCount,
     activeSubagentCount,
     mainLimit,
     subagentLimit,
-    estCost: `$${formatNumber(estCost)}`,
-    planCost: `$${planCost.toFixed(0)}`,
-    planName,
-    // 24h savings (backward compatible)
-    estSavings: savingsPositive ? `$${formatNumber(monthlySavings)}/mo` : null,
-    savingsPercent: savingsPositive ? Math.round((monthlySavings / monthlyApiCost) * 100) : 0,
-    estMonthlyCost: `$${Math.round(monthlyApiCost).toLocaleString()}`,
-    // Multi-window savings (24h, 3da, 7da)
-    savingsWindows,
-    // Per-session averages
-    avgTokensPerSession: formatTokens(avgTokensPerSession),
-    avgCostPerSession: `$${avgCostPerSession.toFixed(2)}`,
-    sessionCount,
+    estCost: money(report.totalCost),
+    costPeriod: report.period,
+    costStatus: report.status,
+    costRefreshing: report.refreshing,
+    planCost: "N/A",
+    planName: "Plan not inferred",
+    estSavings: null,
+    savingsPercent: 0,
+    estMonthlyCost: "N/A",
+    savingsWindows: Object.fromEntries(
+      Object.entries(report.windows).map(([key, w]) => [
+        key === "24h" ? key : key + "ma",
+        {
+          label: w.label,
+          estCost: money(w.dailyAvg),
+          estMonthlyCost: "N/A",
+          estSavings: null,
+          savingsPercent: 0,
+        },
+      ]),
+    ),
+    avgTokensPerSession: "N/A",
+    avgCostPerSession: "N/A",
+    sessionCount: sessions?.length || 0,
   };
 }
 
@@ -452,6 +406,7 @@ function getTokenStats(sessions, capacity, config = {}) {
 // Call this once during server startup instead of auto-starting on module load
 function startTokenUsageRefresh(getOpenClawDir) {
   // Do an initial refresh
+  void usageReportCache.refresh();
   refreshTokenUsageAsync(getOpenClawDir);
 
   // Set up periodic refresh
@@ -473,6 +428,7 @@ module.exports = {
   getDailyTokenUsage,
   calculateCostForBucket,
   getCostBreakdown,
+  buildCostBreakdown,
   getTopSessionsByTokens,
   getTokenStats,
   startTokenUsageRefresh,

@@ -9,6 +9,7 @@
     <script src="js/lib/morphdom.min.js"></script>
     <script src="js/i18n.js"></script>
     <!-- Shared Sidebar Loader -->
+    <script src="js/state-stream.js"></script>
     <script src="js/sidebar.js"></script>
   </head>
   <body>
@@ -65,7 +66,7 @@
       <div class="stats-bar">
         <div class="stat">
           <div class="stat-value" id="total-tokens">-</div>
-          <div class="stat-label" data-i18n="stats.totalTokens">Total Tokens</div>
+          <div class="stat-label" id="token-period-label">Tokens</div>
         </div>
         <div class="stat">
           <div class="stat-value" id="input-tokens">-</div>
@@ -89,7 +90,7 @@
           style="cursor: pointer"
         >
           <div class="stat-value" id="est-cost">-</div>
-          <div class="stat-label" data-i18n="stats.estCost24h">Est. Cost (24h) 📊</div>
+          <div class="stat-label" id="cost-period-label">Est. API Cost 📊</div>
         </div>
         <div
           class="stat"
@@ -1569,7 +1570,7 @@
     <div id="cost-modal-overlay" class="detail-overlay hidden" onclick="closeCostModal()"></div>
     <div id="cost-modal" class="detail-panel hidden" style="max-width: 500px">
       <div class="detail-header">
-        <h2>💰 Cost Breakdown (24h)</h2>
+        <h2 id="cost-modal-title">💰 Cost Breakdown</h2>
         <button class="close-btn" onclick="closeCostModal()">✕</button>
       </div>
       <div class="detail-content" id="cost-modal-content">
@@ -1578,7 +1579,7 @@
           <div class="detail-box" id="cost-tokens"></div>
         </div>
         <div class="detail-section">
-          <h3>💵 Pricing Rates (Claude Opus)</h3>
+          <h3>💵 Pricing Basis</h3>
           <div class="detail-box" id="cost-rates"></div>
         </div>
         <div class="detail-section">
@@ -1589,11 +1590,11 @@
           class="detail-section"
           style="background: rgba(63, 185, 80, 0.1); border-radius: 8px; padding: 16px"
         >
-          <h3>✨ Est. Savings</h3>
+          <h3>✨ Billing &amp; Recent Averages</h3>
           <div class="detail-box" id="cost-savings"></div>
         </div>
         <div class="detail-section">
-          <h3>🔥 Top Sessions by Tokens (24h)</h3>
+          <h3>🔥 Current Sessions (Lifetime Tokens)</h3>
           <div class="detail-box" id="cost-top-sessions" style="font-size: 0.85rem"></div>
         </div>
       </div>
@@ -2634,10 +2635,21 @@
         currentTokenStats = stats; // Store for window switching
 
         $set("total-tokens", "textContent", stats.total || "0");
+        $set("token-period-label", "textContent", `Tokens · ${stats.costPeriod || "Unavailable"}`);
+        $set(
+          "total-tokens",
+          "title",
+          "Input + output tokens; cached tokens are shown in the cost breakdown.",
+        );
         $set("active-sessions", "textContent", stats.activeCount || 0);
         $set("input-tokens", "textContent", stats.input || "0");
         $set("output-tokens", "textContent", stats.output || "0");
-        $set("est-cost", "textContent", stats.estCost || "$0.00");
+        $set("est-cost", "textContent", stats.estCost || "N/A");
+        $set(
+          "cost-period-label",
+          "textContent",
+          `Est. API Cost · ${stats.costPeriod || "Unavailable"}${stats.costRefreshing ? " · provisional" : ""}`,
+        );
         $set("nav-tokens", "textContent", stats.total || "0");
         $set("nav-cost", "textContent", stats.estCost || "$0.00");
         $set("nav-monthly-cost", "textContent", stats.estMonthlyCost || "-");
@@ -3606,6 +3618,8 @@
       }
 
       function closeDetail() {
+        detailGeneration++;
+        detailController?.abort();
         document.getElementById("detail-panel").classList.remove("visible");
         document.getElementById("detail-overlay").classList.remove("visible");
         setTimeout(() => {
@@ -3614,28 +3628,55 @@
         }, 200);
       }
 
-      // Cost breakdown modal
+      // One bounded request; don't leave an empty panel while it loads.
       let cachedCostData = null;
-
+      let costController = null;
+      let costGeneration = 0;
+      function renderCostState(message) {
+        for (const id of [
+          "cost-tokens",
+          "cost-rates",
+          "cost-calculation",
+          "cost-savings",
+          "cost-top-sessions",
+        ]) {
+          document.getElementById(id).innerHTML = `<em>${escapeHtml(message)}</em>`;
+        }
+      }
       async function openCostModal() {
         document.getElementById("cost-modal").classList.remove("hidden");
         document.getElementById("cost-modal").classList.add("visible");
         document.getElementById("cost-modal-overlay").classList.remove("hidden");
         document.getElementById("cost-modal-overlay").classList.add("visible");
-
-        // Fetch cost breakdown data
+        costController?.abort();
+        const controller = new AbortController();
+        costController = controller;
+        const generation = ++costGeneration;
+        renderCostState("Loading cost data…");
+        const timer = setTimeout(() => controller.abort(), 10000);
         try {
-          const res = await fetch("api/cost-breakdown");
+          const res = await fetch("api/cost-breakdown", { signal: controller.signal });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
+          if (!data || data.error) throw new Error(data?.error || "Invalid cost response");
+          if (generation !== costGeneration) return;
           cachedCostData = data;
           renderCostBreakdown(data);
         } catch (e) {
-          document.getElementById("cost-tokens").innerHTML =
-            '<em style="color:var(--red)">Failed to load cost data</em>';
+          if (generation === costGeneration)
+            renderCostState(
+              e.name === "AbortError"
+                ? "Cost request timed out. Close and reopen to retry."
+                : "Cost data unavailable. Close and reopen to retry.",
+            );
+        } finally {
+          clearTimeout(timer);
         }
       }
 
       function closeCostModal() {
+        costGeneration++;
+        costController?.abort();
         document.getElementById("cost-modal").classList.remove("visible");
         document.getElementById("cost-modal-overlay").classList.remove("visible");
         setTimeout(() => {
@@ -4221,108 +4262,58 @@
       }
 
       function renderCostBreakdown(data) {
-        // Token usage
-        document.getElementById("cost-tokens").innerHTML = `
-          <div class="detail-row"><span class="detail-label">Input Tokens</span><span class="detail-value">${(data.inputTokens || 0).toLocaleString()}</span></div>
-          <div class="detail-row"><span class="detail-label">Output Tokens</span><span class="detail-value">${(data.outputTokens || 0).toLocaleString()}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">${(data.cacheRead || 0).toLocaleString()}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">${(data.cacheWrite || 0).toLocaleString()}</span></div>
-          <div class="detail-row"><span class="detail-label">API Requests</span><span class="detail-value">${(data.requests || 0).toLocaleString()}</span></div>
-        `;
-
-        // Pricing rates
-        document.getElementById("cost-rates").innerHTML = `
-          <div class="detail-row"><span class="detail-label">Input</span><span class="detail-value">$${data.rates?.input || "15.00"}/1M tokens</span></div>
-          <div class="detail-row"><span class="detail-label">Output</span><span class="detail-value">$${data.rates?.output || "75.00"}/1M tokens</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Read</span><span class="detail-value">$${data.rates?.cacheRead || "1.50"}/1M tokens (90% discount)</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Write</span><span class="detail-value">$${data.rates?.cacheWrite || "18.75"}/1M tokens (25% premium)</span></div>
-        `;
-
-        // Calculation breakdown
+        if (!data || typeof data.status !== "string") {
+          renderCostState("Cost data unavailable");
+          return;
+        }
+        const count = (n) => (Number.isFinite(n) ? n.toLocaleString() : "N/A");
+        const money = (n) => (Number.isFinite(n) ? `$${formatCurrency(n, 4)}` : "N/A");
+        const row = (label, value) =>
+          `<div class="detail-row"><span class="detail-label">${escapeHtml(label)}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
+        document.getElementById("cost-modal-title").textContent =
+          `💰 Cost Breakdown · ${data.period}`;
+        const note =
+          data.status === "unavailable"
+            ? "Usage unavailable; not a zero-cost reading."
+            : data.status === "partial"
+              ? "Some usage has no recorded price; total cost is unavailable."
+              : data.refreshing
+                ? "Provisional snapshot — OpenClaw is refreshing its usage records."
+                : "";
+        document.getElementById("cost-tokens").innerHTML =
+          `<p>${escapeHtml(note)}</p>` +
+          row("Input tokens", count(data.inputTokens)) +
+          row("Output tokens", count(data.outputTokens)) +
+          row("Cache read", count(data.cacheRead)) +
+          row("Cache write", count(data.cacheWrite)) +
+          row("API requests", count(data.requests));
+        document.getElementById("cost-rates").innerHTML =
+          `<p>${escapeHtml(data.pricingBasis || "Pricing unavailable")}</p><p>No single rate is applied across different models.</p>`;
         const calc = data.calculation || {};
-        document.getElementById("cost-calculation").innerHTML = `
-          <div class="detail-row"><span class="detail-label">Input Cost</span><span class="detail-value">$${formatCurrency(calc.inputCost, 2)}</span></div>
-          <div class="detail-row"><span class="detail-label">Output Cost</span><span class="detail-value">$${formatCurrency(calc.outputCost, 2)}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Read Cost</span><span class="detail-value">$${formatCurrency(calc.cacheReadCost, 2)}</span></div>
-          <div class="detail-row"><span class="detail-label">Cache Write Cost</span><span class="detail-value">$${formatCurrency(calc.cacheWriteCost, 2)}</span></div>
-          <div class="detail-row" style="border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px;">
-            <span class="detail-label"><strong>Est. API Cost</strong></span>
-            <span class="detail-value"><strong>$${formatCurrency(data.totalCost)}</strong></span>
-          </div>
-        `;
-
-        // Savings - show all three windows (24h, 3da, 7da)
-        const planCost = data.planCost || 200;
-        const planName = data.planName || "Claude Code Max";
-        const windows = data.windows || {};
-
-        // Build savings rows for each window
-        const windowOrder = ["24h", "3d", "7d"];
-        const windowLabels = { "24h": "24h", "3d": "3dma", "7d": "7dma" };
-
-        let savingsHtml = `
-          <div class="detail-row"><span class="detail-label">${planName}</span><span class="detail-value">$${planCost}/month</span></div>
-          <div style="margin-top: 12px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-muted);">Projected Monthly Cost by Window:</div>
-        `;
-
-        let hasSavings = false;
-        for (const key of windowOrder) {
-          const w = windows[key];
-          if (!w) continue;
-
-          const monthlyProjected = w.monthlyProjected || 0;
-          const savings = w.monthlySavings || 0;
-          const pct = w.savingsPercent || 0;
-
-          if (savings > 0) hasSavings = true;
-
-          const savingsStr =
-            savings > 0
-              ? `<span style="color: var(--green);">↓$${Math.round(savings).toLocaleString()}/mo (${pct}%)</span>`
-              : `<span style="color: var(--text-muted);">-</span>`;
-
-          savingsHtml += `
-            <div class="detail-row">
-              <span class="detail-label">${windowLabels[key]}</span>
-              <span class="detail-value">$${Math.round(monthlyProjected).toLocaleString()}/mo ${savingsStr}</span>
-            </div>
-          `;
-        }
-
-        if (!hasSavings) {
-          savingsHtml += `
-            <p style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted);">
-              📈 Keep going! Once your monthly cost exceeds $${planCost}, you'll start seeing savings.
-            </p>
-          `;
-        }
-
-        document.getElementById("cost-savings").innerHTML = savingsHtml;
-
-        // Top sessions by tokens
-        const topSessions = data.topSessions || [];
-        if (topSessions.length > 0) {
-          document.getElementById("cost-top-sessions").innerHTML = topSessions
-            .map((s, i) => {
-              const tokensFormatted =
-                s.tokens >= 1000000
-                  ? (s.tokens / 1000000).toFixed(1) + "M"
-                  : s.tokens >= 1000
-                    ? (s.tokens / 1000).toFixed(1) + "k"
-                    : s.tokens;
-              const statusIcon = s.active ? "🟢" : "⚪";
-              return `<div class="detail-row">
-              <span class="detail-label">${statusIcon} ${s.label.substring(0, 30)}${s.label.length > 30 ? "..." : ""}</span>
-              <span class="detail-value">${tokensFormatted}</span>
-            </div>`;
-            })
-            .join("");
-        } else {
-          document.getElementById("cost-top-sessions").innerHTML =
-            '<em style="color: var(--text-muted)">No session data available</em>';
-        }
+        document.getElementById("cost-calculation").innerHTML =
+          row("Input cost", money(calc.inputCost)) +
+          row("Output cost", money(calc.outputCost)) +
+          row("Cache read cost", money(calc.cacheReadCost)) +
+          row("Cache write cost", money(calc.cacheWriteCost)) +
+          row(
+            data.refreshing ? "API equivalent (provisional)" : "API equivalent",
+            money(data.totalCost),
+          );
+        document.getElementById("cost-savings").innerHTML =
+          `<p>${escapeHtml(data.savingsReason || "Savings unavailable")}</p>` +
+          Object.values(data.windows || {})
+            .map((w) => row(w.label, money(w.dailyAvg)))
+            .join("") +
+          "<p>Calendar-day averages include the current partial day; they are not a monthly bill forecast.</p>";
+        document.getElementById("cost-top-sessions").innerHTML =
+          `<p>${escapeHtml(data.topSessionsScope || "Session totals")}</p>` +
+          ((data.topSessions || [])
+            .map((s) => row(String(s.label || "Session").slice(0, 60), count(s.tokens)))
+            .join("") || "<em>No session data available</em>");
       }
 
+      let detailController = null;
+      let detailGeneration = 0;
       async function fetchSessionDetail(key) {
         // Handle null/undefined sessionKey
         if (!key) {
@@ -4332,7 +4323,10 @@
         }
 
         // Add timeout to prevent hanging forever
+        detailController?.abort();
         const controller = new AbortController();
+        detailController = controller;
+        const generation = ++detailGeneration;
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
         try {
@@ -4347,6 +4341,7 @@
 
           const data = await res.json();
 
+          if (generation !== detailGeneration) return;
           // Check for API error response
           if (data.error) {
             console.error("API error:", data.error);
@@ -4357,6 +4352,7 @@
           renderDetail(data);
         } catch (e) {
           clearTimeout(timeoutId);
+          if (generation !== detailGeneration) return;
           console.error("Failed to fetch detail:", e);
           const msg =
             e.name === "AbortError" ? "Request timed out" : e.message || "Failed to load session";
@@ -4395,8 +4391,8 @@
         smartUpdate(
           document.getElementById("detail-overview"),
           `
-                <div class="detail-row"><span class="detail-label">Channel</span><span class="detail-value">${data.channel || "-"}</span></div>
-                <div class="detail-row"><span class="detail-label">Model</span><span class="detail-value">${data.model || "-"}</span></div>
+                <div class="detail-row"><span class="detail-label">Channel</span><span class="detail-value">${escapeHtml(data.channel || "-")}</span></div>
+                <div class="detail-row"><span class="detail-label">Model</span><span class="detail-value">${escapeHtml(data.model || "-")}</span></div>
                 <div class="detail-row"><span class="detail-label">Total Tokens</span><span class="detail-value">${data.tokens?.toLocaleString() || "-"}</span></div>
                 <div class="detail-row"><span class="detail-label">Input / Output</span><span class="detail-value">${(data.inputTokens || 0).toLocaleString()} / ${(data.outputTokens || 0).toLocaleString()}</span></div>
                 ${cacheDisplay}
@@ -4408,7 +4404,8 @@
         // Summary
         smartUpdate(
           document.getElementById("detail-summary"),
-          data.summary || "<em>No summary</em>",
+          escapeHtml(data.summary || "No summary") +
+            (data.historyScope ? `<p>${escapeHtml(data.historyScope)}</p>` : ""),
         );
 
         // Missing storage is unknown, not evidence of no messages or action items.
@@ -4497,7 +4494,7 @@
             data.tools
               .map(
                 (t) =>
-                  `<span class="tool-tag"><code>${t.name}</code> <span class="tool-count">×${t.count}</span></span>`,
+                  `<span class="tool-tag"><code>${escapeHtml(t.name)}</code> <span class="tool-count">×${t.count}</span></span>`,
               )
               .join(""),
           );
@@ -4606,7 +4603,7 @@
         setConnectionStatus("connecting", i18nText("app.connecting", {}, "Connecting..."));
 
         try {
-          eventSource = new EventSource("api/events");
+          eventSource = window.DashboardEvents.connect();
 
           eventSource.onopen = function () {
             console.log("[SSE] Connected");
