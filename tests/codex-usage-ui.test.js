@@ -47,6 +47,7 @@ test("full renderer displays OpenAI usage even when Claude fails", () => {
   context.renderLlmUsage(data);
   assert.match(element("codex-windows").innerHTML, /Week usage/);
   assert.match(element("codex-windows").innerHTML, /28% used/);
+  assert.match(element("codex-windows").innerHTML, /72% remaining/);
   assert.equal(element("codex-plan").textContent, "pro");
   assert.doesNotMatch(element("claude-session-reset").innerHTML, /openAuthModal/);
 });
@@ -70,4 +71,30 @@ test("stale windows and malicious labels remain unavailable and escaped", () => 
   assert.doesNotMatch(html, /<img/);
   assert.match(html, /&lt;img/);
   assert.match(element("codex-status").textContent, /Stale/);
+});
+
+test("quota complements stay consistent at boundaries and after rounding", () => {
+  const { context, element } = renderer();
+  for (const [value, used, left] of [
+    [0, 0, 100],
+    [31, 31, 69],
+    [31.5, 32, 68],
+    [100, 100, 0],
+  ]) {
+    context.renderCodexUsage({
+      status: "available",
+      windows: [{ label: "Week", usedPercent: value }],
+    });
+    const html = element("codex-windows").innerHTML;
+    assert.ok(html.includes(`${used}% used`));
+    assert.ok(html.includes(`${left}% remaining`));
+    assert.ok(html.includes(`aria-valuenow="${used}"`));
+  }
+});
+test("unavailable quota never implies full remaining capacity", () => {
+  const { context, element } = renderer();
+  for (const status of ["error", "stale"]) {
+    context.renderCodexUsage({ status, windows: [{ label: "Week", usedPercent: 0 }] });
+    assert.doesNotMatch(element("codex-windows").innerHTML, /% remaining|role="meter"/);
+  }
 });

@@ -2110,3 +2110,39 @@ main {
   font-size: 0.75rem;
   color: var(--red);
 }
+
+/* Complementary account quota segments share the same reading. */
+.quota-split {
+  display: flex;
+}
+.quota-used.low {
+  background: var(--green);
+}
+.quota-used.medium {
+  background: var(--yellow);
+}
+.quota-used.high {
+  background: var(--red);
+}
+.quota-remaining {
+  background: var(--blue, #58a6ff);
+}
+.quota-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 16px;
+  font-size: 0.75rem;
+  margin-bottom: 8px;
+}
+.quota-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.quota-swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
