@@ -644,7 +644,7 @@ setInterval(() => {
   if (sseClients.size > 0 && !sseRefreshing) {
     sseRefreshing = true;
     try {
-      const fullState = state.refreshState();
+      const fullState = state.getFullState();
       broadcastSSE("update", fullState);
       broadcastSSE("heartbeat", { clients: sseClients.size, timestamp: Date.now() });
     } catch (e) {
