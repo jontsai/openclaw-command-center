@@ -2926,6 +2926,7 @@
                   window.usedPercent >= 0 &&
                   window.usedPercent <= 100;
                 const percent = known ? Math.round(window.usedPercent) : null;
+                const remaining = percent === null ? null : 100 - percent;
                 const reset = Number.isFinite(window.resetAt)
                   ? new Date(window.resetAt).toLocaleString()
                   : null;
@@ -2937,7 +2938,9 @@
                       : percent < 80
                         ? "medium"
                         : "high";
-                return `<div style="margin-top: 8px"><div class="quota-stats"><span>${escapeHtml(window.label)} usage</span><span class="quota-value">${percent === null ? "N/A" : percent + "% used"}</span></div><div class="quota-bar"><div class="quota-bar-fill ${color}" style="width: ${percent ?? 0}%"></div></div>${reset ? `<div style="font-size: 0.7rem; color: var(--text-muted)">Resets ${escapeHtml(reset)}</div>` : ""}</div>`;
+                return `<div style="margin-top: 8px"><div class="quota-stats"><span>${escapeHtml(window.label)} usage</span>${percent === null ? '<span class="quota-value">N/A</span>' : ""}</div>
+                  ${percent === null ? '<div class="quota-bar" aria-hidden="true"></div>' : `<div class="quota-bar quota-split" role="meter" aria-label="${escapeHtml(window.label)} quota used" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}" aria-valuetext="${percent}% used, ${remaining}% remaining"><div class="quota-used ${color}" style="width: ${percent}%"></div><div class="quota-remaining" style="width: ${remaining}%"></div></div><div class="quota-legend"><span><i class="quota-swatch quota-used ${color}" aria-hidden="true"></i><span class="quota-value">${percent}% used</span></span><span><i class="quota-swatch quota-remaining" aria-hidden="true"></i><span class="quota-value">${remaining}% remaining</span></span></div>`}
+                  ${reset ? `<div style="font-size: 0.7rem; color: var(--text-muted)">Resets ${escapeHtml(reset)}</div>` : ""}</div>`;
               })
               .join("")
           : '<span class="quota-value">N/A</span> — Usage unavailable';
