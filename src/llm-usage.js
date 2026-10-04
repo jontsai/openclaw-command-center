@@ -4,13 +4,15 @@ const { execFile } = require("child_process");
 const { getSafeEnv } = require("./openclaw");
 
 // Cache for LLM usage data (openclaw CLI is slow ~4-5s)
-let llmUsageCache = { data: null, timestamp: 0, refreshing: false };
+let llmUsageCache = { data: null, timestamp: 0, refreshing: false, lastAttempt: 0 };
 const LLM_CACHE_TTL_MS = 60000; // 60 seconds
+const MAX_USAGE_AGE_MS = 2 * LLM_CACHE_TTL_MS;
 
 // Background async refresh of LLM usage data
 function refreshLlmUsageAsync() {
-  if (llmUsageCache.refreshing) return; // Already refreshing
+  if (llmUsageCache.refreshing || Date.now() - llmUsageCache.lastAttempt < LLM_CACHE_TTL_MS) return;
   llmUsageCache.refreshing = true;
+  llmUsageCache.lastAttempt = Date.now();
 
   const profile = process.env.OPENCLAW_PROFILE || "";
   const args = profile
@@ -44,15 +46,70 @@ function refreshLlmUsageAsync() {
   );
 }
 
+function validPercent(value) {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= 100
+    ? Math.round(value)
+    : null;
+}
+
+// Cached data is useful during refresh, but must not masquerade as a fresh quota.
+function applyUsageFreshness(data, now = Date.now()) {
+  const observedAt = Date.parse(data.timestamp);
+  const stale =
+    !Number.isFinite(observedAt) || observedAt > now + 60000 || now - observedAt > MAX_USAGE_AGE_MS;
+  if (!stale) return { ...data, stale: false };
+  return {
+    ...data,
+    stale: true,
+    codex: {
+      ...data.codex,
+      status: "stale",
+      windows: (data.codex?.windows || []).map((window) => ({ ...window, usedPercent: null })),
+      usage5hPct: null,
+      usageDayPct: null,
+      usageWeekPct: null,
+      tasksToday: null,
+    },
+  };
+}
+
 // Transform live usage data from OpenClaw CLI
 function transformLiveUsageData(usage) {
   const anthropic = usage.providers?.find((p) => p.provider === "anthropic");
   const codexProvider = usage.providers?.find((p) => p.provider === "openai-codex");
 
+  // Providers are independent: a Claude error must not discard OpenAI quota data.
+  const openai = usage.providers?.find((p) => p.provider === "openai") || codexProvider;
+  const timestamp = usage.updatedAt
+    ? new Date(usage.updatedAt).toISOString()
+    : new Date().toISOString();
+  const windows = (openai?.error ? [] : openai?.windows || []).map((window) => ({
+    label: String(window.label || "Usage"),
+    usedPercent: validPercent(window.usedPercent),
+    resetAt: Number.isFinite(window.resetAt) ? window.resetAt : null,
+  }));
+  const codex = {
+    provider: openai?.provider || null,
+    plan: typeof openai?.plan === "string" ? openai.plan : null,
+    status: openai?.error
+      ? "error"
+      : windows.some((w) => w.usedPercent !== null)
+        ? "available"
+        : "unavailable",
+    error: openai?.error || null,
+    windows,
+    lastSynced: timestamp,
+    sessionsToday: null,
+    tasksToday: null,
+    usage5hPct: windows.find((w) => w.label === "5h")?.usedPercent ?? null,
+    usageDayPct: windows.find((w) => w.label === "Day")?.usedPercent ?? null,
+    usageWeekPct: windows.find((w) => w.label === "Week")?.usedPercent ?? null,
+  };
+
   // Check for auth errors
   if (anthropic?.error) {
     return {
-      timestamp: new Date().toISOString(),
+      timestamp,
       source: "error",
       error: anthropic.error,
       errorType: anthropic.error.includes("403") ? "auth" : "unknown",
@@ -62,7 +119,7 @@ function transformLiveUsageData(usage) {
         sonnet: { usedPct: null, remainingPct: null, resets: null, error: anthropic.error },
         lastSynced: null,
       },
-      codex: { sessionsToday: 0, tasksToday: 0, usage5hPct: 0, usageDayPct: 0 },
+      codex,
       routing: {
         total: 0,
         claudeTasks: 0,
@@ -77,8 +134,6 @@ function transformLiveUsageData(usage) {
   const session5h = anthropic?.windows?.find((w) => w.label === "5h");
   const weekAll = anthropic?.windows?.find((w) => w.label === "Week");
   const sonnetWeek = anthropic?.windows?.find((w) => w.label === "Sonnet");
-  const codex5h = codexProvider?.windows?.find((w) => w.label === "5h");
-  const codexDay = codexProvider?.windows?.find((w) => w.label === "Day");
 
   const formatReset = (resetAt) => {
     if (!resetAt) return "?";
@@ -90,32 +145,36 @@ function transformLiveUsageData(usage) {
   };
 
   return {
-    timestamp: new Date().toISOString(),
+    timestamp,
     source: "live",
     claude: {
       session: {
-        usedPct: Math.round(session5h?.usedPercent || 0),
-        remainingPct: Math.round(100 - (session5h?.usedPercent || 0)),
+        usedPct: validPercent(session5h?.usedPercent),
+        remainingPct:
+          validPercent(session5h?.usedPercent) === null
+            ? null
+            : 100 - validPercent(session5h?.usedPercent),
         resetsIn: formatReset(session5h?.resetAt),
       },
       weekly: {
-        usedPct: Math.round(weekAll?.usedPercent || 0),
-        remainingPct: Math.round(100 - (weekAll?.usedPercent || 0)),
+        usedPct: validPercent(weekAll?.usedPercent),
+        remainingPct:
+          validPercent(weekAll?.usedPercent) === null
+            ? null
+            : 100 - validPercent(weekAll?.usedPercent),
         resets: formatReset(weekAll?.resetAt),
       },
       sonnet: {
-        usedPct: Math.round(sonnetWeek?.usedPercent || 0),
-        remainingPct: Math.round(100 - (sonnetWeek?.usedPercent || 0)),
+        usedPct: validPercent(sonnetWeek?.usedPercent),
+        remainingPct:
+          validPercent(sonnetWeek?.usedPercent) === null
+            ? null
+            : 100 - validPercent(sonnetWeek?.usedPercent),
         resets: formatReset(sonnetWeek?.resetAt),
       },
       lastSynced: new Date().toISOString(),
     },
-    codex: {
-      sessionsToday: 0,
-      tasksToday: 0,
-      usage5hPct: Math.round(codex5h?.usedPercent || 0),
-      usageDayPct: Math.round(codexDay?.usedPercent || 0),
-    },
+    codex,
     routing: { total: 0, claudeTasks: 0, codexTasks: 0, claudePct: 0, codexPct: 0, codexFloor: 20 },
   };
 }
@@ -129,13 +188,12 @@ function getLlmUsage(statePath) {
     refreshLlmUsageAsync();
   }
 
-  // Return cached data if available AND not an error
-  // If cache has error, try file fallback first
-  if (llmUsageCache.data && llmUsageCache.data.source !== "error") {
-    return llmUsageCache.data;
+  // Keep provider-independent results, even if another provider failed.
+  if (llmUsageCache.data) {
+    return applyUsageFreshness(llmUsageCache.data);
   }
 
-  // Cache empty or has error - check if we can read from state file
+  // Cache empty - check if we can read legacy Claude data from the state file
   // But don't return misleading 0% values - return error/loading state instead
   const stateFile = path.join(statePath, "llm-routing.json");
   try {
@@ -171,10 +229,15 @@ function getLlmUsage(statePath) {
             lastSynced: data.claude?.last_synced || null,
           },
           codex: {
-            sessionsToday: data.codex?.sessions_today || 0,
-            tasksToday: data.codex?.tasks_today || 0,
-            usage5hPct: data.codex?.usage_5h_pct || 0,
-            usageDayPct: data.codex?.usage_day_pct || 0,
+            status: "unavailable",
+            plan: null,
+            windows: [],
+            lastSynced: null,
+            sessionsToday: null,
+            tasksToday: null,
+            usage5hPct: null,
+            usageDayPct: null,
+            usageWeekPct: null,
           },
           routing: {
             total: data.routing?.total_tasks || 0,
@@ -197,19 +260,34 @@ function getLlmUsage(statePath) {
     console.error("[LLM Usage] File fallback failed:", e.message);
   }
 
-  // No valid data - return auth error state (we know API returns 403)
+  // No successful observation yet: missing data is not proof of an auth failure.
   return {
     timestamp: new Date().toISOString(),
     source: "error",
-    error: "API key lacks user:profile OAuth scope",
-    errorType: "auth",
+    error: "Usage data unavailable",
+    errorType: "unavailable",
     claude: {
-      session: { usedPct: null, remainingPct: null, resetsIn: null, error: "Auth required" },
-      weekly: { usedPct: null, remainingPct: null, resets: null, error: "Auth required" },
-      sonnet: { usedPct: null, remainingPct: null, resets: null, error: "Auth required" },
+      session: {
+        usedPct: null,
+        remainingPct: null,
+        resetsIn: null,
+        error: "Usage data unavailable",
+      },
+      weekly: { usedPct: null, remainingPct: null, resets: null, error: "Usage data unavailable" },
+      sonnet: { usedPct: null, remainingPct: null, resets: null, error: "Usage data unavailable" },
       lastSynced: null,
     },
-    codex: { sessionsToday: 0, tasksToday: 0, usage5hPct: 0, usageDayPct: 0 },
+    codex: {
+      status: "unavailable",
+      plan: null,
+      windows: [],
+      lastSynced: null,
+      sessionsToday: null,
+      tasksToday: null,
+      usage5hPct: null,
+      usageDayPct: null,
+      usageWeekPct: null,
+    },
     routing: { total: 0, claudeTasks: 0, codexTasks: 0, claudePct: 0, codexPct: 0, codexFloor: 20 },
   };
 }
@@ -297,6 +375,7 @@ function startLlmUsageRefresh() {
 }
 
 module.exports = {
+  applyUsageFreshness,
   refreshLlmUsageAsync,
   transformLiveUsageData,
   getLlmUsage,
