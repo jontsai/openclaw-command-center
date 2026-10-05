@@ -40,9 +40,11 @@ observation marks the snapshot stale, including while the view stays open.
 
 Search currently filters loaded titles, references and excerpts locally. It is
 not full-text corpus search, vector similarity or QMD retrieval. Previews are capped
-at 12,000 characters and truncation is explicit. QMD can later supply the same
-hierarchy contract, with interactive retrieval requiring a separate bounded query
-API. Do not represent a fresh collection of old files as newly learned knowledge.
+at 12,000 characters and truncation is explicit. Spacesuit now supplies opt-in QMD
+collection snapshots using the same hierarchy contract, with QMD citations rendered
+as inert source references. Its bounded sample is not a full index export. QMD
+source/index modification times are unknown when the CLI does not supply them.
+Interactive retrieval still requires a separate bounded query API. Do not represent a fresh collection of old files as newly learned knowledge.
 
 ## Preview and verification
 

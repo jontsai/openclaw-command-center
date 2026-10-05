@@ -132,6 +132,49 @@
           "url": null
         }
       ]
+    },
+    {
+      "id": "qmd-index-notes",
+      "adapter": "qmd",
+      "label": "QMD · notes",
+      "status": "ready",
+      "observedAt": "2026-10-05T03:08:04.295Z",
+      "indexUpdatedAt": null,
+      "documents": [
+        {
+          "id": "qmd-780b50a29475420c463cef33",
+          "parentId": null,
+          "kind": "folder",
+          "title": "strategy",
+          "sourceRef": "qmd://notes/strategy",
+          "excerpt": "",
+          "updatedAt": null,
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "qmd-1b11be6e31b770280cf55056",
+          "parentId": "qmd-780b50a29475420c463cef33",
+          "kind": "document",
+          "title": "Protect the planning window",
+          "sourceRef": "qmd://notes/strategy/protected-planning.md",
+          "excerpt": "# Protect the planning window\n\nImportant, non-urgent work deserves scheduled capacity. This synthetic indexed excerpt is independent from the live workspace.\n\nSource: qmd://notes/strategy/protected-planning.md",
+          "updatedAt": null,
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "qmd-978369db39a9f6c73216e8c1",
+          "parentId": "qmd-780b50a29475420c463cef33",
+          "kind": "document",
+          "title": "Reset evidence, not guesses",
+          "sourceRef": "qmd://notes/strategy/reset-evidence.md",
+          "excerpt": "# Reset evidence, not guesses\n\nVerify available reset credits and expiry from the provider before recommending a push. Quota percentages do not imply banked credits.\n\nSynthetic example only; not a report of an actual account.",
+          "updatedAt": null,
+          "truncated": false,
+          "url": null
+        }
+      ]
     }
   ]
 }

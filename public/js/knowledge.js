@@ -34,7 +34,7 @@
     folder: "Folder",
     topic: "Topic",
     footnote:
-      "Read-only excerpts. Relationships are supplied by adapters; nothing is inferred from similar titles. QMD retrieval is not connected in this version.",
+      "Read-only excerpts. Relationships are supplied by adapters; nothing is inferred from similar titles. QMD collection snapshots are supported through Spacesuit; semantic search is not connected.",
   };
   let data = null,
     scope = null,

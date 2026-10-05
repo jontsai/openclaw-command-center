@@ -13,16 +13,28 @@ const assert = require("node:assert/strict");
     const base = process.env.KNOWLEDGE_PREVIEW_URL || "http://127.0.0.1:18340";
     await page.goto(`${base}/preview/knowledge.html`, { waitUntil: "domcontentloaded" });
     await page.locator(".knowledge-document").first().waitFor();
-    assert.equal(await page.locator(".knowledge-source").count(), 2);
-    assert.equal(await page.locator(".knowledge-document").count(), 6);
+    assert.equal(await page.locator(".knowledge-source").count(), 3);
+    assert.equal(await page.locator(".knowledge-document").count(), 8);
     await page.locator("#knowledge-tree > details").nth(1).locator(":scope > button").click();
     assert.equal(await page.locator(".knowledge-document").count(), 4);
     await page.locator("#knowledge-tree > button").click();
     await page.locator(".knowledge-document").filter({ hasText: "Small batches" }).click();
     await page.locator("#knowledge-reader h3").filter({ hasText: "Small batches" }).waitFor();
     assert.match(await page.locator("#knowledge-reader").innerText(), /memory\/decisions/);
+    await page.locator("#knowledge-tree > details").nth(2).locator(":scope > button").click();
+    assert.equal(await page.locator(".knowledge-document").count(), 2);
+    await page.locator(".knowledge-document").filter({ hasText: "Protect the planning" }).click();
+    assert.match(
+      await page.locator("#knowledge-reader").innerText(),
+      /qmd:\/\/notes\/strategy\/protected-planning.md/,
+    );
+    assert.equal(await page.locator('#knowledge-reader a[href^="qmd:"]').count(), 0);
+    assert.match(await page.locator("#knowledge-reader").innerText(), /Unknown/);
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+    await page.waitForFunction(() => window.scrollY === 0);
     if (process.env.KNOWLEDGE_SCREENSHOT)
       await page.screenshot({ path: process.env.KNOWLEDGE_SCREENSHOT, fullPage: true });
+    await page.locator("#knowledge-tree > button").click();
     await page.locator("#knowledge-search").fill("fresh page");
     assert.equal(await page.locator(".knowledge-document").count(), 1);
     await page.locator("#knowledge-search").fill("");

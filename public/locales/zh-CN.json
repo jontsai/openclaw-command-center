@@ -8,6 +8,10 @@
     "error": "🔴 错误"
   },
   "sidebar": {
+    "intel": "情报",
+    "pipelines": "流程",
+    "monetization": "变现",
+
     "title": "指挥中心",
     "navigation": "导航",
     "settings": "设置",
@@ -674,6 +678,6 @@
     "document": "文档",
     "folder": "文件夹",
     "topic": "主题",
-    "footnote": "只读摘录。关系由适配器提供，不根据相似标题推断。此版本尚未连接 QMD 检索。"
+    "footnote": "只读摘录。关系由适配器提供，不根据相似标题推断。可通过 Spacesuit 显示 QMD 集合快照；尚未连接语义搜索。"
   }
 }
