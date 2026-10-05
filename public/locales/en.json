@@ -41,7 +41,7 @@
     "output": "Output",
     "active15m": "Active (15m)",
     "estCost24h": "Est. Cost (24h) 📊",
-    "estMonthlySavings": "Est. Monthly Savings",
+    "estMonthlySavings": "Est. monthly savings (scenario)",
     "main": "Main",
     "subagents": "Sub-agents",
     "estApiCost": "Est. API Cost"
@@ -115,6 +115,13 @@
     "statusRunning": "Running"
   },
   "cost": {
+    "todayWindow": "Today (UTC)",
+    "baselineLabel": "Monthly spend baseline (USD)",
+    "scenarioHelp": "Enter subscription plus API spending for the same usage scope. This browser-only assumption is not read from your bills. Projection = recorded calendar-day average × 30 minus your baseline; not realized savings.",
+    "scenarioUnavailable": "Set a baseline and wait for usage data to calculate a savings scenario.",
+    "scenarioSummary": "{days}-day calendar average × 30: {projected}. Baseline: {baseline}. Estimated difference: {difference}/month. Includes the current partial day; not a bill forecast.",
+    "scenarioPartial": "Partial pricing: projected subtotal only; missing costs excluded.",
+
     "partialSubtotal": "Partial subtotal",
     "recordedSubtotal": "Recorded API-equivalent subtotal",
     "missingEntries": "Entries without pricing",

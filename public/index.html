@@ -9,6 +9,7 @@
     <script src="js/lib/morphdom.min.js"></script>
     <script src="js/i18n.js"></script>
     <script src="js/extensions.js"></script>
+    <script src="js/cost-scenario.js"></script>
     <!-- Shared Sidebar Loader -->
     <script src="js/state-stream.js"></script>
     <script src="js/sidebar.js"></script>
@@ -133,7 +134,7 @@
               "
               onclick="event.stopPropagation()"
             >
-              <option value="24h">24h</option>
+              <option value="24h" data-i18n="cost.todayWindow">Today (UTC)</option>
               <option value="3dma">3dma</option>
               <option value="7dma" selected>7dma</option>
             </select>
@@ -1625,6 +1626,22 @@
         >
           <h3 data-i18n="cost.billing">✨ Billing &amp; Recent Averages</h3>
           <div class="detail-box" id="cost-savings"></div>
+          <label for="savings-baseline" data-i18n="cost.baselineLabel"
+            >Monthly spend baseline (USD)</label
+          >
+          <input
+            id="savings-baseline"
+            type="number"
+            min="0"
+            step="0.01"
+            onchange="setSavingsBaseline(this.value)"
+          />
+          <p data-i18n="cost.scenarioHelp">
+            Enter subscription plus API spending for the same usage scope. This browser-only
+            assumption is not read from your bills. Projection = recorded calendar-day average × 30
+            minus your baseline; not realized savings.
+          </p>
+          <p id="savings-scenario-output" role="status"></p>
         </div>
         <div class="detail-section">
           <h3 data-i18n="cost.sessions">🔥 Current Sessions (Lifetime Tokens)</h3>
@@ -2657,29 +2674,61 @@
         localStorage.setItem("savingsWindow", window);
       }
 
-      // Update savings display based on selected window
-      function updateSavingsDisplay(stats, windowKey) {
-        const savingsStat = document.getElementById("savings-stat");
-        const savingsEl = document.getElementById("est-savings");
-
-        if (!stats || !savingsStat || !savingsEl) return;
-
-        // Get the window-specific data or fall back to 24h
-        const windowData = stats.savingsWindows?.[windowKey] || stats.savingsWindows?.["24h"];
-
-        if (windowData?.estSavings) {
-          savingsEl.textContent = windowData.estSavings;
-          savingsEl.title = `${windowData.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo) [${windowData.label}]`;
-          savingsStat.style.display = "block";
-        } else if (stats.estSavings) {
-          // Fallback to legacy 24h savings
-          savingsEl.textContent = stats.estSavings;
-          savingsEl.title = `${stats.savingsPercent}% saved vs ${stats.planName} ($${stats.planCost}/mo)`;
-          savingsStat.style.display = "block";
-        } else {
-          savingsStat.style.display = "none";
-        }
+      function getSavingsBaseline() {
+        const raw = localStorage.getItem("costBaseline:" + location.pathname);
+        return raw === null || raw.trim() === "" ? null : Number(raw);
       }
+      function setSavingsBaseline(raw) {
+        const key = "costBaseline:" + location.pathname;
+        if (raw.trim() === "" || !Number.isFinite(Number(raw)) || Number(raw) < 0)
+          localStorage.removeItem(key);
+        else localStorage.setItem(key, raw);
+        updateSavingsDisplay(currentTokenStats, getSavingsWindowPref());
+      }
+      function updateSavingsDisplay(stats, windowKey) {
+        const card = document.getElementById("savings-stat");
+        const value = document.getElementById("est-savings");
+        const output = document.getElementById("savings-scenario-output");
+        const text = (key, params, fallback) => window.I18N?.t(key, params, fallback) || fallback;
+        const baseline = getSavingsBaseline();
+        const input = document.getElementById("savings-baseline");
+        if (document.activeElement !== input) input.value = baseline === null ? "" : baseline;
+        const scenario = CostScenario.estimate(stats?.costWindows, windowKey, baseline);
+        card.style.display = scenario ? "block" : "none";
+        if (!scenario) {
+          output.textContent = text(
+            "cost.scenarioUnavailable",
+            {},
+            "Set a baseline and wait for usage data to calculate a savings scenario.",
+          );
+          return;
+        }
+        const dollars = (n) => `${n < 0 ? "-" : ""}$${Math.abs(n).toFixed(2)}`;
+        value.textContent = dollars(scenario.difference) + (scenario.partial ? "*" : "");
+        value.style.color = scenario.difference < 0 ? "var(--yellow)" : "var(--green)";
+        const summary = text(
+          "cost.scenarioSummary",
+          {
+            projected: dollars(scenario.projected),
+            baseline: dollars(baseline),
+            difference: dollars(scenario.difference),
+            days: scenario.days,
+          },
+          "",
+        );
+        const quality = scenario.partial
+          ? text(
+              "cost.scenarioPartial",
+              {},
+              "Partial pricing: projected subtotal only; missing costs excluded.",
+            )
+          : "";
+        output.textContent = summary + " " + quality;
+        value.title = output.textContent;
+      }
+      window.addEventListener("i18n:updated", () =>
+        updateSavingsDisplay(currentTokenStats, getSavingsWindowPref()),
+      );
 
       // Render token stats
       function renderTokenStats(stats) {
@@ -3309,16 +3358,6 @@
           $set("nav-monthly-cost", "textContent", data.tokenStats.estMonthlyCost || "-");
           $set("nav-avg-tokens", "textContent", data.tokenStats.avgTokensPerSession || "-");
           $set("nav-avg-cost", "textContent", data.tokenStats.avgCostPerSession || "-");
-
-          // Show savings if positive
-          const savingsStat = document.getElementById("savings-stat");
-          const savingsEl = document.getElementById("est-savings");
-          if (data.tokenStats.estSavings && savingsStat && savingsEl) {
-            savingsEl.textContent = data.tokenStats.estSavings;
-            savingsStat.style.display = "block";
-          } else if (savingsStat) {
-            savingsStat.style.display = "none";
-          }
         }
 
         // Capacity

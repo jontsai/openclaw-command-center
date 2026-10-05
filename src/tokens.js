@@ -274,6 +274,8 @@ function buildCostBreakdown(usage, topSessions = []) {
       label: key === "24h" ? usage?.period : `${days}-day average`,
       totalCost: complete ? bucket.cost : null,
       dailyAvg: complete ? bucket.cost / days : null,
+      recordedCost: available && Number.isFinite(bucket?.cost) ? bucket.cost : null,
+      missingCostEntries: available ? (bucket?.missingCostEntries ?? null) : null,
     };
   }
   return {
@@ -378,6 +380,7 @@ function getTokenStats(sessions, capacity) {
     estCost: money(report.totalCost),
     recordedCost: Number.isFinite(report.recordedCost) ? money(report.recordedCost) : null,
     missingCostEntries: report.missingCostEntries,
+    costWindows: report.windows,
     costPeriod: report.period,
     costStatus: report.status,
     costRefreshing: report.refreshing,
