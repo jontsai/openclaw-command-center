@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/dashboard.css" />
     <script src="js/lib/morphdom.min.js"></script>
     <script src="js/i18n.js"></script>
+    <script src="js/extensions.js"></script>
     <!-- Shared Sidebar Loader -->
     <script src="js/state-stream.js"></script>
     <script src="js/sidebar.js"></script>
@@ -1115,8 +1116,28 @@
           </div>
         </div>
 
+        <section class="section" id="extensions-section">
+          <div class="section-header">
+            <div class="section-title" data-i18n="extensions.title">Companion extensions</div>
+            <a
+              class="btn-secondary"
+              href="https://github.com/jontsai/openclaw-spacesuit"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-i18n="extensions.learn"
+              >About Spacesuit ↗</a
+            >
+          </div>
+          <div class="vitals-panel" id="extension-content">
+            <p class="extension-note" data-i18n="extensions.companion">
+              Command Center works on its own. Spacesuit is its highly recommended companion for
+              agent flavors and workflows.
+            </p>
+          </div>
+        </section>
+
         <!-- Intel Pipeline Section -->
-        <div class="section" id="intel-section">
+        <div class="section" id="intel-section" data-legacy-panel>
           <div class="section-header">
             <div class="section-title">
               📋 Intel Pipeline
@@ -1180,7 +1201,7 @@
         </div>
 
         <!-- Pipeline Viewer Section -->
-        <div class="section" id="pipeline-section">
+        <div class="section" id="pipeline-section" data-legacy-panel>
           <div class="section-header">
             <div class="section-title">
               🔄 Pipelines
@@ -1195,7 +1216,7 @@
         </div>
 
         <!-- Monetization Tracker Section -->
-        <div class="section" id="monetization-section">
+        <div class="section" id="monetization-section" data-legacy-panel>
           <div class="section-header">
             <div class="section-title">
               💰 Monetization
@@ -2201,6 +2222,7 @@
         if (state.memory) renderMemory(state.memory);
         if (state.cerebro) renderCerebro(state.cerebro);
         if (state.subagents) renderSubagents(state.subagents);
+        window.ExtensionPanels?.render(state.extensions);
         if (state.intel) renderIntel(state.intel);
         if (state.pipeline) renderPipeline(state.pipeline);
         if (state.monetization) renderMonetization(state.monetization);

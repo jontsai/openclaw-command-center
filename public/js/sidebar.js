@@ -21,6 +21,7 @@
     monthlyCost: "-",
     avgTokens: "-",
     avgCost: "-",
+    extensionMode: "legacy",
     intel: 0,
     pipeline: 0,
     monetization: 0,
@@ -198,6 +199,7 @@
    * Handle state updates and update badges
    */
   function handleStateUpdate(data) {
+    sidebarState.extensionMode = data.extensions?.mode || "legacy";
     // Update session count
     if (data.sessions) {
       sidebarState.sessions = data.sessions.length || 0;
@@ -287,6 +289,12 @@
       "nav-avg-tokens": sidebarState.avgTokens,
       "nav-avg-cost": sidebarState.avgCost,
     };
+
+    for (const section of ["intel", "pipeline", "monetization"]) {
+      document.querySelectorAll(`[data-section="${section}"]`).forEach((el) => {
+        el.style.display = sidebarState.extensionMode === "legacy" ? "" : "none";
+      });
+    }
 
     for (const [id, value] of Object.entries(updates)) {
       const el = document.getElementById(id);

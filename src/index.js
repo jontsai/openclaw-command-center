@@ -86,6 +86,8 @@ const { getLlmUsage, getRoutingStats, startLlmUsageRefresh } = require("./llm-us
 const { executeAction } = require("./actions");
 const { migrateDataDir } = require("./data");
 const { createStateModule } = require("./state");
+const { createExtensionHost } = require("./extensions");
+const { createProjectHost } = require("./projects");
 const { createIntelModule } = require("./intel");
 const { createPipelineModule } = require("./pipeline");
 const { createMonetizationModule } = require("./monetization");
@@ -141,6 +143,20 @@ const sessions = createSessionsModule({
   extractJSON,
 });
 
+const extensionHost = createExtensionHost({
+  workspace: PATHS.workspace,
+  profile: process.env.OPENCLAW_PROFILE || "",
+  agentId: process.env.OPENCLAW_AGENT || "main",
+});
+
+// Optional project snapshots are read only on the portfolio request path.
+// Tracker network requests never run inside core monitoring or the UI request.
+const projectHost = createProjectHost({
+  workspace: PATHS.workspace,
+  profile: process.env.OPENCLAW_PROFILE || "",
+  agentId: process.env.OPENCLAW_AGENT || "main",
+});
+
 // Intel, Pipeline, Monetization modules
 const intelModule = createIntelModule({ CONFIG });
 const pipelineModule = createPipelineModule({ CONFIG });
@@ -162,6 +178,7 @@ const state = createStateModule({
   runOpenClaw,
   extractJSON,
   readTranscript: (sessionId) => sessions.readTranscript(sessionId),
+  getExtensions: () => extensionHost.getState(),
   getIntelStats: () => intelModule.getIntelStats(),
   getPipelineStats: () => pipelineModule.getPipelineStats(),
   getMonetizationStats: () => monetizationModule.getMonetizationStats(),
@@ -303,6 +320,18 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/api/status") {
     handleApi(req, res);
+  } else if (pathname === "/api/projects") {
+    if (req.method !== "GET") {
+      res.writeHead(405, { "Content-Type": "application/json", Allow: "GET" });
+      res.end(JSON.stringify({ error: "Read-only project view" }));
+      return;
+    }
+    await projectHost.refresh();
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+    });
+    res.end(JSON.stringify(projectHost.getState()));
   } else if (pathname === "/api/session") {
     const sessionKey = query.get("key");
     if (!sessionKey) {

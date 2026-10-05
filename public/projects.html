@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="projectBoard.pageTitle">Projects - OpenClaw Command Center</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/projects.css" />
+    <script src="js/i18n.js" defer></script>
+    <script src="js/state-stream.js" defer></script>
+    <script src="js/sidebar.js" defer></script>
+    <script src="js/projects.js" defer></script>
+  </head>
+  <body>
+    <div id="sidebar-container"></div>
+    <div class="main-wrapper" id="main-wrapper">
+      <header class="projects-header">
+        <div class="header-left">
+          <button
+            id="projects-menu"
+            aria-controls="sidebar"
+            aria-expanded="false"
+            class="btn-secondary projects-menu"
+            type="button"
+            data-i18n="projectBoard.menu"
+          >
+            Menu
+          </button>
+          <h1 data-i18n="projectBoard.title">Project portfolio</h1>
+        </div>
+        <div class="projects-header-actions">
+          <button
+            id="projects-refresh"
+            class="btn-secondary"
+            type="button"
+            data-i18n="projectBoard.refresh"
+          >
+            Refresh snapshots
+          </button>
+        </div>
+      </header>
+      <main class="projects-main">
+        <p class="projects-intro" data-i18n="projectBoard.intro">
+          Outcomes across trackers, not a list of tasks or sessions.
+        </p>
+        <p class="projects-readonly" data-i18n="projectBoard.readonly">
+          Read-only snapshots. Open the source tracker to change project status. Refresh reloads
+          collected snapshots; it does not sync trackers.
+        </p>
+        <section aria-labelledby="projects-sources-title" class="projects-sources-section">
+          <h2 id="projects-sources-title" data-i18n="projectBoard.sources">Source freshness</h2>
+          <div id="projects-sources" class="projects-sources"></div>
+        </section>
+        <form class="projects-filters" id="projects-filters" role="search">
+          <label
+            ><span data-i18n="projectBoard.search">Search projects</span
+            ><input id="projects-search" type="search" autocomplete="off"
+          /></label>
+          <label
+            ><span data-i18n="projectBoard.source">Source</span
+            ><select id="projects-source"></select
+          ></label>
+          <label
+            ><span data-i18n="projectBoard.health">Delivery health</span
+            ><select id="projects-health"></select
+          ></label>
+          <label
+            ><span data-i18n="projectBoard.agent">Linked agent</span
+            ><select id="projects-agent"></select
+          ></label>
+        </form>
+        <p id="projects-message" class="projects-message" role="status" aria-live="polite"></p>
+        <div id="projects-board" class="projects-board" aria-busy="true"></div>
+        <noscript><p>JavaScript is required to load the project snapshots.</p></noscript>
+      </main>
+    </div>
+  </body>
+</html>
