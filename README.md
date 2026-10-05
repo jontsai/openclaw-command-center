@@ -20,6 +20,11 @@ English | [简体中文](README.zh-CN.md)
 
 ## Standalone monitoring, recommended companion
 
+The read-only [knowledge explorer](docs/architecture/knowledge-explorer.md) adds
+`knowledge.html`: topic hierarchy, document filtering, source previews and separate
+collection/source-update timestamps. Populate it with a reviewed Spacesuit snapshot
+collector. QMD retrieval and automatic indexing are not connected in this version.
+
 **Command Center works out of the box without Spacesuit.** It owns OpenClaw
 sessions, health, jobs, usage and the common dashboard. For a minimal core-only
 view, run `COMMAND_CENTER_MODE=core npm start`.

@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "profile": "",
+  "agentId": "main",
+  "sources": [
+    {
+      "id": "files",
+      "adapter": "files",
+      "label": "Workspace memory",
+      "status": "ready",
+      "observedAt": "2026-10-05T03:08:04.295Z",
+      "indexUpdatedAt": "2026-10-05T03:08:04.257Z",
+      "documents": [
+        {
+          "id": "doc-c8befd925f10d24ca1c7f340",
+          "parentId": null,
+          "kind": "folder",
+          "title": "decisions",
+          "sourceRef": "memory/decisions",
+          "updatedAt": null,
+          "excerpt": "",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-20e66dc8bf6967005bcc22c7",
+          "parentId": "doc-c8befd925f10d24ca1c7f340",
+          "kind": "document",
+          "title": "Small batches, stronger evidence",
+          "sourceRef": "memory/decisions/staged-rollouts.md",
+          "updatedAt": "2026-10-05T03:08:04.257Z",
+          "excerpt": "# Small batches, stronger evidence\n\nDecision: ship in small, verified increments.\n\n## Why\nEvery release should have an observable outcome and a reversible rollout. Agent activity is not the same as verified progress.\n\n## Acceptance\n- A named owner reviews the evidence.\n- Tests exercise the intended behavior.\n- The rollback path is documented.\n",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-d80a1bc1032e5c67d3296f4f",
+          "parentId": null,
+          "kind": "folder",
+          "title": "planning",
+          "sourceRef": "memory/planning",
+          "updatedAt": null,
+          "excerpt": "",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-1682349f7848d5c4715e5d2e",
+          "parentId": "doc-d80a1bc1032e5c67d3296f4f",
+          "kind": "document",
+          "title": "Protect the thinking time",
+          "sourceRef": "memory/planning/next-quarter.md",
+          "updatedAt": "2026-10-05T03:08:04.257Z",
+          "excerpt": "# Protect the thinking time\n\nImportant, non-urgent work deserves reserved time.\n\nAgents can prepare options and gather evidence while the operator chooses which outcomes matter.\n",
+          "truncated": false,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "cerebro",
+      "adapter": "cerebro",
+      "label": "Cerebro topics",
+      "status": "ready",
+      "observedAt": "2026-10-05T03:08:04.295Z",
+      "indexUpdatedAt": "2026-10-05T03:08:04.258Z",
+      "documents": [
+        {
+          "id": "doc-5d8a5e442dd4d843b1f2f9fc",
+          "parentId": null,
+          "kind": "topic",
+          "title": "Reliability & operations",
+          "sourceRef": "cerebro/topics/reliability/topic.md",
+          "updatedAt": "2026-10-05T03:08:04.258Z",
+          "excerpt": "---\ntitle: Reliability & operations\n---\n# Reliability & operations\n\nHow we keep useful work moving without hiding uncertainty.\n\n## Connected ideas\nStaged rollouts, source freshness, verification, and recovery.\n",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-45c028201ad00e3c1f0bcb40",
+          "parentId": "doc-5d8a5e442dd4d843b1f2f9fc",
+          "kind": "folder",
+          "title": "threads",
+          "sourceRef": "cerebro/topics/reliability/threads",
+          "updatedAt": null,
+          "excerpt": "",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-97d7a3f140a765a27b972d19",
+          "parentId": "doc-45c028201ad00e3c1f0bcb40",
+          "kind": "document",
+          "title": "Fresh page, old knowledge",
+          "sourceRef": "cerebro/topics/reliability/threads/source-freshness.md",
+          "updatedAt": "2026-10-05T03:08:04.258Z",
+          "excerpt": "# Fresh page, old knowledge\n\nCollection time tells us when the snapshot was read. Index update time tells us when underlying evidence changed. Keep both visible.\n",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-4af1f84d4ec521a94a501776",
+          "parentId": null,
+          "kind": "topic",
+          "title": "Strategy & priorities",
+          "sourceRef": "cerebro/topics/strategy/topic.md",
+          "updatedAt": "2026-10-05T03:08:04.258Z",
+          "excerpt": "---\ntitle: Strategy & priorities\n---\n# Strategy & priorities\n\nChoose outcomes first. Match the ready work to available capacity.\n",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-4d13bba382e6d7c8ec804b5a",
+          "parentId": "doc-4af1f84d4ec521a94a501776",
+          "kind": "folder",
+          "title": "threads",
+          "sourceRef": "cerebro/topics/strategy/threads",
+          "updatedAt": null,
+          "excerpt": "",
+          "truncated": false,
+          "url": null
+        },
+        {
+          "id": "doc-20cd48a545bbe74fb6a1c0f1",
+          "parentId": "doc-4d13bba382e6d7c8ec804b5a",
+          "kind": "document",
+          "title": "Attention is a scarce resource",
+          "sourceRef": "cerebro/topics/strategy/threads/operator-attention.md",
+          "updatedAt": "2026-10-05T03:08:04.258Z",
+          "excerpt": "# Attention is a scarce resource\n\nSurface decisions, dependencies and verification failures. Let routine execution stay with the agents inside their existing authority.\n",
+          "truncated": false,
+          "url": null
+        }
+      ]
+    }
+  ]
+}

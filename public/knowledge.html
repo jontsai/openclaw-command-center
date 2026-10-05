@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="knowledge.title">Knowledge explorer</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/knowledge.css" />
+    <script src="js/i18n.js" defer></script>
+    <script src="js/state-stream.js" defer></script>
+    <script src="js/sidebar.js" defer></script>
+    <script src="js/knowledge.js" defer></script>
+  </head>
+  <body>
+    <div id="sidebar-container"></div>
+    <div class="main-wrapper">
+      <main class="knowledge-main">
+        <header class="knowledge-heading">
+          <div>
+            <p class="knowledge-eyebrow" data-i18n="knowledge.eyebrow">
+              MEMORY · TOPICS · EVIDENCE
+            </p>
+            <h1 data-i18n="knowledge.title">Knowledge explorer</h1>
+            <p data-i18n="knowledge.intro">Explore what your agents know—and where it came from.</p>
+          </div>
+          <div class="knowledge-actions">
+            <button
+              class="btn-secondary"
+              id="knowledge-menu"
+              data-i18n="projectBoard.menu"
+              aria-controls="sidebar"
+              aria-expanded="false"
+            >
+              Menu
+            </button>
+            <button class="btn-secondary" id="knowledge-refresh" data-i18n="knowledge.refresh">
+              Reload snapshot
+            </button>
+          </div>
+        </header>
+        <div id="knowledge-sources" class="knowledge-sources"></div>
+        <form id="knowledge-search-form" class="knowledge-search" role="search">
+          <label for="knowledge-search" data-i18n="knowledge.search"
+            >Filter titles and previews</label
+          >
+          <input id="knowledge-search" type="search" autocomplete="off" />
+          <span data-i18n="knowledge.searchNote">Local filtering—not semantic retrieval.</span>
+        </form>
+        <p id="knowledge-message" role="status" aria-live="polite"></p>
+        <div class="knowledge-layout">
+          <nav
+            class="knowledge-pane knowledge-tree"
+            aria-label="Topics"
+            data-i18n-aria-label="knowledge.topics"
+          >
+            <h2 data-i18n="knowledge.topics">Topic hierarchy</h2>
+            <div id="knowledge-tree"></div>
+          </nav>
+          <section class="knowledge-pane knowledge-list">
+            <h2 data-i18n="knowledge.documents">Documents</h2>
+            <div id="knowledge-list"></div>
+          </section>
+          <article
+            class="knowledge-pane knowledge-reader"
+            id="knowledge-reader"
+            aria-live="polite"
+          ></article>
+        </div>
+        <p class="knowledge-footnote" data-i18n="knowledge.footnote">
+          Read-only excerpts. Relationships are supplied by adapters; nothing is inferred from
+          similar titles. QMD retrieval is not connected in this version.
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,9 @@
 # 🦞 OpenClaw Command Center
 
+只读[知识浏览器](docs/architecture/knowledge-explorer.md)（`knowledge.html`）提供主题层级、
+文档筛选、来源预览，以及独立的采集时间和来源更新时间。内容来自经过审查的 Spacesuit
+快照采集器；此版本尚未连接 QMD 检索或自动索引。
+
 [English](README.md) | 简体中文
 
 <div align="center">

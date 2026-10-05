@@ -75,6 +75,7 @@ const {
 const { createSessionsModule } = require("./sessions");
 const { getCronJobs } = require("./cron");
 const { getCerebroTopics, updateTopicStatus } = require("./cerebro");
+const { createKnowledgeHost } = require("./knowledge");
 const {
   getDailyTokenUsage,
   getTokenStats,
@@ -158,6 +159,12 @@ const projectHost = createProjectHost({
 });
 
 // Intel, Pipeline, Monetization modules
+const knowledgeHost = createKnowledgeHost({
+  workspace: PATHS.workspace,
+  profile: process.env.OPENCLAW_PROFILE || "",
+  agentId: process.env.OPENCLAW_AGENT || "main",
+});
+
 const intelModule = createIntelModule({ CONFIG });
 const pipelineModule = createPipelineModule({ CONFIG });
 const monetizationModule = createMonetizationModule({ CONFIG });
@@ -320,6 +327,15 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/api/status") {
     handleApi(req, res);
+  } else if (pathname === "/api/knowledge") {
+    if (req.method !== "GET") {
+      res.writeHead(405, { "Content-Type": "application/json", Allow: "GET" });
+      res.end(JSON.stringify({ error: "Read-only knowledge view" }));
+      return;
+    }
+    const knowledge = await knowledgeHost.refresh();
+    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+    res.end(JSON.stringify(knowledge));
   } else if (pathname === "/api/projects") {
     if (req.method !== "GET") {
       res.writeHead(405, { "Content-Type": "application/json", Allow: "GET" });
