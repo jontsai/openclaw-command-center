@@ -2218,7 +2218,7 @@
         if (state.capacity) renderCapacity(state.capacity);
         if (state.operators) renderOperators(state.operators);
         if (state.llmUsage) renderLlmUsage(state.llmUsage);
-        if (state.cron) renderCron(state.cron);
+        if (state.cron) renderCron(state.cron, state.cronStatus);
         if (state.memory) renderMemory(state.memory);
         if (state.cerebro) renderCerebro(state.cerebro);
         if (state.subagents) renderSubagents(state.subagents);
@@ -2269,7 +2269,7 @@
         if (sessions?.tokenStats) renderTokenStats(sessions.tokenStats);
         if (operators) renderOperators(operators);
         if (llm) renderLlmUsage(llm);
-        if (cron?.cron) renderCron(cron.cron);
+        if (cron?.cron) renderCron(cron.cron, cron.cronStatus);
         if (memory?.memory) renderMemory(memory.memory);
         if (cerebro) renderCerebro(cerebro);
         if (subagents?.subagents) renderSubagents(subagents.subagents);
@@ -2475,7 +2475,21 @@
       }
 
       // Render just cron jobs (for progressive loading)
-      function renderCron(cron) {
+      function renderCron(
+        cron,
+        status = document.getElementById("cron-source-status")?.dataset.status || "available",
+      ) {
+        const notice = document.getElementById("cron-source-status") || document.createElement("p");
+        notice.id = "cron-source-status";
+        notice.dataset.status = status;
+        notice.setAttribute("data-i18n", "cron.sourceUnavailable");
+        notice.textContent = (window.I18N?.t || ((_key, _params, fallback) => fallback))(
+          "cron.sourceUnavailable",
+          {},
+          "Scheduled-job data is loading, incomplete, or stale. Counts are not authoritative.",
+        );
+        notice.hidden = status === "available";
+        document.getElementById("cron-jobs").before(notice);
         const cronEl = document.getElementById("cron-jobs");
         cronData = cron; // Store for re-rendering after privacy changes
 
@@ -2491,7 +2505,11 @@
         $set("cron-count", "textContent", cronCountText);
         $set("nav-cron-count", "textContent", cron.length);
 
-        if (visibleCrons.length === 0) {
+        if (visibleCrons.length === 0 && status !== "available") {
+          cronEl.replaceChildren();
+          $set("cron-count", "textContent", "—");
+          $set("nav-cron-count", "textContent", "—");
+        } else if (visibleCrons.length === 0) {
           smartUpdate(
             cronEl,
             `
@@ -2514,7 +2532,7 @@
                         <div class="cron-icon">⏰</div>
                         <div class="cron-info">
                             <div class="cron-name">${escapeHtml(c.name)}</div>
-                            <div class="cron-schedule">${c.schedule}</div>
+                            <div class="cron-schedule">${escapeHtml(c.schedule)}</div>
                             ${humanSchedule}
                         </div>
                         <div class="cron-meta">
@@ -3273,7 +3291,7 @@
         // Use the split render functions (avoids code duplication)
         if (data.vitals) renderVitals(data.vitals);
         if (data.sessions) renderSessions(data.sessions, data.pagination, data.statusCounts);
-        if (data.cron) renderCron(data.cron);
+        if (data.cron) renderCron(data.cron, data.cronStatus);
         if (data.tokenStats) {
           renderTokenStats(data.tokenStats);
           // Also update the detailed stats

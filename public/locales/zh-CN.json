@@ -1,4 +1,5 @@
 {
+  "cron": { "sourceUnavailable": "定时任务数据正在加载、不完整或已过期；计数尚未确认。" },
   "app": {
     "title": "OpenClaw 指挥中心",
     "connecting": "连接中...",
@@ -493,6 +494,7 @@
     ]
   },
   "jobs": {
+    "providerUnavailable": "AI 任务尚未连接。OpenClaw 自动化任务请查看“定时任务”。",
     "pageTitle": "AI 任务 - OpenClaw 指挥中心",
     "dashboard": "🤖 AI 任务面板",
     "refresh": "🔄 刷新",

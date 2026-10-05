@@ -73,7 +73,8 @@ const {
   calculateOperatorStats,
 } = require("./operators");
 const { createSessionsModule } = require("./sessions");
-const { getCronJobs } = require("./cron");
+const { createCronHost } = require("./cron");
+const cronHost = createCronHost({ run: runOpenClawAsync });
 const { getCerebroTopics, updateTopicStatus } = require("./cerebro");
 const {
   getDailyTokenUsage,
@@ -168,7 +169,8 @@ const state = createStateModule({
   getOpenClawDir,
   getSessions: (opts) => sessions.getSessions(opts),
   getSystemVitals,
-  getCronJobs: () => getCronJobs(getOpenClawDir),
+  getCronJobs: () => cronHost.getState().jobs,
+  getCronStatus: () => cronHost.getState().status,
   loadOperators: () => loadOperators(DATA_DIR),
   calculateOperatorStats,
   getLlmUsage: () => getLlmUsage(PATHS.state),
@@ -260,7 +262,8 @@ function handleApi(req, res) {
 
   const data = {
     sessions: sessionsList,
-    cron: getCronJobs(getOpenClawDir),
+    cron: cronHost.getState().jobs,
+    cronStatus: cronHost.getState().status,
     system: state.getSystemStatus(),
     activity: state.getRecentActivity(),
     tokenStats,
@@ -535,9 +538,10 @@ const server = http.createServer(async (req, res) => {
       ),
     );
   } else if (pathname === "/api/cron") {
-    const cron = getCronJobs(getOpenClawDir);
+    const snapshot = cronHost.getState();
+    const cron = snapshot.jobs;
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ cron }, null, 2));
+    res.end(JSON.stringify({ cron, cronStatus: snapshot.status }, null, 2));
   } else if (pathname === "/api/operators") {
     const method = req.method;
     const data = loadOperators(DATA_DIR);
