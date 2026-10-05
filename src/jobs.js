@@ -75,8 +75,15 @@ async function handleJobsRequest(req, res, pathname, query, method) {
   const api = await getAPI();
 
   if (!api) {
-    res.writeHead(500, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ error: "Jobs API not available" }));
+    const listing = pathname === "/api/jobs" && method === "GET";
+    res.writeHead(listing ? 200 : 503, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        status: "unavailable",
+        jobs: null,
+        error: "AI Jobs provider is not configured or could not be loaded",
+      }),
+    );
     return;
   }
 

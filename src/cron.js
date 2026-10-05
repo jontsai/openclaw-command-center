@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { stripVTControlCharacters } = require("node:util");
 const path = require("path");
 
 // Convert cron expression to human-readable text
@@ -98,62 +99,101 @@ function cronToHuman(expr) {
   return expr; // Return original as fallback
 }
 
-// Get cron jobs - reads directly from file for speed (CLI takes 11s+)
+// Normalize only display fields; never return automation prompts or delivery config.
+function normalizeJobs(jobs) {
+  return jobs.map((j) => {
+    if (!j || typeof j.id !== "string") throw new Error("invalid_cron_job");
+    const schedule = j.schedule || {};
+    let scheduleStr = "—",
+      scheduleHuman = null;
+    if (schedule.kind === "cron" && typeof schedule.expr === "string") {
+      scheduleStr = schedule.expr;
+      scheduleHuman = cronToHuman(schedule.expr);
+    } else if (["once", "at"].includes(schedule.kind)) {
+      scheduleStr = "once";
+      scheduleHuman = "One-time";
+    } else if (schedule.kind === "every" && Number.isFinite(schedule.everyMs)) {
+      scheduleStr = `every ${schedule.everyMs / 1000}s`;
+    }
+    const nextMs = j.nextRunAtMs ?? j.state?.nextRunAtMs;
+    let nextRun = "—";
+    if (Number.isFinite(nextMs)) {
+      const mins = Math.round((nextMs - Date.now()) / 60000);
+      nextRun =
+        mins < 0
+          ? "overdue"
+          : mins < 60
+            ? `${mins}m`
+            : mins < 1440
+              ? `${Math.round(mins / 60)}h`
+              : `${Math.round(mins / 1440)}d`;
+    }
+    return {
+      id: j.id,
+      name: typeof j.name === "string" ? j.name : j.id.slice(0, 8),
+      schedule: scheduleStr,
+      scheduleHuman,
+      nextRun,
+      enabled: j.enabled !== false,
+      lastStatus: j.lastRunStatus ?? j.state?.lastStatus,
+    };
+  });
+}
+
+// Legacy helper retained for callers that explicitly use a JSON store.
 function getCronJobs(getOpenClawDir) {
   try {
-    const cronPath = path.join(getOpenClawDir(), "cron", "jobs.json");
-    if (fs.existsSync(cronPath)) {
-      const data = JSON.parse(fs.readFileSync(cronPath, "utf8"));
-      return (data.jobs || []).map((j) => {
-        // Parse schedule
-        let scheduleStr = "—";
-        let scheduleHuman = null;
-        if (j.schedule) {
-          if (j.schedule.kind === "cron" && j.schedule.expr) {
-            scheduleStr = j.schedule.expr;
-            scheduleHuman = cronToHuman(j.schedule.expr);
-          } else if (j.schedule.kind === "once") {
-            scheduleStr = "once";
-            scheduleHuman = "One-time";
-          }
-        }
-
-        // Format next run
-        let nextRunStr = "—";
-        if (j.state?.nextRunAtMs) {
-          const next = new Date(j.state.nextRunAtMs);
-          const now = new Date();
-          const diffMs = next - now;
-          const diffMins = Math.round(diffMs / 60000);
-          if (diffMins < 0) {
-            nextRunStr = "overdue";
-          } else if (diffMins < 60) {
-            nextRunStr = `${diffMins}m`;
-          } else if (diffMins < 1440) {
-            nextRunStr = `${Math.round(diffMins / 60)}h`;
-          } else {
-            nextRunStr = `${Math.round(diffMins / 1440)}d`;
-          }
-        }
-
-        return {
-          id: j.id,
-          name: j.name || j.id.slice(0, 8),
-          schedule: scheduleStr,
-          scheduleHuman: scheduleHuman,
-          nextRun: nextRunStr,
-          enabled: j.enabled !== false,
-          lastStatus: j.state?.lastStatus,
-        };
-      });
-    }
-  } catch (e) {
-    console.error("Failed to get cron:", e.message);
+    const file = path.join(getOpenClawDir(), "cron", "jobs.json");
+    if (fs.existsSync(file))
+      return normalizeJobs(JSON.parse(fs.readFileSync(file, "utf8")).jobs || []);
+  } catch {
+    /* unavailable, not an authoritative empty catalog */
   }
   return [];
 }
 
-module.exports = {
-  cronToHuman,
-  getCronJobs,
-};
+function createCronHost({ run, now = Date.now, refreshMs = 30000 }) {
+  let snapshot = { jobs: [], status: "loading", observedAt: null },
+    pending = null,
+    nextCheck = 0;
+  function refresh() {
+    if (pending) return pending;
+    nextCheck = now() + refreshMs;
+    pending = Promise.resolve()
+      .then(async () => {
+        try {
+          const raw = await run(
+            ["cron", "list", "--agent", "main", "--all", "--json", "--timeout", "5000"],
+            { timeout: 8000 },
+          );
+          if (typeof raw !== "string" || Buffer.byteLength(raw) > 4 * 1024 * 1024)
+            throw new Error("invalid_cron_catalog");
+          const data = JSON.parse(stripVTControlCharacters(raw).trim());
+          if (!Array.isArray(data.jobs) || data.jobs.length > 1000)
+            throw new Error("invalid_cron_catalog");
+          snapshot = {
+            jobs: normalizeJobs(data.jobs),
+            status: data.hasMore || data.total > data.jobs.length ? "partial" : "available",
+            observedAt: now(),
+          };
+        } catch {
+          snapshot = {
+            ...snapshot,
+            status: snapshot.observedAt === null ? "unavailable" : "stale",
+          };
+        }
+        return snapshot;
+      })
+      .finally(() => {
+        pending = null;
+        nextCheck = now() + refreshMs;
+      });
+    return pending;
+  }
+  function getState() {
+    if (now() >= nextCheck && !pending) void refresh();
+    return snapshot;
+  }
+  return { getState, refresh };
+}
+module.exports = { cronToHuman, getCronJobs, normalizeJobs, createCronHost };

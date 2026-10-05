@@ -210,7 +210,12 @@
 
     // Update cron count
     if (data.cron) {
-      sidebarState.cron = Array.isArray(data.cron) ? data.cron.length : 0;
+      sidebarState.cron =
+        data.cronStatus && data.cronStatus !== "available"
+          ? "—"
+          : Array.isArray(data.cron)
+            ? data.cron.length
+            : "—";
     }
 
     // Update jobs count (from jobs API if available)
@@ -225,7 +230,8 @@
 
     // Update cerebro count
     if (data.cerebro) {
-      sidebarState.cerebro = data.cerebro.topicCount || data.cerebro.totalTopics || 0;
+      sidebarState.cerebro =
+        data.cerebro.topics?.total ?? data.cerebro.topicCount ?? data.cerebro.totalTopics ?? "—";
     }
 
     // Update intel count
@@ -357,10 +363,12 @@
     try {
       const response = await fetch("api/jobs");
       const data = await response.json();
-      sidebarState.jobs = data.jobs?.length || 0;
+      sidebarState.jobs = response.ok && Array.isArray(data.jobs) ? data.jobs.length : "—";
       updateBadges();
     } catch (error) {
       // Jobs API may not be available
+      sidebarState.jobs = "—";
+      updateBadges();
     }
   }
 

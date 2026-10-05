@@ -20,6 +20,11 @@ English | [简体中文](README.zh-CN.md)
 
 ## Standalone monitoring, recommended companion
 
+Cron Jobs lists OpenClaw automations through its read-only CLI API, cached for
+30 seconds. Loading, partial and stale catalogs are labeled; missing legacy JSON
+files no longer imply zero automations. AI Jobs is a separate optional provider:
+without it the page shows "not connected", not an empty successful job catalog.
+
 **Command Center works out of the box without Spacesuit.** It owns OpenClaw
 sessions, health, jobs, usage and the common dashboard. For a minimal core-only
 view, run `COMMAND_CENTER_MODE=core npm start`.

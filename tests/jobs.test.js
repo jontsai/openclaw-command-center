@@ -65,7 +65,7 @@ describe("jobs module", () => {
       _resetForTesting();
     });
 
-    it("returns 500 when jobs API is not available", async () => {
+    it("reports an unavailable capability when optional jobs API is absent", async () => {
       // Force API to be unavailable for this test
       _resetForTesting({ forceUnavailable: true });
 
@@ -86,13 +86,13 @@ describe("jobs module", () => {
 
       await handleJobsRequest(mockReq, mockRes, "/api/jobs", query, "GET");
 
-      assert.strictEqual(statusCode, 500);
+      assert.strictEqual(statusCode, 200);
       const parsed = JSON.parse(body);
       assert.ok(parsed.error, "should have an error message");
-      assert.ok(
-        parsed.error.includes("not available"),
-        `Error should mention not available: ${parsed.error}`,
-      );
+      assert.equal(parsed.status, "unavailable");
+      assert.equal(parsed.jobs, null);
+      await handleJobsRequest(mockReq, mockRes, "/api/jobs/example/run", query, "POST");
+      assert.strictEqual(statusCode, 503);
     });
   });
 });

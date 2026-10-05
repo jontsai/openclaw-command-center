@@ -935,6 +935,9 @@
           </button>
         </div>
 
+        <p id="jobs-unavailable" role="status" data-i18n="jobs.providerUnavailable" hidden>
+          AI Jobs is not connected. Scheduled OpenClaw automations are shown under Cron Jobs.
+        </p>
         <!-- Jobs Grid -->
         <div class="section">
           <div id="jobs-loading" class="loading">
@@ -1185,6 +1188,7 @@
 
       // Set filter
       function setFilter(filter) {
+        if (!jobsAvailable) return;
         currentFilter = filter;
         document.querySelectorAll(".filter-btn").forEach((btn) => {
           btn.classList.toggle("active", btn.dataset.filter === filter);
@@ -1192,12 +1196,38 @@
         renderJobs();
       }
 
+      let jobsAvailable = false;
+      function showJobsUnavailable() {
+        jobsAvailable = false;
+        jobs = [];
+        document.getElementById("jobs-unavailable").hidden = false;
+        for (const id of ["jobs-loading", "jobs-empty", "jobs-grid"])
+          document.getElementById(id).style.display = "none";
+        for (const id of [
+          "stat-total",
+          "stat-active",
+          "stat-paused",
+          "stat-running",
+          "stat-success-rate",
+          "stat-failures",
+          "nav-jobs-count",
+        ]) {
+          const element = document.getElementById(id);
+          if (element) element.textContent = "—";
+        }
+      }
       // Fetch jobs from API
       async function fetchJobs() {
         try {
           const res = await fetch("api/jobs");
           const data = await res.json();
-          jobs = data.jobs || [];
+          if (!res.ok || data.status === "unavailable" || !Array.isArray(data.jobs)) {
+            showJobsUnavailable();
+            return;
+          }
+          jobsAvailable = true;
+          document.getElementById("jobs-unavailable").hidden = true;
+          jobs = data.jobs;
           renderJobs();
           updateStats();
           document.getElementById("sidebar-updated").textContent = t(
@@ -1206,6 +1236,7 @@
             "Updated: " + new Date().toLocaleTimeString(),
           );
         } catch (e) {
+          showJobsUnavailable();
           console.error("Failed to fetch jobs:", e);
           showToast(t("jobs.toastLoadFailed", {}, "Failed to load jobs"), "error");
         }

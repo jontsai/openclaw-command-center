@@ -1,4 +1,7 @@
 {
+  "cron": {
+    "sourceUnavailable": "Scheduled-job data is loading, incomplete, or stale. Counts are not authoritative."
+  },
   "app": {
     "title": "OpenClaw Command Center",
     "connecting": "Connecting...",
@@ -64,6 +67,7 @@
     "polling": "Polling mode (SSE disconnected)"
   },
   "jobs": {
+    "providerUnavailable": "AI Jobs is not connected. Scheduled OpenClaw automations are shown under Cron Jobs.",
     "pageTitle": "AI Jobs - OpenClaw Command Center",
     "dashboard": "🤖 AI Jobs Dashboard",
     "refresh": "🔄 Refresh",
