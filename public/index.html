@@ -2466,7 +2466,7 @@
                         <div class="card-header">
                             <div class="card-icon ${iconClass}">${icon}</div>
                             <div class="card-title-area">
-                                <div class="card-title">${escapeHtml(s.label)}</div>
+                                <div class="card-title" title="${escapeHtml(s.channelId ? `${s.channelId} · ${s.channelNameStatus || "unresolved"}` : "")}">${escapeHtml(s.label)}</div>
                                 <div class="card-subtitle">${s.kind} • ${model}</div>
                                 ${originatorHtml}
                             </div>
@@ -4357,8 +4357,8 @@
         }
         const count = (n) => (Number.isFinite(n) ? n.toLocaleString() : "N/A");
         const money = (n) => (Number.isFinite(n) ? `$${formatCurrency(n, 4)}` : "N/A");
-        const row = (label, value) =>
-          `<div class="detail-row"><span class="detail-label">${escapeHtml(label)}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
+        const row = (label, value, tooltip = "") =>
+          `<div class="detail-row"><span class="detail-label" title="${escapeHtml(tooltip)}">${escapeHtml(label)}</span><span class="detail-value">${escapeHtml(value)}</span></div>`;
         document.getElementById("cost-modal-title").textContent = data.period || "Unavailable";
         const note =
           data.status === "unavailable"
@@ -4405,7 +4405,13 @@
         document.getElementById("cost-top-sessions").innerHTML =
           `<p>${escapeHtml(data.topSessionsScope || "Session totals")}</p>` +
           ((data.topSessions || [])
-            .map((s) => row(String(s.label || "Session").slice(0, 60), count(s.tokens)))
+            .map((s) =>
+              row(
+                String(s.label || "Session").slice(0, 120),
+                count(s.tokens),
+                s.channelId ? `${s.channelId} · ${s.channelNameStatus || "unresolved"}` : "",
+              ),
+            )
             .join("") || "<em>No session data available</em>");
       }
 
@@ -4470,6 +4476,7 @@
       function renderDetail(data) {
         // Update the title with the best available channel name
         const titleEl = document.getElementById("detail-title");
+        titleEl.title = data.channelId || "";
         const channelName = data.groupChannel || data.channel || "Session Details";
         titleEl.textContent = channelName;
 

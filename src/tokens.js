@@ -324,6 +324,8 @@ function getTopSessionsByTokens(limit = 5, getSessions) {
       .slice(0, limit)
       .map((s) => ({
         label: s.label,
+        channelId: s.channelId || null,
+        channelNameStatus: s.channelNameStatus || null,
         tokens: s.tokens,
         channel: s.channel,
         active: s.active,
