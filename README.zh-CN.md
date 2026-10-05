@@ -308,3 +308,10 @@ MIT © [Jonathan Tsai](https://github.com/jontsai)
 **[Install from ClawHub](https://www.clawhub.ai/jontsai/command-center)** · **[OpenClaw](https://github.com/openclaw/openclaw)** · **[Discord](https://discord.gg/clawd)**
 
 </div>
+
+## 项目看板（只读预览）
+
+[项目看板](docs/architecture/project-portfolio.md)按工作流阶段汇总不同来源的交付目标，
+而不是将任务或会话当作项目。Spacesuit 提供 Linear/Jira 适配器，Command Center
+提供统一视图。保留来源状态、数据新鲜度和未知指标；安装不会自动连接跟踪系统，
+也不会修改任务状态。当前版本读取明确选择的数据快照。

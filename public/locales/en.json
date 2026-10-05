@@ -29,7 +29,8 @@
     "avgCostSess": "Avg $/Sess",
     "autoRefresh": "Auto-refresh: 30s",
     "live": "Live: {time}",
-    "updated": "Updated: {time}"
+    "updated": "Updated: {time}",
+    "projects": "Projects"
   },
   "stats": {
     "totalTokens": "Total Tokens",
@@ -139,5 +140,77 @@
       "error": "Error",
       "disabled": "Disabled"
     }
+  },
+  "projectBoard": {
+    "all": "All",
+    "refresh": "Refresh snapshots",
+    "refreshing": "Loading snapshots…",
+    "loading": "Loading project snapshots…",
+    "error": "Project snapshots could not be loaded. Try Refresh snapshots.",
+    "retained": "Refresh failed. Showing previous snapshots; source data is not current.",
+    "noSources": "No project sources configured. Command Center works on its own; add Spacesuit tracker adapters to populate this board.",
+    "empty": "No projects reported. Check source freshness above.",
+    "noMatches": "No projects match these filters.",
+    "visible": "{count} projects shown · {total} reported",
+    "partial": "Some sources are incomplete or unavailable. Check source freshness above.",
+    "emptyColumn": "No projects",
+    "source": "Source",
+    "health": "Delivery health",
+    "owner": "Owner",
+    "unassigned": "Unassigned",
+    "nativeStatus": "Tracker status",
+    "tasks": "Tasks",
+    "taskCounts": "{done} done / {total} total · {blocked} blocked",
+    "taskNote": "Task counts are not a project completion estimate.",
+    "agents": "Linked agents",
+    "noAgents": "None linked",
+    "sessions": "Linked sessions",
+    "dependencies": "Dependencies",
+    "unresolved": "Not in this snapshot",
+    "target": "Target date",
+    "updated": "Project updated",
+    "observed": "Snapshot observed",
+    "unknown": "Unknown",
+    "open": "Open in tracker ↗",
+    "sourceData": "Source data",
+    "snapshotOnly": "Collected snapshot, not a live tracker connection",
+    "kind": {
+      "project": "Project",
+      "epic": "Epic",
+      "milestone": "Milestone"
+    },
+    "stage": {
+      "inbox": "Inbox",
+      "planned": "Planned",
+      "doing": "Doing",
+      "review": "In Review",
+      "done": "Done",
+      "canceled": "Canceled",
+      "unknown": "Unmapped"
+    },
+    "healthState": {
+      "on-track": "On track",
+      "at-risk": "At risk",
+      "blocked": "Blocked",
+      "off-track": "Off track",
+      "unknown": "Health unknown"
+    },
+    "sourceState": {
+      "ready": "Ready",
+      "partial": "Partial",
+      "error": "Error",
+      "unavailable": "Unavailable",
+      "loading": "Loading",
+      "disabled": "Disabled",
+      "stale": "Stale"
+    },
+    "pageTitle": "Projects - OpenClaw Command Center",
+    "title": "Project portfolio",
+    "intro": "Outcomes across trackers, not a list of tasks or sessions.",
+    "readonly": "Read-only snapshots. Open the source tracker to change project status. Refresh reloads collected snapshots; it does not sync trackers.",
+    "sources": "Source freshness",
+    "search": "Search projects",
+    "agent": "Linked agent",
+    "menu": "Menu"
   }
 }

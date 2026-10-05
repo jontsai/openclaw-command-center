@@ -29,7 +29,8 @@
     "avgCostSess": "平均 $/会话",
     "autoRefresh": "自动刷新：30秒",
     "live": "实时：{time}",
-    "updated": "更新：{time}"
+    "updated": "更新：{time}",
+    "projects": "项目"
   },
   "stats": {
     "totalTokens": "总 Token",
@@ -568,5 +569,77 @@
       "error": "错误",
       "disabled": "已停用"
     }
+  },
+  "projectBoard": {
+    "all": "全部",
+    "refresh": "刷新快照",
+    "refreshing": "正在加载快照…",
+    "loading": "正在加载项目快照…",
+    "error": "无法加载项目快照。请尝试刷新快照。",
+    "retained": "刷新失败。显示上次的快照；来源数据不是最新的。",
+    "noSources": "尚未配置项目来源。Command Center 可独立运行；添加 Spacesuit 跟踪系统适配器即可填充此看板。",
+    "empty": "没有已报告的项目。请检查上方来源的新鲜度。",
+    "noMatches": "没有符合筛选条件的项目。",
+    "visible": "显示 {count} 个项目 · 共报告 {total} 个",
+    "partial": "部分来源的数据不完整或不可用。请检查上方来源的新鲜度。",
+    "emptyColumn": "暂无项目",
+    "source": "来源",
+    "health": "交付健康状态",
+    "owner": "负责人",
+    "unassigned": "未分配",
+    "nativeStatus": "跟踪系统状态",
+    "tasks": "任务",
+    "taskCounts": "已完成 {done} / 总计 {total} · 阻塞 {blocked}",
+    "taskNote": "任务数量不代表项目完成度估算。",
+    "agents": "关联代理",
+    "noAgents": "暂无关联",
+    "sessions": "关联会话",
+    "dependencies": "依赖关系",
+    "unresolved": "不在此快照中",
+    "target": "目标日期",
+    "updated": "项目更新时间",
+    "observed": "快照采集时间",
+    "unknown": "未知",
+    "open": "在跟踪系统中打开 ↗",
+    "sourceData": "来源数据",
+    "snapshotOnly": "已采集的快照，而非跟踪系统实时连接",
+    "kind": {
+      "project": "项目",
+      "epic": "史诗",
+      "milestone": "里程碑"
+    },
+    "stage": {
+      "inbox": "收件箱",
+      "planned": "已规划",
+      "doing": "进行中",
+      "review": "审核中",
+      "done": "已完成",
+      "canceled": "已取消",
+      "unknown": "未映射"
+    },
+    "healthState": {
+      "on-track": "按计划进行",
+      "at-risk": "有风险",
+      "blocked": "受阻",
+      "off-track": "偏离计划",
+      "unknown": "健康状态未知"
+    },
+    "sourceState": {
+      "ready": "就绪",
+      "partial": "不完整",
+      "error": "错误",
+      "unavailable": "不可用",
+      "loading": "加载中",
+      "disabled": "已停用",
+      "stale": "已过期"
+    },
+    "pageTitle": "项目 - OpenClaw Command Center",
+    "title": "项目组合",
+    "intro": "跨跟踪系统的交付目标，而不是任务或会话列表。",
+    "readonly": "只读快照。请在来源跟踪系统中更改项目状态。刷新仅重新加载已采集的快照，不会同步跟踪系统。",
+    "sources": "来源新鲜度",
+    "search": "搜索项目",
+    "agent": "关联代理",
+    "menu": "菜单"
   }
 }

@@ -369,3 +369,13 @@ Preserve `data-i18n` hooks and existing translations in UI changes. Localize new
 static and dynamic labels in English and Chinese, including unavailable/error
 states. Keep raw business data separate from localized labels; never infer its
 translation. Verify language switching while new panels are open.
+
+## Project and knowledge boundaries
+
+Read [the project portfolio contract](docs/architecture/project-portfolio.md) before
+changing board or adapter behavior. Tracker-specific APIs, entity/status mappings,
+memory conventions and retrieval strategies belong in Spacesuit adapters. Core owns
+provider-independent presentation and bounded snapshot validation. Keep projects,
+tasks and runtime sessions distinct. Never infer cross-source identity by title or
+convert missing metrics/statuses to zero/Done. Preserve source-native states and
+explicit capabilities; no external writes or live tracker credentials in UI code.

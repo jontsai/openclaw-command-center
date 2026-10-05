@@ -420,3 +420,12 @@ MIT © [Jonathan Tsai](https://github.com/jontsai)
 **[Install from ClawHub](https://www.clawhub.ai/jontsai/command-center)** · **[OpenClaw](https://github.com/openclaw/openclaw)** · **[Discord](https://discord.gg/clawd)**
 
 </div>
+
+## Project portfolio (read-only preview)
+
+The [Projects board](docs/architecture/project-portfolio.md) groups delivery outcomes
+by workflow stage across explicitly selected tracker sources. Spacesuit supplies
+Linear/Jira adapters; Command Center supplies the unified view without depending
+on a tracker. Native statuses, source freshness and missing metrics stay visible.
+This slice consumes snapshots, not a live tracker connection configured at install.
+No tasks are moved and no external tracker records are changed.
