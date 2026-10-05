@@ -261,7 +261,10 @@
     // Update token stats
     if (data.tokenStats) {
       sidebarState.tokens = data.tokenStats.totalFormatted || data.tokenStats.total || "-";
-      sidebarState.cost = data.tokenStats.estCostFormatted || data.tokenStats.estCost || "-";
+      sidebarState.cost =
+        data.tokenStats.costStatus === "partial" && data.tokenStats.recordedCost != null
+          ? `${data.tokenStats.recordedCost}*`
+          : data.tokenStats.estCostFormatted || data.tokenStats.estCost || "N/A";
       sidebarState.monthlyCost =
         data.tokenStats.estMonthlyCostFormatted || data.tokenStats.estMonthlyCost || "-";
       sidebarState.avgTokens = data.tokenStats.avgTokensPerSession || "-";

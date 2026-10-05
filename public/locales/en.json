@@ -115,6 +115,10 @@
     "statusRunning": "Running"
   },
   "cost": {
+    "partialSubtotal": "Partial subtotal",
+    "recordedSubtotal": "Recorded API-equivalent subtotal",
+    "missingEntries": "Entries without pricing",
+
     "title": "💰 Cost Breakdown",
     "tokenUsage": "📊 Token Usage",
     "pricingBasis": "💵 Pricing Basis",

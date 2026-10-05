@@ -48,6 +48,11 @@ test("zero, unknown and partially priced usage remain distinct", () => {
   assert.equal(partial.totalCost, null);
   assert.equal(partial.recordedCost, 3);
   assert.equal(partial.inputTokens, 100);
+  raw.daily[2].totalCost = 0;
+  const unpriced = buildCostBreakdown(normalizeUsageReport(raw, now));
+  assert.equal(unpriced.recordedCost, 0);
+  assert.equal(unpriced.totalCost, null);
+  assert.equal(unpriced.missingCostEntries, 1);
 });
 test("invalid buckets fail closed", () => {
   const raw = report();

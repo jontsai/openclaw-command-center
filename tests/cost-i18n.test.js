@@ -11,6 +11,7 @@ test("cost and token labels retain localization hooks beside runtime values", ()
     "stats.totalTokens",
     "stats.estApiCost",
     "cost.title",
+    "cost.partialSubtotal",
     "cost.tokenUsage",
     "cost.pricingBasis",
     "cost.calculation",

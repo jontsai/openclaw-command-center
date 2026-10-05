@@ -66,6 +66,8 @@
   },
   "phrases": {
     "exact": {
+      "Recorded API-equivalent subtotal": "已记录的 API 等价费用小计",
+      "Entries without pricing": "缺少定价的记录数",
       "OpenClaw Command Center": "OpenClaw 指挥中心",
       "Command Center": "指挥中心",
       "Connecting...": "连接中...",
@@ -542,6 +544,10 @@
     "statusRunning": "运行中"
   },
   "cost": {
+    "partialSubtotal": "部分小计",
+    "recordedSubtotal": "已记录的 API 等价费用小计",
+    "missingEntries": "缺少定价的记录数",
+
     "title": "💰 费用明细",
     "tokenUsage": "📊 令牌用量",
     "pricingBasis": "💵 计价依据",
