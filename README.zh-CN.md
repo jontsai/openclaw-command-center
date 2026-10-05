@@ -281,6 +281,10 @@ mkdir -p ~/your-workspace/cerebro/orphans
 
 欢迎贡献，提交前请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+### 保留国际化支持
+
+修改界面时，必须保留现有的 `data-i18n` 属性及相关翻译钩子。新增或修改面向用户的文案（包括加载和错误状态）时，必须同步更新所有支持的语言。将翻译标签与动态数值分开，并在相关面板打开时及实时更新后验证英文 → 中文 → 英文切换。完整的代理要求请参阅 [AGENTS.md](AGENTS.md#-preserve-internationalization)。
+
 ### 开发命令
 
 ```bash

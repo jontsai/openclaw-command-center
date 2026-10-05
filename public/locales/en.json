@@ -39,7 +39,8 @@
     "estCost24h": "Est. Cost (24h) 📊",
     "estMonthlySavings": "Est. Monthly Savings",
     "main": "Main",
-    "subagents": "Sub-agents"
+    "subagents": "Sub-agents",
+    "estApiCost": "Est. API Cost"
   },
   "quickActions": {
     "title": "⚡ Quick Actions",
@@ -107,6 +108,14 @@
     "statusSuccess": "Success",
     "statusFailed": "Failed",
     "statusRunning": "Running"
+  },
+  "cost": {
+    "title": "💰 Cost Breakdown",
+    "tokenUsage": "📊 Token Usage",
+    "pricingBasis": "💵 Pricing Basis",
+    "calculation": "🧮 Calculation",
+    "billing": "✨ Billing & Recent Averages",
+    "sessions": "🔥 Current Sessions (Lifetime Tokens)"
   },
   "extensions": {
     "title": "Companion extensions",

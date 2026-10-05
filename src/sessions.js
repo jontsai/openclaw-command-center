@@ -78,7 +78,9 @@ function createSessionsModule(deps) {
   const { getOpenClawDir, getOperatorBySlackId, runOpenClaw, runOpenClawAsync, extractJSON } = deps;
 
   // SESSION CACHE - Async refresh to avoid blocking
-  let sessionsCache = { sessions: [], timestamp: 0, refreshing: false };
+  let sessionsCache = { sessions: [], raw: [], timestamp: 0, refreshing: false };
+  let sessionsRefreshPromise = null;
+  const detailCache = new Map();
   const SESSIONS_CACHE_TTL = 60000; // 1 minute
   const transcriptMetadataCache = new Map();
   let transcriptPathIndex = null;
@@ -368,8 +370,15 @@ function createSessionsModule(deps) {
     };
   }
 
-  async function refreshSessionsCache() {
-    if (sessionsCache.refreshing) return; // Don't double-refresh
+  function refreshSessionsCache() {
+    if (sessionsRefreshPromise) return sessionsRefreshPromise;
+    sessionsRefreshPromise = performSessionsRefresh().finally(() => {
+      sessionsRefreshPromise = null;
+    });
+    return sessionsRefreshPromise;
+  }
+
+  async function performSessionsRefresh() {
     sessionsCache.refreshing = true;
 
     try {
@@ -385,6 +394,7 @@ function createSessionsModule(deps) {
 
         sessionsCache = {
           sessions: mapped,
+          raw: sessions,
           timestamp: Date.now(),
           refreshing: false,
         };
@@ -470,11 +480,13 @@ function createSessionsModule(deps) {
   }
 
   // Get detailed session info
-  function getSessionDetail(sessionKey) {
+  function getSessionDetail(sessionKey, supplied = {}) {
     try {
       // Get basic session info
-      const listOutput = runOpenClaw(`${SESSION_LIST_COMMAND} --json`);
-      let sessionInfo = null;
+      const listOutput = supplied.sessionInfo
+        ? null
+        : runOpenClaw(`${SESSION_LIST_COMMAND} --json`);
+      let sessionInfo = supplied.sessionInfo || null;
       const jsonStr = extractJSON(listOutput);
       if (jsonStr) {
         const data = JSON.parse(jsonStr);
@@ -486,10 +498,8 @@ function createSessionsModule(deps) {
       }
 
       // Read transcript directly from JSONL file
-      const { entries: transcript, available: transcriptAvailable } = readTranscript(
-        sessionInfo.sessionId,
-        { withStatus: true },
-      );
+      const { entries: transcript, available: transcriptAvailable } =
+        supplied.transcript || readTranscript(sessionInfo.sessionId, { withStatus: true });
       let messages = [];
       let tools = {};
       let facts = [];
@@ -596,7 +606,7 @@ function createSessionsModule(deps) {
       let topics = [];
 
       if (messages.length > 0) {
-        summary = `${messages.length} messages (${userMessages.length} user, ${assistantMessages.length} assistant). `;
+        summary = `${messages.length}${supplied.recent ? " recent" : ""} messages (${userMessages.length} user, ${assistantMessages.length} assistant). `;
 
         // Identify main topics from all text using pattern matching
         const allText = messages.map((m) => m.text).join(" ");
@@ -645,9 +655,15 @@ function createSessionsModule(deps) {
       }
 
       // Use parsed totals or fallback to session info
-      const finalTotalTokens = totalInputTokens + totalOutputTokens || sessionInfo.totalTokens || 0;
-      const finalInputTokens = totalInputTokens || sessionInfo.inputTokens || 0;
-      const finalOutputTokens = totalOutputTokens || sessionInfo.outputTokens || 0;
+      const finalTotalTokens = supplied.recent
+        ? sessionInfo.totalTokens || 0
+        : totalInputTokens + totalOutputTokens || sessionInfo.totalTokens || 0;
+      const finalInputTokens = supplied.recent
+        ? sessionInfo.inputTokens || 0
+        : totalInputTokens || sessionInfo.inputTokens || 0;
+      const finalOutputTokens = supplied.recent
+        ? sessionInfo.outputTokens || 0
+        : totalOutputTokens || sessionInfo.outputTokens || 0;
 
       // Format model name (strip prefix)
       const modelDisplay = (detectedModel || sessionInfo.model || "-")
@@ -664,9 +680,12 @@ function createSessionsModule(deps) {
         tokens: finalTotalTokens,
         inputTokens: finalInputTokens,
         outputTokens: finalOutputTokens,
-        cacheRead: totalCacheRead,
-        cacheWrite: totalCacheWrite,
-        estCost: totalCost > 0 ? `$${totalCost.toFixed(4)}` : null,
+        cacheRead: supplied.recent ? null : totalCacheRead,
+        cacheWrite: supplied.recent ? null : totalCacheWrite,
+        historyScope: supplied.recent
+          ? "Recent messages only; metadata totals cover the session."
+          : null,
+        estCost: !supplied.recent && totalCost > 0 ? `$${totalCost.toFixed(4)}` : null,
         lastActive,
         summary,
         topics, // Array of detected topics
@@ -687,6 +706,70 @@ function createSessionsModule(deps) {
     }
   }
 
+  async function getSessionDetailAsync(sessionKey) {
+    if (!sessionsCache.timestamp) {
+      void refreshSessionsCache();
+      return { error: "Session catalog is loading; retry shortly." };
+    } else getSessionsCached();
+    const sessionInfo = sessionsCache.raw.find((s) => s.key === sessionKey);
+    if (!sessionInfo)
+      return {
+        error: sessionsCache.timestamp
+          ? "Session not found"
+          : "Session catalog unavailable; retry shortly.",
+      };
+    const cached = detailCache.get(sessionKey);
+    if (
+      cached &&
+      cached.sessionId === sessionInfo.sessionId &&
+      Date.now() - cached.timestamp < 30000
+    )
+      return cached.promise;
+    const entry = { timestamp: Date.now(), sessionId: sessionInfo.sessionId, promise: null };
+    entry.promise = (async () => {
+      try {
+        const output = await runOpenClawAsync(
+          [
+            "gateway",
+            "call",
+            "chat.history",
+            "--params",
+            JSON.stringify({ sessionKey, limit: 50 }),
+            "--timeout",
+            "5000",
+            "--json",
+          ],
+          { timeout: 7000 },
+        );
+        const data = JSON.parse(extractJSON(output));
+        if (
+          data?.sessionKey === sessionKey &&
+          (!data.sessionId || data.sessionId === sessionInfo.sessionId) &&
+          Array.isArray(data.messages)
+        ) {
+          return getSessionDetail(sessionKey, {
+            sessionInfo,
+            recent: true,
+            transcript: {
+              available: true,
+              entries: data.messages.map((message) => ({
+                type: "message",
+                message,
+                timestamp: message.timestamp,
+              })),
+            },
+          });
+        }
+      } catch {
+        /* Legacy stores can still provide a local transcript. */
+      }
+      return getSessionDetail(sessionKey, { sessionInfo });
+    })();
+    detailCache.set(sessionKey, entry);
+    while (detailCache.size > 100) detailCache.delete(detailCache.keys().next().value);
+    return entry.promise;
+  }
+
   return {
     findTranscriptPath,
     getSessionOriginator,
@@ -697,6 +780,7 @@ function createSessionsModule(deps) {
     getSessions,
     readTranscript,
     getSessionDetail,
+    getSessionDetailAsync,
     parseSessionLabel,
   };
 }

@@ -393,6 +393,10 @@ The complete dashboard with all panels visible.
 
 Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md).
 
+### Preserve localization
+
+UI changes must preserve existing `data-i18n` attributes and related translation hooks. Update every supported locale when adding or changing user-facing text, including loading and error states. Keep translated labels separate from dynamic values, and verify English → Chinese → English switching with the affected panel open and after live updates. See [AGENTS.md](AGENTS.md#-preserve-internationalization) for the full agent requirements.
+
 ### Development
 
 ```bash
