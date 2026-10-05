@@ -376,6 +376,8 @@ function getTokenStats(sessions, capacity) {
     mainLimit,
     subagentLimit,
     estCost: money(report.totalCost),
+    recordedCost: Number.isFinite(report.recordedCost) ? money(report.recordedCost) : null,
+    missingCostEntries: report.missingCostEntries,
     costPeriod: report.period,
     costStatus: report.status,
     costRefreshing: report.refreshing,

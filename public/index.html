@@ -97,6 +97,9 @@
           <div class="stat-label">
             <span data-i18n="stats.estApiCost">Est. API Cost</span> ·
             <span id="cost-period-label">-</span> <span id="cost-provisional-label"></span>
+            <span id="cost-coverage-label" data-i18n="cost.partialSubtotal" hidden
+              >Partial subtotal</span
+            >
           </div>
         </div>
         <div
@@ -2693,11 +2696,14 @@
         $set("active-sessions", "textContent", stats.activeCount || 0);
         $set("input-tokens", "textContent", stats.input || "0");
         $set("output-tokens", "textContent", stats.output || "0");
-        $set("est-cost", "textContent", stats.estCost || "N/A");
+        const partialCost = stats.costStatus === "partial" && stats.recordedCost != null;
+        const displayCost = partialCost ? `${stats.recordedCost}*` : stats.estCost || "N/A";
+        $set("est-cost", "textContent", displayCost);
+        document.getElementById("cost-coverage-label").hidden = !partialCost;
         $set("cost-period-label", "textContent", stats.costPeriod || "Unavailable");
         $set("cost-provisional-label", "textContent", stats.costRefreshing ? "(provisional)" : "");
         $set("nav-tokens", "textContent", stats.total || "0");
-        $set("nav-cost", "textContent", stats.estCost || "$0.00");
+        $set("nav-cost", "textContent", displayCost);
         $set("nav-monthly-cost", "textContent", stats.estMonthlyCost || "-");
         $set("nav-avg-tokens", "textContent", stats.avgTokensPerSession || "-");
         $set("nav-avg-cost", "textContent", stats.avgCostPerSession || "-");
@@ -3299,9 +3305,7 @@
           $set("input-tokens", "textContent", data.tokenStats.input);
           $set("output-tokens", "textContent", data.tokenStats.output);
           $set("active-sessions", "textContent", data.tokenStats.activeCount);
-          $set("est-cost", "textContent", data.tokenStats.estCost);
           $set("nav-tokens", "textContent", data.tokenStats.total);
-          $set("nav-cost", "textContent", data.tokenStats.estCost);
           $set("nav-monthly-cost", "textContent", data.tokenStats.estMonthlyCost || "-");
           $set("nav-avg-tokens", "textContent", data.tokenStats.avgTokensPerSession || "-");
           $set("nav-avg-cost", "textContent", data.tokenStats.avgCostPerSession || "-");
@@ -4335,7 +4339,16 @@
         document.getElementById("cost-rates").innerHTML =
           `<p>${escapeHtml(data.pricingBasis || "Pricing unavailable")}</p><p>No single rate is applied across different models.</p>`;
         const calc = data.calculation || {};
+        const costText = (key, fallback) => window.I18N?.t(key, {}, fallback) || fallback;
         document.getElementById("cost-calculation").innerHTML =
+          row(
+            costText("cost.recordedSubtotal", "Recorded API-equivalent subtotal"),
+            money(data.recordedCost),
+          ) +
+          row(
+            costText("cost.missingEntries", "Entries without pricing"),
+            count(data.missingCostEntries),
+          ) +
           row("Input cost", money(calc.inputCost)) +
           row("Output cost", money(calc.outputCost)) +
           row("Cache read cost", money(calc.cacheReadCost)) +
