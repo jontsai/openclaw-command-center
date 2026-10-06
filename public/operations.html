@@ -11,6 +11,8 @@
     <script src="js/sidebar.js" defer></script>
     <script src="js/operations-model.js" defer></script>
     <script src="js/operations.js" defer></script>
+    <script src="js/operations-atlas-model.js" defer></script>
+    <script src="js/operations-atlas.js" defer></script>
   </head>
   <body>
     <div id="sidebar-container"></div>
@@ -26,63 +28,147 @@
             Refresh snapshot
           </button>
         </header>
-        <p data-i18n="operations.intro">
-          One work graph. Different lenses. See the outcome, the roles, and the runs behind it.
-        </p>
-        <p id="op-status" role="status"></p>
-        <div class="op-controls">
-          <label
-            ><span data-i18n="operations.lens">View by</span
-            ><select id="op-lens">
-              <option value="outcome" data-i18n="operations.outcome">Outcome / epic</option>
-              <option value="role" data-i18n="operations.role">Role</option>
-              <option value="agent" data-i18n="operations.agent">Agent</option>
-              <option value="topic" data-i18n="operations.topic">Topic</option>
-            </select></label
-          ><label
-            ><span data-i18n="operations.search">Find work</span
-            ><input id="op-search" type="search" maxlength="200" /></label
-          ><label class="op-check"
-            ><input id="op-inferred" type="checkbox" /><span data-i18n="operations.inferredToggle"
-              >Preview inferred associations</span
-            ></label
+        <nav class="op-tabs" aria-label="Operations views" data-i18n-aria-label="atlas.views">
+          <button
+            id="atlas-tab"
+            class="btn-secondary"
+            aria-pressed="true"
+            data-i18n="atlas.sessions"
           >
-        </div>
-        <p id="op-summary"></p>
-        <p id="op-inference-notice" hidden data-i18n="operations.inferenceNotice">
-          Preview includes unconfirmed associations. Counts may change; this does not accept or save
-          suggestions.
-        </p>
-        <div class="op-layout">
-          <section>
-            <h2 data-i18n="operations.clusters">Work clusters</h2>
-            <div id="op-clusters"></div>
+            Session atlas
+          </button>
+          <button id="work-tab" class="btn-secondary" aria-pressed="false" data-i18n="atlas.work">
+            Work relationships
+          </button>
+        </nav>
+        <section id="atlas-view">
+          <p data-i18n="atlas.intro">
+            Start with everything visible in this runtime. Open a stack, regroup, and zoom into the
+            work. Search is optional.
+          </p>
+          <p id="atlas-status" role="status"></p>
+          <div class="op-controls">
+            <label
+              ><span data-i18n="operations.search">Find work</span
+              ><input id="atlas-search" type="search" maxlength="200"
+            /></label>
+            <label
+              ><span data-i18n="atlas.sort">Order</span
+              ><select id="atlas-sort">
+                <option value="recent" data-i18n="atlas.recency">Recent activity</option>
+                <option value="tokens" data-i18n="atlas.tokens">Lifetime tokens</option>
+              </select></label
+            >
+            <label
+              ><span data-i18n="atlas.zoom">Zoom / card detail</span
+              ><input id="atlas-zoom" type="range" min="1" max="3" value="2"
+            /></label>
+            <label class="op-check"
+              ><input id="atlas-inferred" type="checkbox" /><span
+                data-i18n="operations.inferredToggle"
+                >Preview inferred associations</span
+              ></label
+            >
+          </div>
+          <div
+            class="op-tabs"
+            id="atlas-lenses"
+            aria-label="Group sessions"
+            data-i18n-aria-label="atlas.groupLabel"
+          ></div>
+          <div
+            class="op-tabs"
+            id="atlas-filters"
+            aria-label="Activity filters"
+            data-i18n-aria-label="atlas.filterLabel"
+          ></div>
+          <nav
+            id="atlas-trail"
+            class="op-tabs"
+            aria-label="Filter path"
+            data-i18n-aria-label="atlas.pathLabel"
+          ></nav>
+          <p id="atlas-summary"></p>
+          <p id="atlas-graph-status"></p>
+          <div class="atlas-layout">
+            <section
+              id="atlas-board"
+              aria-label="Session stacks"
+              data-i18n-aria-label="atlas.boardLabel"
+            ></section>
+            <aside class="op-panel atlas-inspector">
+              <h2 data-i18n="operations.inspect">Evidence inspector</h2>
+              <div id="atlas-inspector"></div>
+            </aside>
+          </div>
+          <button id="atlas-more" class="btn-secondary" hidden data-i18n="atlas.more">
+            Show more
+          </button>
+          <p data-i18n="atlas.limit">
+            Catalog snapshot for this runtime, not the whole fleet. Activity is not task completion.
+            Token counts are lifetime totals, not burn rates. Unknown relationships remain
+            unassigned.
+          </p>
+        </section>
+        <section id="work-view" hidden>
+          <p data-i18n="operations.intro">
+            One work graph. Different lenses. See the outcome, the roles, and the runs behind it.
+          </p>
+          <p id="op-status" role="status"></p>
+          <div class="op-controls">
+            <label
+              ><span data-i18n="operations.lens">View by</span
+              ><select id="op-lens">
+                <option value="outcome" data-i18n="operations.outcome">Outcome / epic</option>
+                <option value="role" data-i18n="operations.role">Role</option>
+                <option value="agent" data-i18n="operations.agent">Agent</option>
+                <option value="topic" data-i18n="operations.topic">Topic</option>
+              </select></label
+            ><label
+              ><span data-i18n="operations.search">Find work</span
+              ><input id="op-search" type="search" maxlength="200" /></label
+            ><label class="op-check"
+              ><input id="op-inferred" type="checkbox" /><span data-i18n="operations.inferredToggle"
+                >Preview inferred associations</span
+              ></label
+            >
+          </div>
+          <p id="op-summary"></p>
+          <p id="op-inference-notice" hidden data-i18n="operations.inferenceNotice">
+            Preview includes unconfirmed associations. Counts may change; this does not accept or
+            save suggestions.
+          </p>
+          <div class="op-layout">
+            <section>
+              <h2 data-i18n="operations.clusters">Work clusters</h2>
+              <div id="op-clusters"></div>
+            </section>
+            <section class="op-panel">
+              <h2 data-i18n="operations.inspect">Evidence inspector</h2>
+              <div id="op-inspector"></div>
+            </section>
+          </div>
+          <section class="op-panel">
+            <h2 data-i18n="operations.connections">Selected cluster: tasks → runs</h2>
+            <p data-i18n="operations.legend">
+              Solid = observed link · Dashed = inferred link · Gray = unknown. Select a node for
+              evidence. At most 40 nodes shown.
+            </p>
+            <div id="op-graph"></div>
           </section>
           <section class="op-panel">
-            <h2 data-i18n="operations.inspect">Evidence inspector</h2>
-            <div id="op-inspector"></div>
+            <h2 data-i18n="operations.heatmap">Agent × role heatmap</h2>
+            <p data-i18n="operations.heatmapHelp">
+              Distinct linked runs in this snapshot, not utilization or productivity. A run can have
+              multiple roles; do not sum columns.
+            </p>
+            <div id="op-heatmap"></div>
           </section>
-        </div>
-        <section class="op-panel">
-          <h2 data-i18n="operations.connections">Selected cluster: tasks → runs</h2>
-          <p data-i18n="operations.legend">
-            Solid = observed link · Dashed = inferred link · Gray = unknown. Select a node for
-            evidence. At most 40 nodes shown.
+          <p data-i18n="operations.limit">
+            Manual-refresh snapshots. Tracker “Done” is reported status, not verified acceptance.
+            Weighted progress, schedule variance, ETA and live token rates are unavailable.
           </p>
-          <div id="op-graph"></div>
         </section>
-        <section class="op-panel">
-          <h2 data-i18n="operations.heatmap">Agent × role heatmap</h2>
-          <p data-i18n="operations.heatmapHelp">
-            Distinct linked runs in this snapshot, not utilization or productivity. A run can have
-            multiple roles; do not sum columns.
-          </p>
-          <div id="op-heatmap"></div>
-        </section>
-        <p data-i18n="operations.limit">
-          Manual-refresh snapshots. Tracker “Done” is reported status, not verified acceptance.
-          Weighted progress, schedule variance, ETA and live token rates are unavailable.
-        </p>
       </main>
     </div>
   </body>

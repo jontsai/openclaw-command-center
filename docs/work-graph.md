@@ -66,3 +66,32 @@ of their associated sessions is hidden.
 
 `tests/fixtures/work-graph.json` is fully synthetic. Its old timestamps intentionally
 show stale data; do not replace it with real workspace exports or screenshots.
+
+## Browse-first session atlas
+
+Operations now opens on **All sessions**, loaded from the same cached native
+catalog as System Vitals. It does not need a tracker export or a known search term.
+Group chips build channel, agent, activity-window, outcome, role or topic stacks.
+Open a stack, regroup the subset, and use breadcrumbs/Back/Everything to navigate.
+Zoom changes card density/detail; this is a browseable atlas, not a free-pan canvas
+or automatic semantic-clustering engine. The existing work graph remains available
+under **Work relationships**.
+
+The catalog request loads at most 5,000 sessions and 8 MiB; the view reports loaded,
+source-total, privacy-visible and filtered counts separately. Cards and stacks are
+rendered in batches of 60 with Show more. Nothing outside the displayed coverage is
+claimed to be searched. Catalog observation time is distinct from tracker freshness.
+Refresh reuses the cached native catalog; it does not synchronously rescan transcripts.
+
+Outcome/role/topic associations require exact run `sessionKey` matches to the
+validated work graph. Titles never create bindings. Sessions without bindings stay
+in **Unassigned**, and inference is opt-in and unsaved. Token fields remain unknown
+when absent and are labeled lifetime totals. Activity and tokens are not completion.
+The summary fetch is on demand, relative to the dashboard path, bounded and abortable;
+a failed detail request does not clear the session metadata.
+
+No additional SSE connection, tracker sync or auto-refresh schedule is introduced.
+Privacy settings load before catalogs; a privacy error clears both views. Hidden
+sessions are omitted before all grouping/filtering/inspection. See the
+[source-build pilot guide](operations-source-pilot.md) for isolated testing without
+a registry release.

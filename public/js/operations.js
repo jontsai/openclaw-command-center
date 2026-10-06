@@ -138,7 +138,6 @@
     root.append(table);
   }
   function render() {
-    $("refresh").disabled = busy;
     $("status").textContent = busy
       ? t("loading")
       : failed
@@ -196,67 +195,18 @@
     draw(group, view);
     heatmap(view);
   }
-  async function read(url, signal) {
-    const r = await fetch(url, { signal, cache: "no-store" });
-    if (!r.ok) throw Error();
-    const reader = r.body.getReader(),
-      chunks = [];
-    let bytes = 0;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      bytes += value.length;
-      if (bytes > 2097152) {
-        await reader.cancel();
-        throw Error();
-      }
-      chunks.push(value);
-    }
-    const b = new Uint8Array(bytes);
-    let p = 0;
-    for (const c of chunks) {
-      b.set(c, p);
-      p += c.length;
-    }
-    return JSON.parse(new TextDecoder().decode(b));
-  }
-  async function refresh() {
-    if (busy) return;
-    busy = true;
-    render();
-    const controller = new AbortController(),
-      timer = setTimeout(() => controller.abort(), 12000);
-    try {
-      const settings = await read("api/privacy", controller.signal);
-      if (!Array.isArray(settings.hiddenSessions)) throw Error();
-      privacy = settings.hiddenSessions;
-      const data = await read("api/work-graph", controller.signal);
-      if (
-        !Array.isArray(data.nodes) ||
-        !Array.isArray(data.edges) ||
-        !Array.isArray(data.sources) ||
-        data.nodes.length > 2000 ||
-        data.edges.length > 5000
-      )
-        throw Error();
-      graph = data;
-      failed = false;
-    } catch {
-      graph = { nodes: [], edges: [], sources: [], status: "unavailable" };
-      failed = true;
-    } finally {
-      clearTimeout(timer);
-      busy = false;
-      render();
-    }
-  }
   function init() {
     $("menu").onclick = () => document.getElementById("sidebar")?.classList.toggle("visible");
     for (const id of ["lens", "inferred"]) $(id).onchange = render;
     $("search").oninput = render;
-    $("refresh").onclick = refresh;
+    window.addEventListener("operations:snapshot", (event) => {
+      graph = event.detail.graph;
+      privacy = event.detail.privacy;
+      failed = event.detail.failed;
+      render();
+    });
     window.addEventListener("i18n:updated", render);
-    refresh();
+    render();
   }
   if (document.readyState === "loading")
     document.addEventListener("DOMContentLoaded", init, { once: true });
