@@ -20,6 +20,21 @@ English | [简体中文](README.zh-CN.md)
 
 ## Standalone monitoring, recommended companion
 
+### Human-readable costs and channels
+
+Click **Est. API Cost** to enter a monthly spend baseline for the savings scenario.
+The baseline is stored only in this browser and dashboard path; no plan price is
+assumed. The selected calendar-day average is projected to 30 days and compared
+with your baseline. Include subscription and API spending for the same scope.
+Incomplete pricing stays marked partial, and negative differences are displayed.
+This is a what-if comparison, not realized savings or a billing forecast.
+
+Channel names come from OpenClaw's native directory, cached per provider/account
+for five minutes. Channel IDs remain in session-title and cost-breakdown tooltips.
+Unknown channels have an explicit generic label; stale cached names retain their
+status in the tooltip. No workspace-specific channel map or provider credentials
+are embedded in the dashboard. Directory reads are bounded and asynchronous.
+
 Cron Jobs lists OpenClaw automations through its read-only CLI API, cached for
 30 seconds. Loading, partial and stale catalogs are labeled; missing legacy JSON
 files no longer imply zero automations. AI Jobs is a separate optional provider:

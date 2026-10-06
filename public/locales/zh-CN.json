@@ -39,7 +39,7 @@
     "output": "输出",
     "active15m": "活跃（15分钟）",
     "estCost24h": "预估成本（24小时）📊",
-    "estMonthlySavings": "预估月节省",
+    "estMonthlySavings": "估算每月节省（情景）",
     "main": "主会话",
     "subagents": "子代理",
     "estApiCost": "估算 API 费用"
@@ -544,6 +544,13 @@
     "statusRunning": "运行中"
   },
   "cost": {
+    "todayWindow": "今天（UTC）",
+    "baselineLabel": "每月支出基准（美元）",
+    "scenarioHelp": "请输入与用量范围一致的订阅及 API 支出。此假设仅保存在当前浏览器，并非账单数据。估算＝已记录的日历日均值 × 30 减去支出基准；不代表实际节省。",
+    "scenarioUnavailable": "请设置支出基准，并等待用量数据以计算节省情景。",
+    "scenarioSummary": "{days} 天日历平均值 × 30：{projected}。基准：{baseline}。估算差额：{difference}/月。包含尚未结束的当天；不是账单预测。",
+    "scenarioPartial": "定价不完整：仅投影已记录的小计，不包含缺少价格的费用。",
+
     "partialSubtotal": "部分小计",
     "recordedSubtotal": "已记录的 API 等价费用小计",
     "missingEntries": "缺少定价的记录数",

@@ -3,41 +3,23 @@ const fs = require("fs");
 const path = require("path");
 const { detectTopics } = require("./topics");
 
-// Channel ID to name mapping (auto-populated from Slack)
-const CHANNEL_MAP = {
-  c0aax7y80np: "#cc-meta",
-  c0ab9f8sdfe: "#cc-research",
-  c0aan4rq7v5: "#cc-finance",
-  c0abxulk1qq: "#cc-properties",
-  c0ab5nz8mkl: "#cc-ai",
-  c0aan38tzv5: "#cc-dev",
-  c0ab7wwhqvc: "#cc-home",
-  c0ab1pjhxef: "#cc-health",
-  c0ab7txvcqd: "#cc-legal",
-  c0aay2g3n3r: "#cc-social",
-  c0aaxrw2wqp: "#cc-business",
-  c0ab19f3lae: "#cc-random",
-  c0ab0r74y33: "#cc-food",
-  c0ab0qrq3r9: "#cc-travel",
-  c0ab0sbqqlg: "#cc-family",
-  c0ab0slqdba: "#cc-games",
-  c0ab1ps7ef2: "#cc-music",
-  c0absbnrsbe: "#cc-dashboard",
-};
+const { createChannelDirectory } = require("./channel-directory");
+// Deprecated export retained for compatibility; names come from runtime metadata.
+const CHANNEL_MAP = {};
 
 // Parse session key into readable label
-function parseSessionLabel(key) {
+function parseSessionLabel(key, resolvedName = null) {
   // Pattern: agent:main:slack:channel:CHANNEL_ID:thread:TIMESTAMP
   // or: agent:main:slack:channel:CHANNEL_ID
   // or: agent:main:main (telegram main)
 
   const parts = key.split(":");
 
-  if (parts.includes("slack")) {
+  if (parts.includes("slack") || parts.includes("discord")) {
     const channelIdx = parts.indexOf("channel");
     if (channelIdx >= 0 && parts[channelIdx + 1]) {
-      const channelId = parts[channelIdx + 1].toLowerCase();
-      const channelName = CHANNEL_MAP[channelId] || `#${channelId}`;
+      const channelName =
+        resolvedName || (parts.includes("slack") ? "Slack channel" : "Discord channel");
 
       // Check if it's a thread
       if (parts.includes("thread")) {
@@ -76,6 +58,34 @@ function parseSessionLabel(key) {
  */
 function createSessionsModule(deps) {
   const { getOpenClawDir, getOperatorBySlackId, runOpenClaw, runOpenClawAsync, extractJSON } = deps;
+  const directory = deps.channelDirectory || createChannelDirectory({ run: runOpenClawAsync });
+  function channelIdentity(session) {
+    const parts = (session.key || "").split(":");
+    const provider = parts.includes("slack")
+      ? "slack"
+      : parts.includes("discord")
+        ? "discord"
+        : null;
+    const index = parts.indexOf("channel");
+    if (!provider || index < 0 || !parts[index + 1]) return null;
+    const id = parts[index + 1];
+    const account =
+      session.accountId || session.origin?.accountId || session.deliveryContext?.accountId || "";
+    const result = directory.lookup(provider, id, account);
+    const metadataName = session.groupChannel;
+    const readableMetadata =
+      typeof metadataName === "string" && !metadataName.toLowerCase().includes(id.toLowerCase())
+        ? metadataName
+        : null;
+    const name = result.name ? `#${result.name.replace(/^#/, "")}` : readableMetadata;
+    return {
+      channelId: id,
+      channelName: name,
+      channelNameStatus: result.name ? result.status : readableMetadata ? "metadata" : "unresolved",
+      channelAccount: account,
+      channelNameObservedAt: result.observedAt || null,
+    };
+  }
 
   // SESSION CACHE - Async refresh to avoid blocking
   let sessionsCache = { sessions: [], raw: [], timestamp: 0, refreshing: false };
@@ -339,7 +349,10 @@ function createSessionsModule(deps) {
 
     const metadata = getSessionMetadata(s.sessionId);
     const originator = metadata.originator;
-    const label = s.groupChannel || s.displayName || parseSessionLabel(s.key);
+    const identity = channelIdentity(s);
+    const label = identity
+      ? parseSessionLabel(s.key, identity.channelName)
+      : s.groupChannel || s.displayName || parseSessionLabel(s.key);
     const topic = metadata.topic;
 
     const totalTokens = s.totalTokens || 0;
@@ -350,7 +363,8 @@ function createSessionsModule(deps) {
       sessionKey: s.key,
       sessionId: s.sessionId,
       label: label,
-      groupChannel: s.groupChannel || null,
+      ...identity,
+      groupChannel: identity?.channelName || s.groupChannel || null,
       displayName: s.displayName || null,
       kind: s.kind,
       channel: channel,
@@ -418,7 +432,19 @@ function createSessionsModule(deps) {
       refreshSessionsCache();
     }
 
-    return sessionsCache.sessions;
+    // Refresh cheap display metadata without rescanning transcripts or waiting for
+    // the slower session catalog refresh after the directory becomes available.
+    return sessionsCache.sessions.map((session, index) => {
+      const identity = channelIdentity(sessionsCache.raw[index] || { key: session.sessionKey });
+      return identity
+        ? {
+            ...session,
+            ...identity,
+            label: parseSessionLabel(session.sessionKey, identity.channelName),
+            groupChannel: identity.channelName,
+          }
+        : session;
+    });
   }
 
   function getSessions(options = {}) {
@@ -633,26 +659,12 @@ function createSessionsModule(deps) {
               ? `${Math.round(ageMs / 3600000)} hours ago`
               : `${Math.round(ageMs / 86400000)} days ago`;
 
-      // Determine readable channel name
-      // Priority: groupChannel > displayName > parsed from key > fallback
-      let channelDisplay = "Other";
-      if (sessionInfo.groupChannel) {
-        channelDisplay = sessionInfo.groupChannel;
-      } else if (sessionInfo.displayName) {
-        channelDisplay = sessionInfo.displayName;
-      } else if (sessionKey.includes("slack")) {
-        // Try to parse channel name from key
-        const parts = sessionKey.split(":");
-        const channelIdx = parts.indexOf("channel");
-        if (channelIdx >= 0 && parts[channelIdx + 1]) {
-          const channelId = parts[channelIdx + 1].toLowerCase();
-          channelDisplay = CHANNEL_MAP[channelId] || `#${channelId}`;
-        } else {
-          channelDisplay = "Slack";
-        }
-      } else if (sessionKey.includes("telegram")) {
-        channelDisplay = "Telegram";
-      }
+      const identity = channelIdentity({ ...sessionInfo, key: sessionKey });
+      const channelDisplay =
+        identity?.channelName ||
+        (identity
+          ? parseSessionLabel(sessionKey)
+          : sessionInfo.groupChannel || sessionInfo.displayName || parseSessionLabel(sessionKey));
 
       // Use parsed totals or fallback to session info
       const finalTotalTokens = supplied.recent
@@ -675,7 +687,8 @@ function createSessionsModule(deps) {
         transcriptAvailable,
         kind: sessionInfo.kind,
         channel: channelDisplay,
-        groupChannel: sessionInfo.groupChannel || channelDisplay,
+        ...identity,
+        groupChannel: channelDisplay,
         model: modelDisplay,
         tokens: finalTotalTokens,
         inputTokens: finalInputTokens,
