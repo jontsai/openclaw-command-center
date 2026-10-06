@@ -1,0 +1,227 @@
+.operations {
+  padding: 24px;
+  max-width: 1800px;
+  width: 100%;
+  margin: auto;
+  min-width: 0;
+}
+.main-wrapper {
+  min-width: 0;
+}
+.operations header {
+  position: static;
+  padding: 18px;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-radius: 10px;
+}
+.operations h1 {
+  font-size: 1.7rem;
+}
+.operations small {
+  color: var(--green);
+  letter-spacing: 0.12em;
+}
+.operations p {
+  margin: 14px 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.op-controls {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.op-controls label {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  min-width: 0;
+}
+.op-controls input,
+.op-controls select {
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 8px;
+  border-radius: 6px;
+  max-width: 100%;
+}
+.op-controls .op-check {
+  flex-direction: row;
+  align-items: center;
+}
+.op-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: 20px;
+  margin: 20px 0;
+}
+.operations h2 {
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+#op-clusters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  max-height: 65vh;
+  overflow: auto;
+}
+.op-cluster {
+  cursor: pointer;
+  text-align: left;
+  padding: 18px;
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font: inherit;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.op-cluster[aria-pressed="true"] {
+  border-color: var(--green);
+  box-shadow: inset 3px 0 var(--green);
+}
+.op-cluster strong {
+  display: block;
+  margin: 4px 0 12px;
+}
+.op-cluster span {
+  display: block;
+  line-height: 1.8;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+.op-panel {
+  padding: 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 18px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#op-inspector {
+  max-height: 65vh;
+  overflow: auto;
+}
+#op-inspector button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+#op-inspector details {
+  margin: 12px 0;
+}
+#op-inspector code {
+  display: block;
+  word-break: break-all;
+}
+#op-graph {
+  overflow: auto;
+  max-height: 65vh;
+}
+#op-graph svg {
+  width: 100%;
+  min-width: 650px;
+  display: block;
+}
+#op-graph text {
+  fill: var(--text);
+  font: 12px sans-serif;
+  pointer-events: none;
+}
+#op-graph rect {
+  fill: var(--bg);
+  stroke: var(--border);
+  stroke-width: 2;
+}
+#op-graph [data-state="done"] rect {
+  stroke: var(--green);
+}
+#op-graph [data-state="doing"] rect,
+#op-graph [data-state="active"] rect {
+  stroke: var(--accent);
+}
+#op-graph [data-state="review"] rect,
+#op-graph [data-state="waiting"] rect {
+  stroke: var(--yellow);
+}
+#op-graph line {
+  stroke: var(--text-muted);
+  stroke-width: 1.5;
+}
+#op-graph [data-basis="inferred"] {
+  stroke-dasharray: 6 4;
+}
+#op-graph g[role="button"] {
+  cursor: pointer;
+}
+#op-graph g:focus rect {
+  stroke: var(--accent);
+  stroke-width: 4;
+}
+#op-heatmap {
+  overflow: auto;
+  max-height: 45vh;
+}
+#op-heatmap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+#op-heatmap th,
+#op-heatmap td {
+  padding: 10px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+#op-heatmap td[data-hot="true"] {
+  background: rgba(63, 185, 80, 0.3);
+}
+#op-inference-notice {
+  color: var(--yellow);
+}
+.operations :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (max-width: 750px) {
+  .operations {
+    padding: 12px;
+  }
+  .op-layout {
+    grid-template-columns: 1fr;
+  }
+  #op-clusters {
+    grid-template-columns: 1fr;
+    max-height: 45vh;
+  }
+  .operations h1 {
+    font-size: 1.3rem;
+  }
+}
+
+#op-menu {
+  display: none;
+}
+@media (max-width: 750px) {
+  #op-menu {
+    display: inline-block;
+    margin-bottom: 12px;
+    padding: 8px;
+    color: var(--text);
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+}

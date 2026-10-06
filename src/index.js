@@ -89,6 +89,7 @@ const { migrateDataDir } = require("./data");
 const { createStateModule } = require("./state");
 const { createExtensionHost } = require("./extensions");
 const { createProjectHost } = require("./projects");
+const { createWorkGraphHost } = require("./work-graph");
 const { createIntelModule } = require("./intel");
 const { createPipelineModule } = require("./pipeline");
 const { createMonetizationModule } = require("./monetization");
@@ -153,6 +154,12 @@ const extensionHost = createExtensionHost({
 // Optional project snapshots are read only on the portfolio request path.
 // Tracker network requests never run inside core monitoring or the UI request.
 const projectHost = createProjectHost({
+  workspace: PATHS.workspace,
+  profile: process.env.OPENCLAW_PROFILE || "",
+  agentId: process.env.OPENCLAW_AGENT || "main",
+});
+
+const workGraphHost = createWorkGraphHost({
   workspace: PATHS.workspace,
   profile: process.env.OPENCLAW_PROFILE || "",
   agentId: process.env.OPENCLAW_AGENT || "main",
@@ -323,6 +330,15 @@ const server = http.createServer(async (req, res) => {
 
   if (pathname === "/api/status") {
     handleApi(req, res);
+  } else if (pathname === "/api/work-graph") {
+    if (req.method !== "GET") {
+      res.writeHead(405, { Allow: "GET" });
+      res.end();
+      return;
+    }
+    const graph = await workGraphHost.refresh();
+    res.writeHead(200, { "Content-Type": "application/json", "Cache-Control": "no-store" });
+    res.end(JSON.stringify(graph));
   } else if (pathname === "/api/projects") {
     if (req.method !== "GET") {
       res.writeHead(405, { "Content-Type": "application/json", Allow: "GET" });

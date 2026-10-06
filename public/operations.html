@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="operations.title">Operations map</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/operations.css" />
+    <script src="js/i18n.js" defer></script>
+    <script src="js/state-stream.js" defer></script>
+    <script src="js/sidebar.js" defer></script>
+    <script src="js/operations-model.js" defer></script>
+    <script src="js/operations.js" defer></script>
+  </head>
+  <body>
+    <div id="sidebar-container"></div>
+    <div id="main-wrapper" class="main-wrapper">
+      <main class="operations">
+        <button class="mobile-menu-btn" id="op-menu" aria-label="Toggle navigation">☰</button>
+        <header>
+          <div>
+            <small data-i18n="operations.kicker">OUTCOMES · PEOPLE · EVIDENCE</small>
+            <h1 data-i18n="operations.title">Operations map</h1>
+          </div>
+          <button class="btn-secondary" id="op-refresh" data-i18n="operations.refresh">
+            Refresh snapshot
+          </button>
+        </header>
+        <p data-i18n="operations.intro">
+          One work graph. Different lenses. See the outcome, the roles, and the runs behind it.
+        </p>
+        <p id="op-status" role="status"></p>
+        <div class="op-controls">
+          <label
+            ><span data-i18n="operations.lens">View by</span
+            ><select id="op-lens">
+              <option value="outcome" data-i18n="operations.outcome">Outcome / epic</option>
+              <option value="role" data-i18n="operations.role">Role</option>
+              <option value="agent" data-i18n="operations.agent">Agent</option>
+              <option value="topic" data-i18n="operations.topic">Topic</option>
+            </select></label
+          ><label
+            ><span data-i18n="operations.search">Find work</span
+            ><input id="op-search" type="search" maxlength="200" /></label
+          ><label class="op-check"
+            ><input id="op-inferred" type="checkbox" /><span data-i18n="operations.inferredToggle"
+              >Preview inferred associations</span
+            ></label
+          >
+        </div>
+        <p id="op-summary"></p>
+        <p id="op-inference-notice" hidden data-i18n="operations.inferenceNotice">
+          Preview includes unconfirmed associations. Counts may change; this does not accept or save
+          suggestions.
+        </p>
+        <div class="op-layout">
+          <section>
+            <h2 data-i18n="operations.clusters">Work clusters</h2>
+            <div id="op-clusters"></div>
+          </section>
+          <section class="op-panel">
+            <h2 data-i18n="operations.inspect">Evidence inspector</h2>
+            <div id="op-inspector"></div>
+          </section>
+        </div>
+        <section class="op-panel">
+          <h2 data-i18n="operations.connections">Selected cluster: tasks → runs</h2>
+          <p data-i18n="operations.legend">
+            Solid = observed link · Dashed = inferred link · Gray = unknown. Select a node for
+            evidence. At most 40 nodes shown.
+          </p>
+          <div id="op-graph"></div>
+        </section>
+        <section class="op-panel">
+          <h2 data-i18n="operations.heatmap">Agent × role heatmap</h2>
+          <p data-i18n="operations.heatmapHelp">
+            Distinct linked runs in this snapshot, not utilization or productivity. A run can have
+            multiple roles; do not sum columns.
+          </p>
+          <div id="op-heatmap"></div>
+        </section>
+        <p data-i18n="operations.limit">
+          Manual-refresh snapshots. Tracker “Done” is reported status, not verified acceptance.
+          Weighted progress, schedule variance, ETA and live token rates are unavailable.
+        </p>
+      </main>
+    </div>
+  </body>
+</html>

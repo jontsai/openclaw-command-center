@@ -416,4 +416,4 @@ function createProjectHost({
   }
   return { getState, refresh };
 }
-module.exports = { createProjectHost, validateProjectSnapshot, LIMITS, STALE_MS };
+module.exports = { createProjectHost, validateProjectSnapshot, readBoundedJson, LIMITS, STALE_MS };
