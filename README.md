@@ -449,3 +449,9 @@ Linear/Jira adapters; Command Center supplies the unified view without depending
 on a tracker. Native statuses, source freshness and missing metrics stay visible.
 This slice consumes snapshots, not a live tracker connection configured at install.
 No tasks are moved and no external tracker records are changed.
+
+## Session explorer
+
+Open **Session explorer** in the sidebar to search session names, agents, models or IDs; combine platform, kind, activity and agent filters; group by channel, agent, platform, kind or last-activity window. Channel groups use provider/account/ID identity, never names alone. The inspector keeps technical identifiers collapsed.
+
+This read-only view loads at most 1,000 sessions from the existing cached API and shows coverage and fetch time. Filters operate across that snapshot, not just the dashboard’s current page; they do not search transcripts or every fleet instance. Existing hidden-session settings apply before search and grouping. A failed privacy or session fetch clears the view until a successful refresh. No automatic refresh, topic inference, graph edges, or task-completion claims. Token sorting is lifetime usage, not reporting-window cost.
