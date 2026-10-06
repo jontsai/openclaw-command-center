@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="explorer.title">Session explorer</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/session-explorer.css" />
+    <script src="js/i18n.js" defer></script>
+    <script src="js/state-stream.js" defer></script>
+    <script src="js/sidebar.js" defer></script>
+    <script src="js/session-explorer-model.js" defer></script>
+    <script src="js/session-explorer.js" defer></script>
+  </head>
+  <body>
+    <div id="sidebar-container"></div>
+    <div class="main-wrapper" id="main-wrapper">
+      <main class="explorer">
+        <header class="explorer-heading">
+          <div>
+            <p class="explorer-kicker" data-i18n="explorer.kicker">OBSERVE · FILTER · CONNECT</p>
+            <h1 data-i18n="explorer.title">Session explorer</h1>
+          </div>
+          <div class="explorer-actions">
+            <button
+              id="explorer-menu"
+              class="btn-secondary"
+              aria-controls="sidebar"
+              aria-expanded="false"
+              data-i18n="explorer.menu"
+            >
+              Menu</button
+            ><button id="explorer-refresh" class="btn-secondary" data-i18n="explorer.refresh">
+              Refresh snapshot
+            </button>
+          </div>
+        </header>
+        <p class="explorer-intro" data-i18n="explorer.intro">
+          Find the work behind the activity. Group sessions by what we know—not what we guess.
+        </p>
+        <p id="explorer-health" role="status" aria-live="polite"></p>
+        <form id="explorer-filters" class="explorer-filters">
+          <label class="explorer-search"
+            ><span data-i18n="explorer.search">Search names, agents, models or IDs</span
+            ><input id="explorer-query" type="search" maxlength="200" autocomplete="off"
+          /></label>
+          <label
+            ><span data-i18n="explorer.groupBy">Group by</span
+            ><select id="explorer-group"></select
+          ></label>
+          <label
+            ><span data-i18n="explorer.sort">Sort sessions</span
+            ><select id="explorer-sort"></select
+          ></label>
+          <label
+            ><span data-i18n="explorer.platform">Platform</span
+            ><select id="explorer-platform"></select
+          ></label>
+          <label
+            ><span data-i18n="explorer.kind">Kind</span
+            ><select id="explorer-kind"></select
+          ></label>
+          <label
+            ><span data-i18n="explorer.status">Activity status</span
+            ><select id="explorer-status"></select
+          ></label>
+          <label
+            ><span data-i18n="explorer.agent">Agent</span
+            ><select id="explorer-agent"></select
+          ></label>
+          <label
+            ><span data-i18n="explorer.activity">Last activity</span
+            ><select id="explorer-activity"></select
+          ></label>
+          <button
+            id="explorer-clear"
+            type="button"
+            class="btn-secondary"
+            data-i18n="explorer.clear"
+          >
+            Clear filters
+          </button>
+        </form>
+        <p id="explorer-count" aria-live="polite"></p>
+        <div class="explorer-layout">
+          <section class="explorer-panel">
+            <h2 data-i18n="explorer.groups">Groups</h2>
+            <div id="explorer-groups"></div>
+          </section>
+          <section class="explorer-panel">
+            <h2 data-i18n="explorer.sessions">Sessions</h2>
+            <div id="explorer-sessions"></div>
+            <button id="explorer-more" class="btn-secondary" hidden data-i18n="explorer.more">
+              Show 50 more
+            </button>
+          </section>
+          <section class="explorer-panel explorer-inspector">
+            <h2 data-i18n="explorer.inspect">Inspector</h2>
+            <div id="explorer-inspector"></div>
+          </section>
+        </div>
+        <p class="explorer-footnote" data-i18n="explorer.boundary">
+          Shared channel membership is not a dependency or a parent/child relationship. Topic
+          inference and graph edges are not part of this view.
+        </p>
+      </main>
+    </div>
+  </body>
+</html>
