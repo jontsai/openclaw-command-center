@@ -449,3 +449,7 @@ Linear/Jira adapters; Command Center supplies the unified view without depending
 on a tracker. Native statuses, source freshness and missing metrics stay visible.
 This slice consumes snapshots, not a live tracker connection configured at install.
 No tasks are moved and no external tracker records are changed.
+
+### Operations map (read-only snapshot)
+
+Explore outcomes, roles, agents, and topics with evidence-labeled relationships in `operations.html`. See [the work graph contract](docs/work-graph.md) for collectors, limitations, and privacy behavior.

@@ -1,0 +1,497 @@
+{
+  "schemaVersion": 1,
+  "profile": "",
+  "agentId": "main",
+  "observedAt": "2026-01-01T12:00:00.000Z",
+  "sources": [
+    {
+      "id": "demo-linear",
+      "provider": "linear",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "complete": true
+    },
+    {
+      "id": "demo-jira",
+      "provider": "jira",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "complete": false
+    }
+  ],
+  "nodes": [
+    {
+      "id": "demo-linear:outcome:checkout",
+      "sourceId": "demo-linear",
+      "kind": "outcome",
+      "title": "Checkout upgrade",
+      "state": "doing",
+      "nativeStatus": "In progress",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "checkout"
+    },
+    {
+      "id": "demo-linear:task:1",
+      "sourceId": "demo-linear",
+      "kind": "task",
+      "title": "Frontend checkout component",
+      "state": "done",
+      "nativeStatus": "completed",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "1",
+      "identifier": "DEMO-1"
+    },
+    {
+      "id": "demo-linear:task:2",
+      "sourceId": "demo-linear",
+      "kind": "task",
+      "title": "Backend payment endpoint",
+      "state": "doing",
+      "nativeStatus": "started",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "2",
+      "identifier": "DEMO-2"
+    },
+    {
+      "id": "demo-linear:task:3",
+      "sourceId": "demo-linear",
+      "kind": "task",
+      "title": "Regression testing",
+      "state": "review",
+      "nativeStatus": "review",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "3",
+      "identifier": "DEMO-3"
+    },
+    {
+      "id": "demo-jira:outcome:10",
+      "sourceId": "demo-jira",
+      "kind": "outcome",
+      "title": "Service rollout",
+      "state": "doing",
+      "nativeStatus": "In progress",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "10",
+      "identifier": "OPS-10"
+    },
+    {
+      "id": "demo-jira:task:1",
+      "sourceId": "demo-jira",
+      "kind": "task",
+      "title": "Deploy service infrastructure",
+      "state": "doing",
+      "nativeStatus": "In progress",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "1",
+      "identifier": "OPS-1"
+    },
+    {
+      "id": "demo-jira:task:2",
+      "sourceId": "demo-jira",
+      "kind": "task",
+      "title": "Service verification",
+      "state": "unknown",
+      "nativeStatus": "Custom review",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "nativeId": "2",
+      "identifier": "OPS-2"
+    },
+    {
+      "id": "shared:role:frontend",
+      "sourceId": "shared",
+      "kind": "role",
+      "title": "frontend",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-linear:topic:checkout",
+      "sourceId": "demo-linear",
+      "kind": "topic",
+      "title": "checkout",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "shared:role:backend",
+      "sourceId": "shared",
+      "kind": "role",
+      "title": "backend",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "shared:role:qa",
+      "sourceId": "shared",
+      "kind": "role",
+      "title": "qa",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "shared:role:infra",
+      "sourceId": "shared",
+      "kind": "role",
+      "title": "infra",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-jira:topic:reliability",
+      "sourceId": "demo-jira",
+      "kind": "topic",
+      "title": "reliability",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-linear:run:run-0",
+      "sourceId": "demo-linear",
+      "kind": "run",
+      "title": "Build checkout UI",
+      "state": "active",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "sessionKey": "agent:demo:run:0",
+      "agent": "Builder"
+    },
+    {
+      "id": "shared:agent:Builder",
+      "sourceId": "shared",
+      "kind": "agent",
+      "title": "Builder",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-linear:run:run-1",
+      "sourceId": "demo-linear",
+      "kind": "run",
+      "title": "Implement payment endpoint",
+      "state": "active",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "sessionKey": "agent:demo:run:1",
+      "agent": "Engineer"
+    },
+    {
+      "id": "shared:agent:Engineer",
+      "sourceId": "shared",
+      "kind": "agent",
+      "title": "Engineer",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-linear:run:run-2",
+      "sourceId": "demo-linear",
+      "kind": "run",
+      "title": "Check purchase flow",
+      "state": "active",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "sessionKey": "agent:demo:run:2",
+      "agent": "Verifier"
+    },
+    {
+      "id": "shared:agent:Verifier",
+      "sourceId": "shared",
+      "kind": "agent",
+      "title": "Verifier",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-jira:run:run-3",
+      "sourceId": "demo-jira",
+      "kind": "run",
+      "title": "Prepare rollout",
+      "state": "active",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "sessionKey": "agent:demo:run:3",
+      "agent": "Operator"
+    },
+    {
+      "id": "shared:agent:Operator",
+      "sourceId": "shared",
+      "kind": "agent",
+      "title": "Operator",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    },
+    {
+      "id": "demo-jira:run:run-4",
+      "sourceId": "demo-jira",
+      "kind": "run",
+      "title": "Waiting for rollout",
+      "state": "waiting",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "sessionKey": "agent:demo:run:4",
+      "agent": "Verifier"
+    },
+    {
+      "id": "demo-linear:run:unlinked",
+      "sourceId": "demo-linear",
+      "kind": "run",
+      "title": "Design review",
+      "state": "active",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z",
+      "sessionKey": "agent:demo:run:unlinked",
+      "agent": "Architect"
+    },
+    {
+      "id": "shared:agent:Architect",
+      "sourceId": "shared",
+      "kind": "agent",
+      "title": "Architect",
+      "state": "unknown",
+      "nativeStatus": "",
+      "observedAt": "2026-01-01T12:00:00.000Z"
+    }
+  ],
+  "edges": [
+    {
+      "from": "demo-linear:outcome:checkout",
+      "to": "demo-linear:task:1",
+      "relation": "contains",
+      "basis": "observed",
+      "evidence": "Provider project reference"
+    },
+    {
+      "from": "demo-linear:task:1",
+      "to": "shared:role:frontend",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit role label"
+    },
+    {
+      "from": "demo-linear:task:1",
+      "to": "demo-linear:topic:checkout",
+      "relation": "topic",
+      "basis": "observed",
+      "evidence": "Explicit topic label"
+    },
+    {
+      "from": "demo-linear:outcome:checkout",
+      "to": "demo-linear:task:2",
+      "relation": "contains",
+      "basis": "observed",
+      "evidence": "Provider project reference"
+    },
+    {
+      "from": "demo-linear:task:2",
+      "to": "demo-linear:topic:checkout",
+      "relation": "topic",
+      "basis": "observed",
+      "evidence": "Explicit topic label"
+    },
+    {
+      "from": "demo-linear:task:2",
+      "to": "shared:role:backend",
+      "relation": "role",
+      "basis": "inferred",
+      "evidence": "Role cue in title: Backend payment endpoint"
+    },
+    {
+      "from": "demo-linear:outcome:checkout",
+      "to": "demo-linear:task:3",
+      "relation": "contains",
+      "basis": "observed",
+      "evidence": "Provider project reference"
+    },
+    {
+      "from": "demo-linear:task:3",
+      "to": "shared:role:qa",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit role label"
+    },
+    {
+      "from": "demo-linear:task:3",
+      "to": "demo-linear:topic:checkout",
+      "relation": "topic",
+      "basis": "observed",
+      "evidence": "Explicit topic label"
+    },
+    {
+      "from": "demo-jira:outcome:10",
+      "to": "demo-jira:task:1",
+      "relation": "contains",
+      "basis": "observed",
+      "evidence": "Provider parent reference"
+    },
+    {
+      "from": "demo-jira:task:1",
+      "to": "shared:role:infra",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit role label"
+    },
+    {
+      "from": "demo-jira:task:1",
+      "to": "demo-jira:topic:reliability",
+      "relation": "topic",
+      "basis": "observed",
+      "evidence": "Explicit topic label"
+    },
+    {
+      "from": "demo-jira:task:1",
+      "to": "demo-jira:task:2",
+      "relation": "blocks",
+      "basis": "observed",
+      "evidence": "Configured provider blocking-link type"
+    },
+    {
+      "from": "demo-jira:outcome:10",
+      "to": "demo-jira:task:2",
+      "relation": "contains",
+      "basis": "observed",
+      "evidence": "Provider parent reference"
+    },
+    {
+      "from": "demo-jira:task:2",
+      "to": "shared:role:qa",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit role label"
+    },
+    {
+      "from": "demo-jira:task:2",
+      "to": "demo-jira:topic:reliability",
+      "relation": "topic",
+      "basis": "observed",
+      "evidence": "Explicit topic label"
+    },
+    {
+      "from": "shared:agent:Builder",
+      "to": "demo-linear:run:run-0",
+      "relation": "runs",
+      "basis": "observed",
+      "evidence": "Runtime agent identity"
+    },
+    {
+      "from": "demo-linear:task:1",
+      "to": "demo-linear:run:run-0",
+      "relation": "works-on",
+      "basis": "observed",
+      "evidence": "Explicit runtime task binding"
+    },
+    {
+      "from": "demo-linear:run:run-0",
+      "to": "shared:role:frontend",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit run role"
+    },
+    {
+      "from": "shared:agent:Engineer",
+      "to": "demo-linear:run:run-1",
+      "relation": "runs",
+      "basis": "observed",
+      "evidence": "Runtime agent identity"
+    },
+    {
+      "from": "demo-linear:task:2",
+      "to": "demo-linear:run:run-1",
+      "relation": "works-on",
+      "basis": "observed",
+      "evidence": "Explicit runtime task binding"
+    },
+    {
+      "from": "demo-linear:run:run-1",
+      "to": "shared:role:backend",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit run role"
+    },
+    {
+      "from": "shared:agent:Verifier",
+      "to": "demo-linear:run:run-2",
+      "relation": "runs",
+      "basis": "observed",
+      "evidence": "Runtime agent identity"
+    },
+    {
+      "from": "demo-linear:task:3",
+      "to": "demo-linear:run:run-2",
+      "relation": "works-on",
+      "basis": "observed",
+      "evidence": "Explicit runtime task binding"
+    },
+    {
+      "from": "demo-linear:run:run-2",
+      "to": "shared:role:qa",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit run role"
+    },
+    {
+      "from": "shared:agent:Operator",
+      "to": "demo-jira:run:run-3",
+      "relation": "runs",
+      "basis": "observed",
+      "evidence": "Runtime agent identity"
+    },
+    {
+      "from": "demo-jira:task:1",
+      "to": "demo-jira:run:run-3",
+      "relation": "works-on",
+      "basis": "observed",
+      "evidence": "Explicit runtime task binding"
+    },
+    {
+      "from": "demo-jira:run:run-3",
+      "to": "shared:role:infra",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit run role"
+    },
+    {
+      "from": "shared:agent:Verifier",
+      "to": "demo-jira:run:run-4",
+      "relation": "runs",
+      "basis": "observed",
+      "evidence": "Runtime agent identity"
+    },
+    {
+      "from": "demo-jira:task:2",
+      "to": "demo-jira:run:run-4",
+      "relation": "works-on",
+      "basis": "observed",
+      "evidence": "Explicit runtime task binding"
+    },
+    {
+      "from": "demo-jira:run:run-4",
+      "to": "shared:role:qa",
+      "relation": "role",
+      "basis": "observed",
+      "evidence": "Explicit run role"
+    },
+    {
+      "from": "shared:agent:Architect",
+      "to": "demo-linear:run:unlinked",
+      "relation": "runs",
+      "basis": "observed",
+      "evidence": "Runtime agent identity"
+    },
+    {
+      "from": "demo-linear:task:2",
+      "to": "demo-linear:run:unlinked",
+      "relation": "works-on",
+      "basis": "inferred",
+      "evidence": "Tracker reference DEMO-2 occurs in run brief; mention does not prove assignment"
+    }
+  ],
+  "warnings": []
+}

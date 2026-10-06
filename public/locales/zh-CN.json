@@ -1,5 +1,7 @@
 {
-  "cron": { "sourceUnavailable": "定时任务数据正在加载、不完整或已过期；计数尚未确认。" },
+  "cron": {
+    "sourceUnavailable": "定时任务数据正在加载、不完整或已过期；计数尚未确认。"
+  },
   "app": {
     "title": "OpenClaw 指挥中心",
     "connecting": "连接中...",
@@ -31,7 +33,8 @@
     "autoRefresh": "自动刷新：30秒",
     "live": "实时：{time}",
     "updated": "更新：{time}",
-    "projects": "项目"
+    "projects": "项目",
+    "operations": "作战视图"
   },
   "stats": {
     "totalTokens": "总 Token",
@@ -550,11 +553,9 @@
     "scenarioUnavailable": "请设置支出基准，并等待用量数据以计算节省情景。",
     "scenarioSummary": "{days} 天日历平均值 × 30：{projected}。基准：{baseline}。估算差额：{difference}/月。包含尚未结束的当天；不是账单预测。",
     "scenarioPartial": "定价不完整：仅投影已记录的小计，不包含缺少价格的费用。",
-
     "partialSubtotal": "部分小计",
     "recordedSubtotal": "已记录的 API 等价费用小计",
     "missingEntries": "缺少定价的记录数",
-
     "title": "💰 费用明细",
     "tokenUsage": "📊 令牌用量",
     "pricingBasis": "💵 计价依据",
@@ -656,5 +657,60 @@
     "search": "搜索项目",
     "agent": "关联代理",
     "menu": "菜单"
+  },
+  "operations": {
+    "title": "作战视图",
+    "kicker": "成果 · 人员 · 证据",
+    "refresh": "刷新快照",
+    "intro": "同一工作图谱，多种视角。查看成果、职责及其背后的运行。",
+    "lens": "分组方式",
+    "outcome": "成果 / Epic",
+    "role": "职责",
+    "agent": "智能体",
+    "topic": "主题",
+    "search": "查找工作",
+    "inferredToggle": "预览推断关联",
+    "inferenceNotice": "预览包含未经确认的关联。计数可能变化；这不会接受或保存建议。",
+    "clusters": "工作集群",
+    "inspect": "证据检查器",
+    "connections": "所选集群：任务 → 运行",
+    "legend": "实线 = 已观测关联 · 虚线 = 推断关联 · 灰色 = 未知。选择节点查看证据。最多显示 40 个节点。",
+    "heatmap": "智能体 × 职责热力图",
+    "heatmapHelp": "不同的关联运行数量，不代表利用率或生产力。同一运行可有多种职责，不要累加列。最多 30 个智能体 × 20 种职责。",
+    "limit": "手动刷新快照。跟踪器的“完成”是报告状态，并非验收证明。加权进度、工期偏差、预计完成时间和实时令牌速率暂无数据。主题来自显式标签，尚非语义向量聚类。",
+    "native": "跟踪器状态：{state}",
+    "observed": "观测时间：{time}",
+    "inferred": "建议",
+    "observedLink": "已观测",
+    "ids": "查看标识符",
+    "noHeat": "暂无智能体职责关联。",
+    "loading": "正在加载快照…",
+    "failed": "无法加载图谱或隐私设置。已隐藏所有内容。",
+    "status": "数据状态：{state} · 采集于 {time}",
+    "summary": "{sources} 个数据源 · 当前视图有 {runs} 个未关联运行 · {suggestions} 个关联建议",
+    "empty": "此视图没有匹配集群。",
+    "taskCount": "{done} / {total} 个导入任务标记为完成",
+    "runCount": "{runs} 个关联运行 · {blocked} 个阻塞关联 · {review} 个审核中任务",
+    "suggestionCount": "{n} 个候选关联",
+    "select": "选择集群或节点以查看证据。",
+    "state_planned": "已规划",
+    "state_doing": "进行中",
+    "state_review": "审核中",
+    "state_done": "已完成",
+    "state_canceled": "已取消",
+    "state_unknown": "未知",
+    "state_active": "活跃",
+    "state_waiting": "等待中",
+    "state_finished": "已结束",
+    "source_ready": "就绪",
+    "source_partial": "部分覆盖",
+    "source_stale": "已过期",
+    "source_unavailable": "不可用",
+    "relation_contains": "包含",
+    "relation_works-on": "关联运行",
+    "relation_runs": "运行",
+    "relation_role": "职责",
+    "relation_topic": "主题",
+    "relation_blocks": "阻塞"
   }
 }
