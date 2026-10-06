@@ -453,3 +453,12 @@ No tasks are moved and no external tracker records are changed.
 ### Operations map (read-only snapshot)
 
 Explore outcomes, roles, agents, and topics with evidence-labeled relationships in `operations.html`. See [the work graph contract](docs/work-graph.md) for collectors, limitations, and privacy behavior.
+
+### Browse sessions without tracker setup
+
+Operations opens on **All sessions** from the native catalog. Group by channel,
+agent or activity; layer in outcome/role/topic relationships when available.
+Clickable stacks, composable breadcrumbs, density zoom and an inspector replace
+search-first navigation. Privacy, snapshot coverage and unknown accounting stay
+explicit. See the [source-build pilot guide](docs/operations-source-pilot.md) to
+test a pinned revision under another profile without publishing a package.

@@ -331,7 +331,7 @@ function createSessionsModule(deps) {
 
   // Helper to map a single session (extracted from getSessions)
   function mapSession(s) {
-    const minutesAgo = s.ageMs ? s.ageMs / 60000 : Infinity;
+    const minutesAgo = typeof s.ageMs === "number" && s.ageMs >= 0 ? s.ageMs / 60000 : Infinity;
 
     // Determine channel type from key (messaging platform)
     let channel = "other";
@@ -373,6 +373,9 @@ function createSessionsModule(deps) {
       recentlyActive: minutesAgo < 60,
       minutesAgo: Math.round(minutesAgo),
       tokens: s.totalTokens || 0,
+      lifetimeTokens: typeof s.totalTokens === "number" ? s.totalTokens : null,
+      inputTokens: typeof s.inputTokens === "number" ? s.inputTokens : null,
+      outputTokens: typeof s.outputTokens === "number" ? s.outputTokens : null,
       model: s.model,
       originator: originator,
       topic: topic,
@@ -790,6 +793,15 @@ function createSessionsModule(deps) {
     mapSession,
     refreshSessionsCache,
     getSessionsCached,
+    getCatalogStatus: () => ({
+      observedAt: sessionsCache.timestamp ? new Date(sessionsCache.timestamp).toISOString() : null,
+      status: !sessionsCache.timestamp
+        ? "loading"
+        : Date.now() - sessionsCache.timestamp > SESSIONS_CACHE_TTL
+          ? "stale"
+          : "ready",
+      refreshing: sessionsCache.refreshing,
+    }),
     getSessions,
     readTranscript,
     getSessionDetail,

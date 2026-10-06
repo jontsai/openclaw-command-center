@@ -537,6 +537,7 @@ const server = http.createServer(async (req, res) => {
       JSON.stringify(
         {
           sessions: displaySessions,
+          catalog: sessions.getCatalogStatus(),
           pagination: {
             page,
             pageSize,
