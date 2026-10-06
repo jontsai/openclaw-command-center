@@ -35,7 +35,6 @@ Unknown channels have an explicit generic label; stale cached names retain their
 status in the tooltip. No workspace-specific channel map or provider credentials
 are embedded in the dashboard. Directory reads are bounded and asynchronous.
 
-
 Cron Jobs lists OpenClaw automations through its read-only CLI API, cached for
 30 seconds. Loading, partial and stale catalogs are labeled; missing legacy JSON
 files no longer imply zero automations. AI Jobs is a separate optional provider:
