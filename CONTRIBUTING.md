@@ -218,7 +218,7 @@ clawhub whoami   # verify
      --changelog "Description of changes"
    ```
 
-   Or use the release script which handles tagging and publishing:
+   The release script only checks metadata; it does not tag or publish:
 
    ```bash
    ./scripts/release.sh <new-version>
@@ -294,3 +294,8 @@ Contributors will be recognized in:
 ---
 
 _"The Swarm welcomes all who serve the greater purpose."_
+
+## Reviewed release artifacts
+
+Follow [release preparation](docs/releases/README.md) before publication. Stage
+tracked files from a clean reviewed commit instead of publishing a working tree.

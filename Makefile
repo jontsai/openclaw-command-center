@@ -108,10 +108,10 @@ clean: ## Stop dashboard and clean logs
 	@rm -f $(LOG_FILE)
 	@echo "✅ Cleaned."
 
-release: ## Create a release (usage: make release V=0.4.0)
+release: ## Check release metadata only (usage: make release V=1.5.0)
 ifndef V
 	@echo "Usage: make release V=<version>"
-	@echo "  e.g., make release V=0.4.0"
+	@echo "  e.g., make release V=1.5.0"
 	@./scripts/release.sh --current
 else
 	@./scripts/release.sh $(V)
